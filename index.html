@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="vi">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<html lang="vi"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>seoyi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Fredoka:wght@500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=Fredoka:wght@500;600;700&amp;family=Quicksand:wght@500;600;700&amp;display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root{
@@ -480,8 +479,20 @@
   <div class="app-layout">
     <aside class="sidebar">
       <div class="sidebar-header"><h2>Databases</h2></div>
-      <div id="db-list" class="db-list"></div>
-      <div id="db-empty" class="empty-state" hidden>
+      <div id="db-list" class="db-list"><button class="db-card">
+        <div class="db-icon"><svg viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.379a1.5 1.5 0 0 1 1.06.44L11.5 7H19.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5v-11Z" style="fill:var(--primary)"></path></svg></div>
+        <div style="flex:1;min-width:0;">
+          <div class="db-name">ALNST - Clique</div>
+          <div class="db-meta">29 records</div>
+        </div>
+        <div class="arrow">→</div></button><button class="db-card active">
+        <div class="db-icon"><svg viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.379a1.5 1.5 0 0 1 1.06.44L11.5 7H19.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5v-11Z" style="fill:var(--primary)"></path></svg></div>
+        <div style="flex:1;min-width:0;">
+          <div class="db-name">ALNST - AET + Find your plus One</div>
+          <div class="db-meta">3 records</div>
+        </div>
+        <div class="arrow">→</div></button></div>
+      <div id="db-empty" class="empty-state" hidden="">
         <p>No databases yet.</p>
         <p>Please contact the admin to add data.</p>
       </div>
@@ -492,7 +503,7 @@
 
     <main class="main-content">
     <!-- VIEW: nothing selected yet -->
-    <section id="view-empty" class="view active">
+    <section id="view-empty" class="view">
       <div class="empty-hint">
         <div class="empty-hint-icon">👈</div>
         <p>Select a database from the left to view its records.</p>
@@ -502,29 +513,81 @@
     <!-- VIEW: database records visible to visitors -->
     <section id="view-search" class="view">
       <div class="view-header">
-        <h1 id="search-db-name">—</h1>
-        <p class="subtitle" id="search-db-sub"></p>
+        <h1 id="search-db-name">ALNST - AET + Find your plus One</h1>
+        <p class="subtitle" id="search-db-sub">3 records · search, then tap a name or VIEW INFO to see details</p>
       </div>
       <div class="search-box">
-        <input type="text" id="search-input" placeholder="Search name or status" autocomplete="off" />
+        <input type="text" id="search-input" placeholder="Search name or status" autocomplete="off">
         <button class="btn-primary" id="search-btn" type="button">Search</button>
       </div>
-      <div id="search-results"></div>
+      <div id="search-results"><div class="visitor-list"><div class="visitor-card">
+        <div class="visitor-card-head">
+          <div class="visitor-main">
+            <div class="visitor-name" tabindex="0">RemgReng Thèm MilkTea VàBánhmìmuốiớt</div>
+            <div class="visitor-status">Status: <span class="status-pill">Cọc</span></div>
+          </div>
+          <button class="view-info-btn" type="button">👁 View Info</button>
+        </div>
+        <div class="public-details" data-rendered="1">
+      <div class="field-row ">
+        <div class="field-label">Facebook</div>
+        <div class="field-value">RemgReng Thèm MilkTea VàBánhmìmuốiớt</div>
+      </div>
+      <div class="field-row ">
+        <div class="field-label">Slot AET</div>
+        <div class="field-value">Minidoll Till Mizi
+Keyring sao Till Mizi</div>
+      </div>
+      <div class="field-row ">
+        <div class="field-label">Giá </div>
+        <div class="field-value">565</div>
+      </div>
+      <div class="field-row ">
+        <div class="field-label">Cọc </div>
+        <div class="field-value">300</div>
+      </div>
+      <div class="field-row ">
+        <div class="field-label">Slot ANM</div>
+        <div class="field-value">Thiệp Till Mizi</div>
+      </div>
+      <div class="field-row ">
+        <div class="field-label">Giá</div>
+        <div class="field-value">65</div>
+      </div></div>
+        </div><div class="visitor-card">
+        <div class="visitor-card-head">
+          <div class="visitor-main">
+            <div class="visitor-name" tabindex="0">Autumn Loralai</div>
+            <div class="visitor-status">Status: <span class="status-pill">✔</span></div>
+          </div>
+          <button class="view-info-btn" type="button">👁 View Info</button>
+        </div>
+        <div class="public-details"></div>
+        </div><div class="visitor-card">
+        <div class="visitor-card-head">
+          <div class="visitor-main">
+            <div class="visitor-name" tabindex="0">Kulu Píc Cà Pu</div>
+            <div class="visitor-status">Status: <span class="status-pill">✔</span></div>
+          </div>
+          <button class="view-info-btn" type="button">👁 View Info</button>
+        </div>
+        <div class="public-details"></div>
+        </div></div></div>
     </section>
 
     <!-- VIEW: admin -->
-    <section id="view-admin" class="view">
+    <section id="view-admin" class="view active">
       <button class="back-btn" id="back-from-admin">← Back</button>
 
-      <div id="admin-login">
+      <div id="admin-login" hidden="">
         <div class="view-header"><h1>Admin Login</h1></div>
         <label>Password</label>
-        <input type="password" id="admin-pass" placeholder="Enter password" />
+        <input type="password" id="admin-pass" placeholder="Enter password">
         <button class="btn-primary" id="admin-login-btn" style="margin-top:14px;">Log In</button>
-        <p class="error-text" id="admin-login-error" hidden>Incorrect password, please try again.</p>
+        <p class="error-text" id="admin-login-error" hidden="">Incorrect password, please try again.</p>
       </div>
 
-      <div id="admin-panel" hidden>
+      <div id="admin-panel">
         <div class="view-header"><h1>Data Administration</h1></div>
 
         <details>
@@ -534,47 +597,79 @@
 
         <div class="admin-section">
           <h2>Existing Databases</h2>
-          <div id="admin-db-list"></div>
+          <div id="admin-db-list"><div class="admin-db-item">
+        <div class="info">
+          <strong>ALNST - Clique</strong>
+          <div>29 records · name: Tên FB · status: TT<br>public: Tên FB, Giá, Char Gift, Món · locked 🔒: MVĐ</div>
+        </div>
+        <div class="row-actions">
+          <button class="btn-link-edit" data-action="manage" data-idx="0">Manage Records</button>
+          <button class="btn-danger" data-action="delete" data-idx="0">Delete</button>
+        </div></div><div class="admin-db-item">
+        <div class="info">
+          <strong>ALNST - AET + Find your plus One</strong>
+          <div>3 records · name: Facebook · status: Ck <br>public: Facebook, Slot AET, Giá , Cọc , Slot ANM, Giá · locked 🔒: —</div>
+        </div>
+        <div class="row-actions">
+          <button class="btn-link-edit" data-action="manage" data-idx="1">Manage Records</button>
+          <button class="btn-danger" data-action="delete" data-idx="1">Delete</button>
+        </div></div></div>
         </div>
 
-        <hr/>
+        <hr>
 
         <div class="admin-section">
           <h2>Add New Database</h2>
           <label>Database name</label>
-          <input type="text" id="new-db-name" placeholder="e.g. June customer list" />
+          <input type="text" id="new-db-name" placeholder="e.g. June customer list">
           <label>Choose file (.xlsx, .xls, .csv)</label>
-          <input type="file" id="file-input" accept=".xlsx,.xls,.csv" />
+          <input type="file" id="file-input" accept=".xlsx,.xls,.csv">
           <label>Database icon (optional)</label>
-          <input type="file" id="import-icon-input" accept="image/*" />
+          <input type="file" id="import-icon-input" accept="image/*">
           <p class="hint-text">If you don't choose an image, the default blue folder icon will be used.</p>
 
-          <div id="preview-area" hidden>
+          <div id="preview-area" hidden="">
             <label>Name column shown to visitors</label>
-            <select id="key-column-select"></select>
+            <select id="key-column-select"><option value="✔">✔</option><option value="Facebook">Facebook</option><option value="Slot AET">Slot AET</option><option value="Giá ">Giá </option><option value="Ck ">Ck </option><option value="Cọc ">Cọc </option><option value="Còn ">Còn </option><option value="Slot ANM">Slot ANM</option><option value="Giá">Giá</option><option value="Ck">Ck</option><option value="Cọc">Cọc</option><option value="Còn">Còn</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option><option value="S4">S4</option></select>
             <label>Status column shown in visitor list</label>
-            <select id="status-column-select"></select>
+            <select id="status-column-select"><option value="">None / use default</option><option value="✔">✔</option><option value="Facebook">Facebook</option><option value="Slot AET">Slot AET</option><option value="Giá ">Giá </option><option value="Ck ">Ck </option><option value="Cọc ">Cọc </option><option value="Còn ">Còn </option><option value="Slot ANM">Slot ANM</option><option value="Giá">Giá</option><option value="Ck">Ck</option><option value="Cọc">Cọc</option><option value="Còn">Còn</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option><option value="S4">S4</option></select>
             <label>Password column (optional; default password is 1234 if empty/missing)</label>
-            <select id="password-column-select"></select>
+            <select id="password-column-select"><option value="">None / use default</option><option value="✔">✔</option><option value="Facebook">Facebook</option><option value="Slot AET">Slot AET</option><option value="Giá ">Giá </option><option value="Ck ">Ck </option><option value="Cọc ">Cọc </option><option value="Còn ">Còn </option><option value="Slot ANM">Slot ANM</option><option value="Giá">Giá</option><option value="Ck">Ck</option><option value="Cọc">Cọc</option><option value="Còn">Còn</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option><option value="S4">S4</option></select>
             <label>Field visibility</label>
             <p class="vis-hint">Check each field into exactly one group below: <strong>Public</strong> = visible right after clicking a name, no password needed. <strong>Locked 🔒</strong> = only shown after the visitor enters the record's password. <strong>Hidden</strong> = never shown to visitors.</p>
-            <div id="visible-columns-checks" class="column-checks"></div>
-            <div class="table-wrap" id="preview-table-wrap"></div>
+            <div id="visible-columns-checks" class="column-checks">
+      <div class="vis-groups">
+        <div class="vis-group vis-group-public">
+          <div class="vis-group-title">🌐 Public <span>— visible right away, no password</span></div>
+          <div class="vis-checklist" data-group-list="public"><label class="check-option"><input type="checkbox"><span>✔</span></label><label class="check-option"><input type="checkbox"><span>Facebook</span></label><label class="check-option"><input type="checkbox"><span>Slot AET</span></label><label class="check-option"><input type="checkbox"><span>Giá </span></label><label class="check-option"><input type="checkbox"><span>Ck </span></label><label class="check-option"><input type="checkbox"><span>Cọc </span></label><label class="check-option"><input type="checkbox"><span>Còn </span></label><label class="check-option"><input type="checkbox"><span>Slot ANM</span></label><label class="check-option"><input type="checkbox"><span>Giá</span></label><label class="check-option"><input type="checkbox"><span>Ck</span></label><label class="check-option"><input type="checkbox"><span>Cọc</span></label><label class="check-option"><input type="checkbox"><span>Còn</span></label><label class="check-option"><input type="checkbox"><span>S1</span></label><label class="check-option"><input type="checkbox"><span>S2</span></label><label class="check-option"><input type="checkbox"><span>S3</span></label><label class="check-option"><input type="checkbox"><span>S4</span></label></div>
+        </div>
+        <div class="vis-group vis-group-locked">
+          <div class="vis-group-title">🔒 Locked <span>— shown after the record's password</span></div>
+          <div class="vis-checklist" data-group-list="locked"><label class="check-option"><input type="checkbox"><span>✔</span></label><label class="check-option"><input type="checkbox"><span>Facebook</span></label><label class="check-option"><input type="checkbox"><span>Slot AET</span></label><label class="check-option"><input type="checkbox"><span>Giá </span></label><label class="check-option"><input type="checkbox"><span>Ck </span></label><label class="check-option"><input type="checkbox"><span>Cọc </span></label><label class="check-option"><input type="checkbox"><span>Còn </span></label><label class="check-option"><input type="checkbox"><span>Slot ANM</span></label><label class="check-option"><input type="checkbox"><span>Giá</span></label><label class="check-option"><input type="checkbox"><span>Ck</span></label><label class="check-option"><input type="checkbox"><span>Cọc</span></label><label class="check-option"><input type="checkbox"><span>Còn</span></label><label class="check-option"><input type="checkbox"><span>S1</span></label><label class="check-option"><input type="checkbox"><span>S2</span></label><label class="check-option"><input type="checkbox"><span>S3</span></label><label class="check-option"><input type="checkbox"><span>S4</span></label></div>
+        </div>
+        <div class="vis-group vis-group-hidden">
+          <div class="vis-group-title">🙈 Hidden <span>— never shown to visitors</span></div>
+          <div class="vis-checklist" data-group-list="hidden"><label class="check-option"><input type="checkbox"><span>✔</span></label><label class="check-option"><input type="checkbox"><span>Facebook</span></label><label class="check-option"><input type="checkbox"><span>Slot AET</span></label><label class="check-option"><input type="checkbox"><span>Giá </span></label><label class="check-option"><input type="checkbox"><span>Ck </span></label><label class="check-option"><input type="checkbox"><span>Cọc </span></label><label class="check-option"><input type="checkbox"><span>Còn </span></label><label class="check-option"><input type="checkbox"><span>Slot ANM</span></label><label class="check-option"><input type="checkbox"><span>Giá</span></label><label class="check-option"><input type="checkbox"><span>Ck</span></label><label class="check-option"><input type="checkbox"><span>Cọc</span></label><label class="check-option"><input type="checkbox"><span>Còn</span></label><label class="check-option"><input type="checkbox"><span>S1</span></label><label class="check-option"><input type="checkbox"><span>S2</span></label><label class="check-option"><input type="checkbox"><span>S3</span></label><label class="check-option"><input type="checkbox"><span>S4</span></label></div>
+        </div>
+      </div></div>
+            <div class="table-wrap" id="preview-table-wrap"><table><thead><tr><th>✔</th><th>Facebook</th><th>Slot AET</th><th>Giá </th><th>Ck </th><th>Cọc </th><th>Còn </th><th>Slot ANM</th><th>Giá</th><th>Ck</th><th>Cọc</th><th>Còn</th><th>S1</th><th>S2</th><th>S3</th><th>S4</th></tr></thead><tbody><tr><td>false</td><td>RemgReng Thèm MilkTea VàBánhmìmuốiớt</td><td>Minidoll Till Mizi
+Keyring sao Till Mizi</td><td>565</td><td>Cọc</td><td>300</td><td>265</td><td>Thiệp Till Mizi</td><td>65</td><td>✖</td><td></td><td>65</td><td></td><td></td><td></td><td></td></tr><tr><td>true</td><td>Autumn Loralai</td><td>Minidoll Luka Hyuna
+Keyring sao Luka Hyuna</td><td>455</td><td>✔</td><td>455</td><td>0</td><td>Thiệp Luka Hyuna</td><td>40</td><td>✔</td><td>40</td><td>0</td><td></td><td></td><td></td><td></td></tr><tr><td>true</td><td>Alex Mint</td><td>Minidoll Ivan Sua</td><td>360</td><td>✔</td><td>360</td><td>0</td><td>Thiệp Ivan Sua</td><td>99</td><td>✔</td><td>99</td><td>0</td><td></td><td></td><td></td><td></td></tr><tr><td>false</td><td>Kulu Píc Cà Pu</td><td>Keyring sao Ivan Sua</td><td>280</td><td>✔</td><td>280</td><td>0</td><td>none</td><td>0</td><td></td><td></td><td>0</td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td>Tổng đơn:</td><td>1660</td><td>3</td><td>1395</td><td>265</td><td></td><td>204</td><td>2</td><td>139</td><td>65</td><td></td><td></td><td></td><td></td></tr></tbody></table></div>
             <button class="btn-primary" id="save-db-btn" style="margin-top:14px; width:100%;">Save Database</button>
           </div>
         </div>
 
-        <hr/>
+        <hr>
 
         <div class="admin-section">
           <h2>Create a Database Manually (no file needed)</h2>
           <p class="hint-text">Use this if you'd rather type data directly on the page, no Excel/CSV file needed.</p>
           <label>Database name</label>
-          <input type="text" id="manual-db-name" placeholder="e.g. Event registration list" />
+          <input type="text" id="manual-db-name" placeholder="e.g. Event registration list">
           <label>Data columns</label>
           <div id="manual-columns-list" class="chip-list"></div>
           <button class="btn-secondary" id="manual-add-column-btn" type="button">+ Add column</button>
-          <div id="manual-key-column-wrap" hidden>
+          <div id="manual-key-column-wrap" hidden="">
             <label>Name column shown to visitors</label>
             <select id="manual-key-column-select"></select>
             <label>Status column shown in visitor list</label>
@@ -586,12 +681,12 @@
             <div id="manual-visible-columns-checks" class="column-checks"></div>
           </div>
           <label>Database icon (optional)</label>
-          <input type="file" id="manual-icon-input" accept="image/*" />
+          <input type="file" id="manual-icon-input" accept="image/*">
           <p class="hint-text">If you don't choose an image, the default blue folder icon will be used.</p>
           <button class="btn-primary" id="manual-create-db-btn" style="margin-top:14px;width:100%;">Create Database</button>
         </div>
 
-        <hr/>
+        <hr>
 
         <div class="admin-section">
           <h2>Publish Website</h2>
@@ -603,7 +698,7 @@
           <h2>Backup / Restore</h2>
           <button class="btn-secondary" id="export-json-btn">⬇ Export data (JSON)</button>
           <label class="file-label" for="import-json-input">⬆ Restore from JSON file</label>
-          <input type="file" id="import-json-input" accept=".json" hidden />
+          <input type="file" id="import-json-input" accept=".json" hidden="">
         </div>
       </div>
     </section>
@@ -612,8 +707,8 @@
     <section id="view-manage-rows" class="view">
       <button class="back-btn" id="back-from-manage-rows">← Back</button>
       <div class="view-header">
-        <h1 id="manage-db-name">—</h1>
-        <p class="subtitle" id="manage-db-sub"></p>
+        <h1 id="manage-db-name">ALNST - AET + Find your plus One</h1>
+        <p class="subtitle" id="manage-db-sub">3 records · 16 columns</p>
       </div>
 
       <button class="btn-secondary" id="manage-add-column-btn" type="button">+ Add new column</button>
@@ -621,9 +716,9 @@
       <div class="admin-section" style="margin-top:18px;">
         <h2>Database icon</h2>
         <div style="display:flex; align-items:center; gap:14px;">
-          <div class="db-icon" id="manage-icon-preview" style="width:56px;height:56px;"></div>
+          <div class="db-icon" id="manage-icon-preview" style="width:56px;height:56px;"><svg viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.379a1.5 1.5 0 0 1 1.06.44L11.5 7H19.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5v-11Z" style="fill:var(--primary)"></path></svg></div>
           <div style="flex:1;">
-            <input type="file" id="manage-icon-input" accept="image/*" />
+            <input type="file" id="manage-icon-input" accept="image/*">
             <button class="btn-secondary" id="manage-icon-reset-btn" type="button" style="margin-top:8px;">Use default icon</button>
           </div>
         </div>
@@ -632,35 +727,331 @@
       <div class="admin-section" style="margin-top:18px;">
         <h2>Visitor Display Settings</h2>
         <label>Name column shown to visitors</label>
-        <select id="manage-key-column-select"></select>
+        <select id="manage-key-column-select"><option value="✔">✔</option><option value="Facebook">Facebook</option><option value="Slot AET">Slot AET</option><option value="Giá ">Giá </option><option value="Ck ">Ck </option><option value="Cọc ">Cọc </option><option value="Còn ">Còn </option><option value="Slot ANM">Slot ANM</option><option value="Giá">Giá</option><option value="Ck">Ck</option><option value="Cọc">Cọc</option><option value="Còn">Còn</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option><option value="S4">S4</option></select>
         <label>Status column shown in visitor list</label>
-        <select id="manage-status-column-select"></select>
+        <select id="manage-status-column-select"><option value="">None / use default</option><option value="✔">✔</option><option value="Facebook">Facebook</option><option value="Slot AET">Slot AET</option><option value="Giá ">Giá </option><option value="Ck ">Ck </option><option value="Cọc ">Cọc </option><option value="Còn ">Còn </option><option value="Slot ANM">Slot ANM</option><option value="Giá">Giá</option><option value="Ck">Ck</option><option value="Cọc">Cọc</option><option value="Còn">Còn</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option><option value="S4">S4</option></select>
         <label>Password column (optional; default password is 1234 if empty/missing)</label>
-        <select id="manage-password-column-select"></select>
+        <select id="manage-password-column-select"><option value="">None / use default</option><option value="✔">✔</option><option value="Facebook">Facebook</option><option value="Slot AET">Slot AET</option><option value="Giá ">Giá </option><option value="Ck ">Ck </option><option value="Cọc ">Cọc </option><option value="Còn ">Còn </option><option value="Slot ANM">Slot ANM</option><option value="Giá">Giá</option><option value="Ck">Ck</option><option value="Cọc">Cọc</option><option value="Còn">Còn</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option><option value="S4">S4</option></select>
         <label>Field visibility</label>
         <p class="vis-hint">Check each field into exactly one group below: <strong>Public</strong> = visible right after clicking a name, no password needed. <strong>Locked 🔒</strong> = only shown after the visitor enters the record's password. <strong>Hidden</strong> = never shown to visitors.</p>
-        <div id="manage-visible-columns-checks" class="column-checks"></div>
+        <div id="manage-visible-columns-checks" class="column-checks">
+      <div class="vis-groups">
+        <div class="vis-group vis-group-public">
+          <div class="vis-group-title">🌐 Public <span>— visible right away, no password</span></div>
+          <div class="vis-checklist" data-group-list="public"><label class="check-option"><input type="checkbox"><span>✔</span></label><label class="check-option"><input type="checkbox"><span>Facebook</span></label><label class="check-option"><input type="checkbox"><span>Slot AET</span></label><label class="check-option"><input type="checkbox"><span>Giá </span></label><label class="check-option"><input type="checkbox"><span>Ck </span></label><label class="check-option"><input type="checkbox"><span>Cọc </span></label><label class="check-option"><input type="checkbox"><span>Còn </span></label><label class="check-option"><input type="checkbox"><span>Slot ANM</span></label><label class="check-option"><input type="checkbox"><span>Giá</span></label><label class="check-option"><input type="checkbox"><span>Ck</span></label><label class="check-option"><input type="checkbox"><span>Cọc</span></label><label class="check-option"><input type="checkbox"><span>Còn</span></label><label class="check-option"><input type="checkbox"><span>S1</span></label><label class="check-option"><input type="checkbox"><span>S2</span></label><label class="check-option"><input type="checkbox"><span>S3</span></label><label class="check-option"><input type="checkbox"><span>S4</span></label></div>
+        </div>
+        <div class="vis-group vis-group-locked">
+          <div class="vis-group-title">🔒 Locked <span>— shown after the record's password</span></div>
+          <div class="vis-checklist" data-group-list="locked"><label class="check-option"><input type="checkbox"><span>✔</span></label><label class="check-option"><input type="checkbox"><span>Facebook</span></label><label class="check-option"><input type="checkbox"><span>Slot AET</span></label><label class="check-option"><input type="checkbox"><span>Giá </span></label><label class="check-option"><input type="checkbox"><span>Ck </span></label><label class="check-option"><input type="checkbox"><span>Cọc </span></label><label class="check-option"><input type="checkbox"><span>Còn </span></label><label class="check-option"><input type="checkbox"><span>Slot ANM</span></label><label class="check-option"><input type="checkbox"><span>Giá</span></label><label class="check-option"><input type="checkbox"><span>Ck</span></label><label class="check-option"><input type="checkbox"><span>Cọc</span></label><label class="check-option"><input type="checkbox"><span>Còn</span></label><label class="check-option"><input type="checkbox"><span>S1</span></label><label class="check-option"><input type="checkbox"><span>S2</span></label><label class="check-option"><input type="checkbox"><span>S3</span></label><label class="check-option"><input type="checkbox"><span>S4</span></label></div>
+        </div>
+        <div class="vis-group vis-group-hidden">
+          <div class="vis-group-title">🙈 Hidden <span>— never shown to visitors</span></div>
+          <div class="vis-checklist" data-group-list="hidden"><label class="check-option"><input type="checkbox"><span>✔</span></label><label class="check-option"><input type="checkbox"><span>Facebook</span></label><label class="check-option"><input type="checkbox"><span>Slot AET</span></label><label class="check-option"><input type="checkbox"><span>Giá </span></label><label class="check-option"><input type="checkbox"><span>Ck </span></label><label class="check-option"><input type="checkbox"><span>Cọc </span></label><label class="check-option"><input type="checkbox"><span>Còn </span></label><label class="check-option"><input type="checkbox"><span>Slot ANM</span></label><label class="check-option"><input type="checkbox"><span>Giá</span></label><label class="check-option"><input type="checkbox"><span>Ck</span></label><label class="check-option"><input type="checkbox"><span>Cọc</span></label><label class="check-option"><input type="checkbox"><span>Còn</span></label><label class="check-option"><input type="checkbox"><span>S1</span></label><label class="check-option"><input type="checkbox"><span>S2</span></label><label class="check-option"><input type="checkbox"><span>S3</span></label><label class="check-option"><input type="checkbox"><span>S4</span></label></div>
+        </div>
+      </div></div>
         <button class="btn-secondary" id="manage-settings-save-btn" type="button">Save Visitor Settings</button>
       </div>
 
       <div class="admin-section" style="margin-top:18px;">
         <h2>Add New Record</h2>
-        <div id="add-row-fields"></div>
+        <div id="add-row-fields">
+      <div>
+        <label>✔</label>
+        <input type="text" class="add-row-input" data-col-idx="0">
+      </div>
+      <div>
+        <label>Facebook</label>
+        <input type="text" class="add-row-input" data-col-idx="1">
+      </div>
+      <div>
+        <label>Slot AET</label>
+        <input type="text" class="add-row-input" data-col-idx="2">
+      </div>
+      <div>
+        <label>Giá </label>
+        <input type="text" class="add-row-input" data-col-idx="3">
+      </div>
+      <div>
+        <label>Ck </label>
+        <input type="text" class="add-row-input" data-col-idx="4">
+      </div>
+      <div>
+        <label>Cọc </label>
+        <input type="text" class="add-row-input" data-col-idx="5">
+      </div>
+      <div>
+        <label>Còn </label>
+        <input type="text" class="add-row-input" data-col-idx="6">
+      </div>
+      <div>
+        <label>Slot ANM</label>
+        <input type="text" class="add-row-input" data-col-idx="7">
+      </div>
+      <div>
+        <label>Giá</label>
+        <input type="text" class="add-row-input" data-col-idx="8">
+      </div>
+      <div>
+        <label>Ck</label>
+        <input type="text" class="add-row-input" data-col-idx="9">
+      </div>
+      <div>
+        <label>Cọc</label>
+        <input type="text" class="add-row-input" data-col-idx="10">
+      </div>
+      <div>
+        <label>Còn</label>
+        <input type="text" class="add-row-input" data-col-idx="11">
+      </div>
+      <div>
+        <label>S1</label>
+        <input type="text" class="add-row-input" data-col-idx="12">
+      </div>
+      <div>
+        <label>S2</label>
+        <input type="text" class="add-row-input" data-col-idx="13">
+      </div>
+      <div>
+        <label>S3</label>
+        <input type="text" class="add-row-input" data-col-idx="14">
+      </div>
+      <div>
+        <label>S4</label>
+        <input type="text" class="add-row-input" data-col-idx="15">
+      </div></div>
         <button class="btn-primary" id="add-row-save-btn" style="margin-top:10px;width:100%;">Save Record</button>
       </div>
 
-      <hr/>
+      <hr>
 
       <div class="admin-section">
         <h2>Records</h2>
-        <div id="rows-list"></div>
+        <div id="rows-list"><div class="row-card">
+          <div class="row-card-top">
+            <span class="row-index">Record #1</span>
+            <div class="row-actions">
+              <button class="btn-link-edit edit-btn">Edit</button>
+              <button class="btn-danger delete-btn">Delete</button>
+            </div>
+          </div>
+          
+          <div class="field-row">
+            <div class="field-label">✔</div>
+            <div class="field-value">false</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Facebook</div>
+            <div class="field-value">RemgReng Thèm MilkTea VàBánhmìmuốiớt</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Slot AET</div>
+            <div class="field-value">Minidoll Till Mizi
+Keyring sao Till Mizi</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Giá </div>
+            <div class="field-value">565</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Ck </div>
+            <div class="field-value">Cọc</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Cọc </div>
+            <div class="field-value">300</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Còn </div>
+            <div class="field-value">265</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Slot ANM</div>
+            <div class="field-value">Thiệp Till Mizi</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Giá</div>
+            <div class="field-value">65</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Ck</div>
+            <div class="field-value">✖</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Cọc</div>
+            <div class="field-value">—</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Còn</div>
+            <div class="field-value">65</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">S1</div>
+            <div class="field-value">—</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">S2</div>
+            <div class="field-value">—</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">S3</div>
+            <div class="field-value">—</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">S4</div>
+            <div class="field-value">—</div>
+          </div></div><div class="row-card">
+          <div class="row-card-top">
+            <span class="row-index">Record #2</span>
+            <div class="row-actions">
+              <button class="btn-link-edit edit-btn">Edit</button>
+              <button class="btn-danger delete-btn">Delete</button>
+            </div>
+          </div>
+          
+          <div class="field-row">
+            <div class="field-label">✔</div>
+            <div class="field-value">true</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Facebook</div>
+            <div class="field-value">Autumn Loralai</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Slot AET</div>
+            <div class="field-value">Minidoll Luka Hyuna
+Keyring sao Luka Hyuna</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Giá </div>
+            <div class="field-value">455</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Ck </div>
+            <div class="field-value">✔</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Cọc </div>
+            <div class="field-value">455</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Còn </div>
+            <div class="field-value">0</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Slot ANM</div>
+            <div class="field-value">Thiệp Luka Hyuna</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Giá</div>
+            <div class="field-value">40</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Ck</div>
+            <div class="field-value">✔</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Cọc</div>
+            <div class="field-value">40</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Còn</div>
+            <div class="field-value">0</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">S1</div>
+            <div class="field-value">—</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">S2</div>
+            <div class="field-value">—</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">S3</div>
+            <div class="field-value">—</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">S4</div>
+            <div class="field-value">—</div>
+          </div></div><div class="row-card">
+          <div class="row-card-top">
+            <span class="row-index">Record #3</span>
+            <div class="row-actions">
+              <button class="btn-link-edit edit-btn">Edit</button>
+              <button class="btn-danger delete-btn">Delete</button>
+            </div>
+          </div>
+          
+          <div class="field-row">
+            <div class="field-label">✔</div>
+            <div class="field-value">false</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Facebook</div>
+            <div class="field-value">Kulu Píc Cà Pu</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Slot AET</div>
+            <div class="field-value">Keyring sao Ivan Sua</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Giá </div>
+            <div class="field-value">280</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Ck </div>
+            <div class="field-value">✔</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Cọc </div>
+            <div class="field-value">280</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Còn </div>
+            <div class="field-value">0</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Slot ANM</div>
+            <div class="field-value">none</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Giá</div>
+            <div class="field-value">0</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Ck</div>
+            <div class="field-value">—</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Cọc</div>
+            <div class="field-value">—</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Còn</div>
+            <div class="field-value">0</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">S1</div>
+            <div class="field-value">—</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">S2</div>
+            <div class="field-value">—</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">S3</div>
+            <div class="field-value">—</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">S4</div>
+            <div class="field-value">—</div>
+          </div></div></div>
       </div>
     </section>
     </main>
   </div>
 </div>
 
-<script id="embedded-data" type="application/json">[]</script>
+<script id="embedded-data" type="application/json">[{"name":"ALNST - Clique","keyColumn":"Tên FB","statusColumn":"TT","passwordColumn":"","publicColumns":["Tên FB","Giá","Char Gift","Món"],"lockedColumns":["MVĐ"],"columns":["STT","Tên FB","G","CG","TG","M","Giá","TT","Cọc","Còn","Gift","Char Gift","🎁","Món","MVĐ","Món_1","Chốt in","Dự kiến về","Dư (nếu có)"],"rows":[{"STT":1,"Tên FB":"Dương Yến Nhi","G":1,"CG":"Ivan","TG":35,"M":"Babge Till 1, Dây A","Giá":"35k","TT":"ckf","Cọc":35,"Còn":"0k","Gift":"1 card gift","Char Gift":"Ivan","🎁":"Ivan","Món":"Babge Till 1, Dây A","MVĐ":"","Món_1":"Sticker","Chốt in":46204,"Dự kiến về":46218,"Dư (nếu có)":"Dư 2 set"},{"STT":2,"Tên FB":"Alis Charline","G":1,"CG":"Till","TG":30,"M":"Sticker 1","Giá":"30k","TT":"ckf","Cọc":30,"Còn":"0k","Gift":"1 card gift","Char Gift":"Till","🎁":"","Món":"Sticker 1","MVĐ":"","Món_1":"Strap","Chốt in":46204,"Dự kiến về":46223,"Dư (nếu có)":"Đủ"},{"STT":3,"Tên FB":"Shining Starz","G":3,"CG":"Mizi, Sua, Till","TG":115,"M":"Babge Mizi 1, Key strap Till 1, Standee Mizi 1, Standee Till 1","Giá":"115k","TT":"chưa ck","Cọc":"","Còn":"115k","Gift":"3 card gift","Char Gift":"Mizi, Sua, Till","🎁":"Mizi","Món":"Babge Mizi 1, Key strap Till 1, Standee Mizi 1, Standee Till 1","MVĐ":"","Món_1":"Dây buộc","Chốt in":46204,"Dự kiến về":46223,"Dư (nếu có)":"Dư 1-2c/m"},{"STT":4,"Tên FB":"ThiênKim Giới Hào Môn","G":2,"CG":"Sua, Till","TG":65,"M":"Key strap Sua 1, Standee Sua 1","Giá":"65k","TT":"ckf","Cọc":65,"Còn":"0k","Gift":"2 card gift","Char Gift":"Sua, Till","🎁":"Sua","Món":"Key strap Sua 1, Standee Sua 1","MVĐ":"","Món_1":"Charm","Chốt in":46209,"Dự kiến về":"x","Dư (nếu có)":""},{"STT":5,"Tên FB":"Đỗ HuyềnAnh","G":1,"CG":"Till","TG":45,"M":"Babge Ivan 1, Babge Till 1, Dây B","Giá":"45k","TT":"ckf","Cọc":45,"Còn":"0k","Gift":"1 card gift","Char Gift":"Till","🎁":"","Món":"Babge Ivan 1, Babge Till 1, Dây B","MVĐ":"","Món_1":"Standee","Chốt in":46209,"Dự kiến về":"x","Dư (nếu có)":""},{"STT":6,"Tên FB":"Sam Guenz","G":1,"CG":"Mizi","TG":45,"M":"Babge Mizi 1, Key strap Mizi 1","Giá":"45k","TT":"chưa ck","Cọc":"","Còn":"45k","Gift":"1 card gift","Char Gift":"Mizi","🎁":"","Món":"Babge Mizi 1, Key strap Mizi 1","MVĐ":"","Món_1":"Badge","Chốt in":46209,"Dự kiến về":"x","Dư (nếu có)":""},{"STT":7,"Tên FB":"Pánh Moè","G":2,"CG":"Ivan, Luka","TG":75,"M":"Sticker 1, Key strap Ivan 1, thêm Key Luka 1","Giá":"75k","TT":"ckf","Cọc":75,"Còn":"0k","Gift":"2 card gift","Char Gift":"Ivan, Luka","🎁":"","Món":"Sticker 1, Key strap Ivan 1, thêm Key Luka 1","MVĐ":"","Món_1":"Card","Chốt in":46210,"Dự kiến về":"x","Dư (nếu có)":"Dư 1-3c/m"},{"STT":8,"Tên FB":"Khánh Chi","G":1,"CG":"Hyuna","TG":30,"M":"Key strap Hyuna 1","Giá":"30k","TT":"chưa ck","Cọc":"","Còn":"30k","Gift":"1 card gift","Char Gift":"Hyuna","🎁":"","Món":"Key strap Hyuna 1","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":9,"Tên FB":"Ăn Thịt Người Già","G":2,"CG":"Till, Ivan","TG":75,"M":"Babge Ivan 1, Babge Till 1, Key strap Till 1, thêm Key Luka 1","Giá":"75k","TT":"ckf","Cọc":75,"Còn":"0k","Gift":"2 card gift","Char Gift":"Till, Ivan","🎁":"","Món":"Babge Ivan 1, Babge Till 1, Key strap Till 1, thêm Key Luka 1","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":10,"Tên FB":"Phan Thảo Vy","G":1,"CG":"Ivan","TG":35,"M":"Standee Ivan 1","Giá":"35k","TT":"ckf","Cọc":35,"Còn":"0k","Gift":"1 card gift","Char Gift":"Ivan","🎁":"","Món":"Standee Ivan 1","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":11,"Tên FB":"Chảo Dính","G":1,"CG":"Ivan","TG":45,"M":"Babge Ivan 1, Babge Till 1, Dây B","Giá":"45k","TT":"ckf","Cọc":45,"Còn":"0k","Gift":"1 card gift","Char Gift":"Ivan","🎁":"","Món":"Babge Ivan 1, Babge Till 1, Dây B","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":12,"Tên FB":"Kuroshiro Daten","G":1,"CG":"Ivan","TG":30,"M":"Sticker 1","Giá":"30k","TT":"chưa ck","Cọc":"","Còn":"30k","Gift":"1 card gift","Char Gift":"Ivan","🎁":"","Món":"Sticker 1","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":13,"Tên FB":"Bánh Socola","G":1,"CG":"Ivan","TG":45,"M":"Babge Ivan 1, Babge Till 1, Babge Luka 1","Giá":"45k","TT":"chưa ck","Cọc":"","Còn":"45k","Gift":"1 card gift","Char Gift":"Ivan","🎁":"","Món":"Babge Ivan 1, Babge Till 1, Babge Luka 1","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":14,"Tên FB":"Emerald Suspect","G":2,"CG":"Till, Mizi, Sua","TG":95,"M":"Key strap Mizi 1, Key strap Ivan 1, Standee Ivan 1","Giá":"95k","TT":"ckf","Cọc":95,"Còn":"0k","Gift":"2 card gift","Char Gift":"Till, Mizi, Sua","🎁":"Till","Món":"Key strap Mizi 1, Key strap Ivan 1, Standee Ivan 1","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":15,"Tên FB":"Bánh Gạo Nếp","G":1,"CG":"Ivan","TG":45,"M":"Babge Ivan 1, Babge Till 1, Dây B","Giá":"45k","TT":"chưa ck","Cọc":"","Còn":"45k","Gift":"1 card gift","Char Gift":"Ivan","🎁":"","Món":"Babge Ivan 1, Babge Till 1, Dây B","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":16,"Tên FB":"Tiêu Dương Đạo","G":2,"CG":"Ivan, Till","TG":75,"M":"Babge Ivan 1, Babge Till 1, Key strap Till 1, thêm Key Ivan 1","Giá":"75k","TT":"chưa ck","Cọc":"","Còn":"75k","Gift":"2 card gift","Char Gift":"Ivan, Till","🎁":"","Món":"Babge Ivan 1, Babge Till 1, Key strap Till 1, thêm Key Ivan 1","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":17,"Tên FB":"Jinx Dolores","G":4,"CG":"Ivan, Till","TG":175,"M":"Babge Ivan 1, Babge Till 1, Dây B, Key strap Ivan 1, Key strap Till 1, Standee Ivan 1, Standee Till 1","Giá":"175k","TT":"ckf","Cọc":175,"Còn":"0k","Gift":"4 card gift","Char Gift":"Ivan, Till","🎁":"","Món":"Babge Ivan 1, Babge Till 1, Dây B, Key strap Ivan 1, Key strap Till 1, Standee Ivan 1, Standee Till 1","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":18,"Tên FB":"Thảo Nguyễn","G":4,"CG":"Ivan, Till, Sua, Mizi","TG":190,"M":"Babge Ivan 1, Babge Till 1, Sticker 1, Key strap Ivan 1, Key strap Till 1, Standee Ivan 1, Standee Till 1","Giá":"190k","TT":"ckf","Cọc":190,"Còn":"0k","Gift":"4 card gift","Char Gift":"Ivan, Till, Sua, Mizi","🎁":"","Món":"Babge Ivan 1, Babge Till 1, Sticker 1, Key strap Ivan 1, Key strap Till 1, Standee Ivan 1, Standee Till 1","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":19,"Tên FB":"Thu Uyên","G":2,"CG":"Luka, Hyuna","TG":90,"M":"Babge Luka 1, Key strap Sua 1, Key strap Hyuna 1, thêm Key Luka 1","Giá":"90k","TT":"chưa ck","Cọc":"","Còn":"90k","Gift":"2 card gift","Char Gift":"Luka, Hyuna","🎁":"Luka","Món":"Babge Luka 1, Key strap Sua 1, Key strap Hyuna 1, thêm Key Luka 1","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":20,"Tên FB":"Oki Doki","G":1,"CG":"Till","TG":30,"M":"Key strap Till 1","Giá":"30k","TT":"ckf","Cọc":30,"Còn":"0k","Gift":"1 card gift","Char Gift":"Till","🎁":"","Món":"Key strap Till 1","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":21,"Tên FB":"Labubu Tun","G":2,"CG":"Ivan, Till","TG":60,"M":"Babge Ivan 2, Babge Till 1, Dây D","Giá":"60k","TT":"ckf","Cọc":60,"Còn":"0k","Gift":"2 card gift","Char Gift":"Ivan, Till","🎁":"Hyuna","Món":"Babge Ivan 2, Babge Till 1, Dây D","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":22,"Tên FB":"RemgReng Thèm MilkTea VàBánhmìmuốiớt","G":1,"CG":"Till, Mizi","TG":45,"M":"Babge Mizi 1, Babge Till 1, Dây A","Giá":"45k","TT":"chưa ck","Cọc":"","Còn":"45k","Gift":"1 card gift","Char Gift":"Till, Mizi","🎁":"","Món":"Babge Mizi 1, Babge Till 1, Dây A","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":23,"Tên FB":"Mực Chin Giòn","G":1,"CG":"Hyuna","TG":30,"M":"Sticker 1","Giá":"30k","TT":"ckf","Cọc":30,"Còn":"0k","Gift":"1 card gift","Char Gift":"Hyuna","🎁":"","Món":"Sticker 1","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":24,"Tên FB":"Đình Vân","G":1,"CG":"","TG":30,"M":"Sticker 1","Giá":"30k","TT":"chưa ck","Cọc":"","Còn":"30k","Gift":"1 card gift","Char Gift":"","🎁":"","Món":"Sticker 1","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":25,"Tên FB":"Nguyễn Hữu Nam","G":3,"CG":"Ivan, Till, Sua","TG":120,"M":"Key strap Sua 1, Key strap Mizi 1, Key strap Ivan 1, Key strap Till 1","Giá":"120k","TT":"ckf","Cọc":120,"Còn":"0k","Gift":"3 card gift","Char Gift":"Ivan, Till, Sua","🎁":"","Món":"Key strap Sua 1, Key strap Mizi 1, Key strap Ivan 1, Key strap Till 1","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":"","Tên FB":"","G":"","CG":"","TG":"","M":"","Giá":"","TT":"","Cọc":"","Còn":"","Gift":"","Char Gift":"","🎁":"","Món":"","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":"","Tên FB":"","G":"","CG":"","TG":"","M":"","Giá":"","TT":"","Cọc":"","Còn":"","Gift":"","Char Gift":"","🎁":"","Món":"","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":"","Tên FB":"","G":"","CG":"","TG":"","M":"","Giá":"","TT":"","Cọc":"","Còn":"","Gift":"","Char Gift":"","🎁":"","Món":"","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""},{"STT":"","Tên FB":"","G":"","CG":"","TG":"","M":"","Giá":"","TT":"","Cọc":"","Còn":"","Gift":"","Char Gift":"","🎁":"","Món":"","MVĐ":"","Món_1":"","Chốt in":"","Dự kiến về":"","Dư (nếu có)":""}],"icon":null},{"name":"ALNST - AET + Find your plus One","keyColumn":"Facebook","statusColumn":"Ck ","passwordColumn":"","publicColumns":["Facebook","Slot AET","Giá ","Cọc ","Slot ANM","Giá"],"lockedColumns":[],"columns":["✔","Facebook","Slot AET","Giá ","Ck ","Cọc ","Còn ","Slot ANM","Giá","Ck","Cọc","Còn","S1","S2","S3","S4"],"rows":[{"✔":false,"Facebook":"RemgReng Thèm MilkTea VàBánhmìmuốiớt","Slot AET":"Minidoll Till Mizi\r\nKeyring sao Till Mizi","Giá ":565,"Ck ":"Cọc","Cọc ":300,"Còn ":265,"Slot ANM":"Thiệp Till Mizi","Giá":65,"Ck":"✖","Cọc":"","Còn":65,"S1":"","S2":"","S3":"","S4":""},{"✔":true,"Facebook":"Autumn Loralai","Slot AET":"Minidoll Luka Hyuna\r\nKeyring sao Luka Hyuna","Giá ":455,"Ck ":"✔","Cọc ":455,"Còn ":0,"Slot ANM":"Thiệp Luka Hyuna","Giá":40,"Ck":"✔","Cọc":40,"Còn":0,"S1":"","S2":"","S3":"","S4":""},{"✔":false,"Facebook":"Kulu Píc Cà Pu","Slot AET":"Keyring sao Ivan Sua","Giá ":280,"Ck ":"✔","Cọc ":280,"Còn ":0,"Slot ANM":"none","Giá":0,"Ck":"","Cọc":"","Còn":0,"S1":"","S2":"","S3":"","S4":""}],"icon":null}]</script>
 
 <script>
 (function(){
@@ -1573,5 +1964,6 @@
   showView('empty');
 })();
 </script>
-</body>
-</html>
+
+
+</body></html>
