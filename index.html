@@ -1,0 +1,2559 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>seoyi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --bg: #f3efe2;
+    --bg-2: #ffffff;
+    --surface: #ffffff;
+    --primary: #1c2c6b;
+    --primary-dark: #10193f;
+    --primary-light: #e3e6f2;
+    --accent: #cbb994;
+    --accent2: #e7ded0;
+    --accent3: #f3efe2;
+    --text: #14204f;
+    --text-muted: #5c6690;
+    --border: #c4c9de;
+    --ink: #1c2c6b;
+    --cta: #cbb994;
+    --cta-text: #14204f;
+    --danger: #d9455f;
+    --danger-light: #fbe3e7;
+    --success: #1c2c6b;
+    --radius-lg: 18px;
+    --radius-md: 14px;
+    --radius-sm: 10px;
+    --shadow: none;
+    --shadow-sm: none;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family:'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+    position:relative;
+    overflow-x:hidden;
+  }
+  h1,h2,h3{ font-family:'Fredoka','Inter',system-ui, sans-serif; margin:0; font-weight:600; letter-spacing:0.01em; }
+  .app{ position:relative; z-index:1; max-width:1040px; margin:0 auto; min-height:100vh; display:flex; flex-direction:column; padding:0 18px; }
+  main{ flex:1; padding-bottom:40px; }
+  .view{ display:none; animation: rise .35s ease both; }
+
+  /* Heart-strip decorative border, echoing the Vinamilk reference */
+  .heart-strip{
+    display:flex; overflow:hidden; white-space:nowrap; user-select:none; pointer-events:none;
+    color:var(--cta); font-size:1rem; letter-spacing:10px; line-height:1; padding:10px 18px;
+    background:var(--primary); margin:0 -18px;
+  }
+  .heart-strip span{ flex-shrink:0; }
+
+  /* ---- Sidebar + main content layout ---- */
+  .app-layout{ flex:1; display:flex; align-items:flex-start; gap:22px; }
+  .sidebar{
+    width:280px; flex-shrink:0; position:sticky; top:20px;
+    background:transparent;
+    border:none; border-right:1px solid var(--ink); border-radius:0; padding:0 18px 0 0;
+    max-height:calc(100vh - 40px); overflow-y:auto;
+  }
+  .sidebar-header h2{
+    font-family:'Inter', system-ui, sans-serif; font-size:.82rem; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--text-muted); margin-bottom:10px; font-weight:700; padding:14px 0 8px;
+  }
+  .sidebar .db-list{ gap:0; border-top:1px solid var(--ink); }
+  .sidebar .db-card{ padding:12px 0; border-radius:0; }
+  .sidebar .db-card .db-name{ font-size:0.98rem; }
+  .sidebar .db-card.active{ background:var(--primary-light); }
+  .sidebar-footer{ margin-top:0; padding:14px 0; border-top:1px solid var(--ink); text-align:left; }
+  .main-content{ flex:1; min-width:0; padding-bottom:40px; }
+  .empty-hint{
+    text-align:center; padding:40px 0; color:var(--text-muted); font-weight:500;
+    background:transparent; border:none; border-top:1px solid var(--ink); border-bottom:1px solid var(--ink); border-radius:0;
+  }
+  .empty-hint-icon{ font-size:2rem; margin-bottom:10px; }
+
+  @media (max-width: 820px){
+    .app{ max-width:560px; }
+    .app-layout{ flex-direction:column; }
+    .sidebar{ width:100%; position:static; max-height:none; border-right:none; border-bottom:1px solid var(--ink); padding:0 0 14px; }
+  }
+  .view.active{ display:block; }
+
+  @keyframes rise{ from{ opacity:0; transform:translateY(14px) scale(0.98);} to{ opacity:1; transform:translateY(0) scale(1);} }
+  @media (prefers-reduced-motion: reduce){ .view{ animation:none; } }
+
+  .view-header{ margin: 6px 0 20px; text-align:left; }
+  .view-header h1{ font-size:1.6rem; color:var(--text); }
+  .subtitle{ color:var(--text-muted); font-size:0.92rem; margin-top:6px; font-weight:500; }
+
+  .back-btn{
+    background:var(--surface); border:1.25px solid var(--ink); color:var(--primary); font-weight:700; font-size:0.85rem;
+    padding:8px 16px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; border-radius:999px;
+    margin-bottom:6px; transition:transform .12s ease, border-color .12s ease;
+    font-family:'Inter', system-ui, sans-serif;
+  }
+  .back-btn:hover{ transform:translateY(-1px); border-color:var(--accent); }
+
+  /* Database select list - flat rows separated by lines only */
+  .db-list{ display:flex; flex-direction:column; gap:0; border-top:1px solid var(--border); }
+  .db-card{
+    position:relative;
+
+    background:transparent;
+    border:none;
+    border-bottom:1px solid var(--border);
+    border-radius:0;
+
+    padding:14px 4px;
+    cursor:pointer;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+
+    transition: background .12s ease;
+}
+  .db-card:hover{
+    background:var(--primary-light);
+}
+  .db-card:active{ background:var(--accent2); }
+  .db-card:focus-visible{ outline:2px solid var(--primary); outline-offset:2px; }
+
+  .db-card .db-name{ font-family:'Fredoka','Inter', system-ui, sans-serif; font-weight:600; font-size:1.08rem; color:var(--text); }
+  .db-card .db-meta{ color:var(--text-muted); font-size:0.82rem; margin-top:3px; font-weight:500; }
+  .db-card .arrow{
+    color:#fff; font-size:1.05rem; flex-shrink:0; background:var(--primary); border:1px solid var(--ink);
+    width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  }
+  .db-icon{
+    width:48px; height:48px; border-radius:50%; background:var(--primary-light);
+    border:1px solid var(--ink); display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden;
+  }
+  .db-icon img{ width:100%; height:100%; object-fit:cover; }
+
+  .empty-state{
+    text-align:center; padding:32px 0; background:transparent; border:none; border-top:1px dashed var(--border); border-bottom:1px dashed var(--border);
+    border-radius:0; color:var(--text-muted); font-weight:500;
+  }
+  .empty-state p{ margin:4px 0; }
+
+  /* Search box */
+  .search-box{
+    display:flex; align-items:center; gap:8px; background:var(--surface); border:1.25px solid var(--ink);
+    border-radius:999px; padding:6px 6px 6px 20px;
+  }
+  .search-box input{
+    flex:1; border:none; outline:none; font-size:1rem; padding:12px 0; font-family:'Inter', system-ui, sans-serif; font-weight:600;
+    background:transparent; color:var(--text);
+  }
+  .search-box input::placeholder{ color:var(--text-muted); font-weight:500; }
+  .btn-primary{
+    position:relative; isolation:isolate;
+    background:var(--cta);
+    color:var(--cta-text); border:1.5px solid var(--ink);
+    padding:13px 26px; border-radius:999px; font-weight:700; font-size:0.95rem; cursor:pointer;
+    transition:transform .12s ease; font-family:'Fredoka','Inter', system-ui, sans-serif; letter-spacing:0.02em;
+  }
+  .btn-primary:hover{ transform:translate(1px, 1px); }
+  .btn-primary:active{ transform:translate(2px, 2px); }
+  .btn-primary:focus-visible, .btn-secondary:focus-visible, input:focus-visible, select:focus-visible{
+    outline:2px solid var(--primary-dark); outline-offset:2px;
+  }
+  .btn-secondary{
+    position:relative; isolation:isolate;
+    background:var(--surface);
+    color:var(--primary); border:1.25px solid var(--ink);
+    padding:12px 18px; border-radius:999px; font-weight:700; font-size:0.9rem; cursor:pointer; width:100%;
+    margin-top:8px; font-family:'Inter', system-ui, sans-serif; transition:transform .12s ease;
+  }
+  .btn-secondary:hover{ transform:translate(1px, 1px); }
+  .btn-danger{
+    background:var(--danger-light); color:var(--danger); border:1.25px solid var(--danger); border-radius:999px;
+    padding:8px 14px; font-weight:700; font-size:0.8rem; cursor:pointer;
+  }
+
+  #search-results{ margin-top:22px; display:flex; flex-direction:column; gap:0; }
+  .hint-box{ text-align:center; color:var(--text-muted); padding:28px 0; font-size:0.92rem; font-weight:500; }
+  .hint-box.none{ color:var(--danger); }
+
+  .result-card{
+    background:transparent; border:none; border-top:1px solid var(--ink); border-bottom:1px solid var(--ink); border-radius:0;
+    padding:16px 0; animation: rise .3s ease both;
+  }
+  .result-card .result-title{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .check-badge{
+    width:30px; height:30px; border-radius:50%; background:var(--primary); border:1px solid var(--ink);
+    color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0;
+  }
+  .result-title strong{ font-family:'Inter', system-ui, sans-serif; font-size:1.1rem; }
+  .field-row{ display:flex; gap:14px; padding:11px 0; border-bottom:1px dashed var(--border); font-size:0.92rem; }
+  .field-row:last-child{ border-bottom:none; }
+  .field-label{ color:var(--text-muted); min-width:38%; flex-shrink:0; font-weight:600; }
+  .field-value{ color:var(--text); font-weight:600; word-break:break-word; }
+
+  .candidate-list{ display:flex; flex-direction:column; gap:0; border-top:1px solid var(--ink); }
+  .candidate-btn{
+    text-align:left; background:transparent; border:none; border-bottom:1px solid var(--ink); border-radius:0;
+    padding:14px 0; cursor:pointer; font-family:'Inter', system-ui, sans-serif; font-weight:600; font-size:0.92rem; color:var(--text);
+    transition:background .12s ease;
+  }
+  .candidate-btn:hover{ background:var(--primary-light); }
+  .candidate-btn .cname{ font-weight:700; }
+  .candidate-btn .csub{ color:var(--text-muted); font-size:0.8rem; margin-top:2px; font-weight:500; }
+
+
+
+  .visitor-list{ display:flex; flex-direction:column; gap:0; margin-top:16px; border-top:1px solid var(--ink); }
+  .visitor-card{
+    background:transparent; border:none; border-bottom:1px solid var(--ink); border-radius:0;
+    padding:14px 0; display:block; font-family:'Inter', system-ui, sans-serif;
+  }
+  .visitor-card-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .visitor-main{ min-width:0; flex:1; }
+  .visitor-name{ font-family:'Inter', system-ui, sans-serif; font-weight:700; font-size:1rem; color:var(--text); cursor:pointer; word-break:break-word; }
+  .visitor-name:hover{ color:var(--primary-dark); text-decoration:underline; }
+  .visitor-status{ margin-top:5px; color:var(--text-muted); font-size:.84rem; font-weight:700; }
+  .status-pill{ display:inline-flex; align-items:center; background:var(--primary-light); color:var(--primary-dark); border:0.75px solid var(--ink); border-radius:999px; padding:3px 10px; margin-left:4px; }
+  .view-info-btn{
+    flex-shrink:0; border:1px solid var(--ink); cursor:pointer; font-family:'Inter', system-ui, sans-serif; font-weight:700; font-size:.78rem;
+    border-radius:999px; padding:10px 12px; color:#fff; background:var(--primary);
+    display:inline-flex; align-items:center; gap:6px;
+    transition:transform .12s ease;
+  }
+  .view-info-btn:hover{ transform:translate(1px, 1px); }
+  .public-details{ margin-top:12px; padding-top:12px; border-top:1px dashed var(--border); display:none; }
+  .visitor-card.expanded .public-details{ display:block; }
+  .locked-panel{ margin-top:14px; padding-top:12px; border-top:1px dashed var(--border); display:none; }
+  .visitor-card.expanded .locked-panel{ display:block; }
+  .locked-label{ display:flex; align-items:center; gap:6px; font-weight:700; font-size:.85rem; color:var(--primary-dark); margin-bottom:10px; }
+  .password-row{ display:flex; gap:8px; align-items:center; }
+  .password-row input{ flex:1; min-width:0; }
+  .locked-panel label{ margin:0 0 6px; }
+  .inline-error{ color:var(--danger); font-size:.82rem; font-weight:700; margin-top:8px; display:none; }
+  .inline-details{ margin-top:14px; }
+  .result-card, .field-row, .field-label, .field-value{ font-family:'Inter', system-ui, sans-serif; }
+  .mvd-row{ background:#fff9d9; border:none; border-left:3px solid var(--primary); border-radius:0; padding-left:10px; }
+  .copy-btn{
+    border:none; border-radius:999px; padding:7px 10px; margin-left:8px; cursor:pointer; font-family:'Inter', system-ui, sans-serif;
+    font-weight:700; font-size:.74rem; color:var(--primary-dark); background:var(--primary-light);
+  }
+  .column-checks{ display:grid; grid-template-columns:1fr; gap:0; margin-top:8px; border-top:1px solid var(--border); }
+  .check-option{ display:flex; align-items:center; gap:9px; padding:10px 0; border:none; border-bottom:1px solid var(--border); border-radius:0; background:transparent; font-size:.88rem; font-weight:700; color:var(--text); cursor:pointer; }
+  .check-option input{ width:auto; flex-shrink:0; }
+  .vis-hint{ font-size:0.8rem; color:var(--text-muted); line-height:1.5; font-weight:500; margin:6px 0 0; }
+  .vis-groups{ display:flex; flex-direction:column; gap:0; margin-top:10px; border-top:1px solid var(--ink); }
+  .vis-group{ border:none; border-bottom:1px solid var(--ink); border-radius:0; padding:14px 0; background:transparent; }
+  .vis-group-public, .vis-group-locked, .vis-group-hidden{ background:transparent; }
+  .vis-group-title{ display:flex; align-items:baseline; gap:6px; flex-wrap:wrap; font-family:'Inter', system-ui, sans-serif; font-weight:700; font-size:.95rem; color:var(--text); margin-bottom:10px; }
+  .vis-group-title span{ font-weight:500; font-size:.76rem; color:var(--text-muted); font-family:'Inter', system-ui, sans-serif; }
+  .vis-checklist{ display:grid; grid-template-columns:1fr; gap:0; max-height:230px; overflow-y:auto; padding-right:4px; border-top:1px solid var(--border); }
+  @media (min-width: 620px){
+    .vis-checklist{ grid-template-columns:1fr 1fr; }
+  }
+
+  /* Admin */
+  .admin-section{ margin-bottom:26px; }
+  .admin-section h2{ font-size:1.1rem; margin-bottom:10px; color:var(--text); }
+  label{ display:block; font-size:0.85rem; color:var(--text-muted); margin:14px 0 6px; font-weight:600; }
+  input[type="text"], input[type="password"]{
+    width:100%; padding:13px 0; border-radius:0; border:none; border-bottom:1.25px solid var(--ink); font-size:0.95rem;
+    font-family:'Inter', system-ui, sans-serif; font-weight:600; background:transparent; color:var(--text);
+  }
+  select{
+    width:100%; padding:13px 0; border-radius:0; border:none; border-bottom:1.25px solid var(--ink); font-size:0.95rem;
+    background:transparent; color:var(--text); font-family:'Inter', system-ui, sans-serif; font-weight:600;
+  }
+  input[type="file"]{ font-size:0.85rem; margin-top:2px; }
+  .file-label{
+    display:inline-block; background:var(--primary-light); color:var(--primary-dark); padding:12px 18px;
+    border-radius:999px; font-weight:700; font-size:0.9rem; cursor:pointer; border:1.25px solid var(--ink);
+    text-align:center; width:100%; margin-top:8px;
+  }
+  hr{ border:none; border-top:1.25px dashed var(--border); margin:26px 0; }
+  .hint-text{ font-size:0.85rem; color:var(--text-muted); line-height:1.5; font-weight:500; }
+  .error-text{ color:var(--danger); font-size:0.85rem; margin-top:8px; font-weight:600; }
+  .admin-db-item{
+    display:flex; align-items:center; justify-content:space-between; gap:10px; background:transparent;
+    border:none; border-bottom:1px solid var(--ink); border-radius:0; padding:14px 0; margin-bottom:0;
+  }
+  .admin-db-item .info strong{ font-size:0.95rem; font-family:'Inter', system-ui, sans-serif; }
+  .admin-db-item .info div{ color:var(--text-muted); font-size:0.78rem; margin-top:2px; font-weight:500; }
+  .table-wrap{ overflow-x:auto; border:none; border-top:1px solid var(--ink); border-bottom:1px solid var(--ink); border-radius:0; margin-top:10px; }
+  table{ border-collapse:collapse; width:100%; font-size:0.8rem; white-space:nowrap; }
+  th,td{ padding:9px 12px; border-bottom:0.5px solid var(--border); text-align:left; }
+  th{ background:var(--primary-light); color:var(--primary-dark); font-weight:700; }
+  details{ background:transparent; border-radius:0; padding:0 0 14px; margin-bottom:18px; border:none; border-bottom:1px solid var(--ink); }
+  details summary{ cursor:pointer; font-weight:700; color:var(--primary-dark); font-size:0.9rem; padding:14px 0; }
+  details p{ font-size:0.85rem; color:var(--text-muted); margin:10px 0 0; line-height:1.6; font-weight:500; }
+
+  .chip-list{ display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+  .chip{
+    display:inline-flex; align-items:center; gap:6px; background:var(--primary-light); color:var(--primary-dark);
+    border:1px solid var(--ink); border-radius:999px; padding:6px 8px 6px 16px; font-size:0.82rem; font-weight:700;
+  }
+  .chip button{
+    background:none; border:none; color:var(--primary-dark); cursor:pointer; font-size:0.95rem; line-height:1;
+    padding:2px 6px; opacity:0.6;
+  }
+  .chip button:hover{ opacity:1; }
+
+  .row-card{
+    background:transparent; border:none; border-bottom:1px solid var(--ink); border-radius:0;
+    padding:16px 0; margin-bottom:0;
+  }
+  .row-card-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .row-index{ color:var(--text-muted); font-size:0.78rem; font-weight:700; letter-spacing:0.02em; }
+  .row-actions{ display:flex; gap:8px; }
+  .btn-link-edit{
+    background:var(--primary-light); color:var(--primary-dark); border:1px solid var(--ink); border-radius:999px;
+    padding:8px 14px; font-weight:700; font-size:0.8rem; cursor:pointer;
+  }
+  .row-edit-field{ margin-bottom:10px; }
+  .row-edit-field label{ margin:0 0 6px; }
+  .row-edit-actions{ display:flex; gap:10px; margin-top:6px; }
+  .row-edit-actions .btn-primary, .row-edit-actions .btn-secondary{ width:auto; flex:1; margin-top:0; }
+
+  .footer{ text-align:center; padding:18px 0 30px; }
+  .link-btn{ background:none; border:none; color:var(--primary-dark); font-size:0.78rem; cursor:pointer; text-decoration:underline; font-weight:700; }
+  .link-btn:hover{ color:var(--primary); }
+
+  /* Profile row (top-left) */
+  .topbar{ padding:20px 4px 16px; text-align:left; }
+  .profile-badge{
+    display:flex; align-items:center; gap:10px;
+  }
+  .profile-pic{ width:50px; height:50px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .profile-pic img{
+    max-width:100%; max-height:100%; display:block; border-radius:50%;
+    filter: drop-shadow(3px 3px 0 #ffffff) drop-shadow(6px 6px 0 var(--primary));
+  }
+  .profile-pic-placeholder{
+    width:50px; height:50px; border-radius:50%; background:var(--primary-light); border:1.25px solid var(--ink);
+    display:flex; align-items:center; justify-content:center; font-size:1.3rem;
+    filter: drop-shadow(3px 3px 0 #ffffff) drop-shadow(6px 6px 0 var(--primary));
+  }
+  .profile-handle{
+    font-family:'Inter', system-ui, sans-serif; font-weight:600; font-size:.92rem; color:var(--text);
+  }
+
+  /* Ship-info reveal: button slides right, password box pops from its bottom-left corner */
+  .ship-info-row{ position:relative; min-height:44px; }
+  .ship-info-btn{
+    border:1.25px solid var(--ink); cursor:pointer; font-family:'Inter', system-ui, sans-serif;
+    font-weight:700; font-size:.85rem; border-radius:999px; padding:11px 18px; color:#fff; background:var(--primary);
+    display:inline-flex; align-items:center; gap:8px;
+    transition: transform .32s cubic-bezier(.34,1.56,.64,1), opacity .25s ease;
+  }
+  .ship-info-btn:hover{ transform:translate(1px, 1px); }
+  .ship-info-btn.slide-out{ transform:translateX(160%); opacity:0; pointer-events:none; }
+  @keyframes popIn{
+    0%{ transform:scale(.15); opacity:0; }
+    65%{ transform:scale(1.08); opacity:1; }
+    100%{ transform:scale(1); opacity:1; }
+  }
+  .password-row.pop-visible{
+    animation: popIn .38s cubic-bezier(.34,1.56,.64,1) both;
+    transform-origin: bottom left;
+  }
+</style>
+
+<style id="reference-blue-layout-v11">
+:root{
+  --bg:#ffffff;
+  --bg-2:#ffffff;
+  --surface:#ffffff;
+  --primary:#2f63d6;
+  --primary-dark:#2051bd;
+  --primary-light:#eef4ff;
+  --accent:#2f63d6;
+  --accent2:#dfe9ff;
+  --accent3:#ffffff;
+  --text:#2458c7;
+  --text-muted:#4f73c8;
+  --border:#7fa7ff;
+  --ink:#2f63d6;
+  --cta:#2f63d6;
+  --cta-text:#ffffff;
+  --danger:#d83e5d;
+  --danger-light:#fff0f4;
+  --success:#2f63d6;
+  --radius-lg:0;
+  --radius-md:0;
+  --radius-sm:0;
+}
+*{box-sizing:border-box}
+html,body{background:#fff}
+body{padding:0;margin:0;font-family:'Inter',system-ui,sans-serif;color:var(--text)}
+.app{max-width:none;margin:0;padding:0;min-height:100vh;background:#fff}
+.topbar{height:64px;padding:28px 30px 8px;text-align:left;background:#fff;border:1.5px solid var(--primary);border-bottom:0;display:flex;align-items:center}
+.profile-badge{gap:0}
+.profile-pic{display:none!important}
+.profile-handle{font-size:14px;font-weight:500;color:var(--primary)}
+.heart-strip{
+  position:absolute;left:258px;right:0;top:0;height:22px;margin:0;padding:0;
+  background:var(--primary);color:transparent;overflow:visible;z-index:5
+}
+.heart-strip::after{
+  content:'';position:absolute;left:0;right:0;bottom:-18px;height:36px;
+  background:radial-gradient(circle at 18px 0,#2f63d6 18px,transparent 19px) 0 0/36px 36px repeat-x;
+}
+.heart-strip span{display:none}
+.app-layout{display:grid;grid-template-columns:258px minmax(0,1fr);gap:0;align-items:stretch;min-height:calc(100vh - 64px)}
+.sidebar{
+  width:auto;position:static;max-height:none;overflow:visible;padding:0 26px 24px 30px;
+  background:#fff;border:1.5px solid var(--primary);border-top:0;border-radius:0
+}
+.sidebar-header h2{display:none}
+.sidebar .db-list,.db-list{border:1.5px dashed #8fb0ff;border-top:1.5px dashed #8fb0ff;margin:0;padding:8px 10px;gap:0}
+.db-card{
+  border:0!important;background:#fff!important;padding:7px 0!important;min-height:28px;border-radius:0!important;
+  display:flex;align-items:center;justify-content:flex-start;gap:9px;color:var(--primary);box-shadow:none!important
+}
+.db-card:hover,.db-card.active{background:#fff!important;transform:none!important}
+.db-card .db-icon{display:none!important}
+.db-card .arrow{display:none!important}
+.db-card>div:nth-child(2){display:flex;align-items:center;gap:8px;min-width:0}
+.db-card>div:nth-child(2)::before{content:'♥';font-size:13px;color:var(--primary);line-height:1}
+.db-card .db-name{font-family:'Inter',sans-serif!important;font-size:15px!important;font-weight:400!important;color:var(--primary)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.db-card .db-meta{display:none}
+.sidebar-footer{display:none}
+.main-content{
+  position:relative;background:#ffffff;padding:48px 28px 30px;min-width:0;border-right:1.5px solid var(--primary);border-bottom:1.5px solid var(--primary)
+}
+.main-content::before,.main-content::after{display:none!important}
+.view-header{margin:0 0 34px}
+.view-header h1{font-family:'Inter',sans-serif!important;font-size:14px!important;font-weight:500!important;color:var(--primary)!important;text-shadow:none!important;-webkit-text-stroke:0!important;max-width:none!important}
+.subtitle{display:none}
+.search-box{display:none}
+#search-results{margin-top:0;gap:20px}
+.visitor-list{margin:0;border:0;gap:20px}
+.visitor-card{
+  background:#fff!important;border:1.5px solid var(--primary)!important;border-radius:0!important;padding:11px 24px!important;
+  box-shadow:none!important;color:var(--primary)
+}
+.visitor-card-head{min-height:34px;gap:16px}
+.visitor-main{display:flex;align-items:center;gap:9px}
+.visitor-main::before{content:'♥';font-size:13px;color:var(--primary)}
+.visitor-name{font-size:16px!important;font-weight:700!important;color:var(--primary)!important;text-decoration:none!important}
+.visitor-name::after{display:none!important}
+.visitor-status{display:none}
+.view-info-btn{
+  margin-left:auto;background:var(--primary)!important;color:#fff!important;border:0!important;border-radius:0!important;
+  padding:8px 18px!important;font-size:14px!important;font-weight:400!important;box-shadow:none!important;transform:none!important
+}
+.view-info-btn::after{display:none!important}
+.public-details,.locked-panel{border-top:0!important;margin-top:12px!important;padding-top:0!important}
+.field-row{display:grid;grid-template-columns:150px 1fr;gap:28px;padding:7px 12px;border-bottom:1px dotted #a9bde8!important;font-size:14px}
+.field-label{min-width:0;color:var(--primary);font-weight:400}
+.field-value{color:var(--primary);font-weight:700}
+.mvd-row{background:transparent!important;border-left:0!important;border-radius:0!important;padding-left:12px!important}
+.ship-info-row{margin:16px 0 9px;min-height:0}
+.ship-info-btn{
+  background:var(--primary)!important;color:#fff!important;border:0!important;border-radius:0!important;
+  padding:9px 16px!important;font-size:14px!important;font-weight:400!important;transform:none!important
+}
+.locked-label{display:none}
+.password-row{gap:8px;align-items:stretch}
+.password-row input,input[type='text'],input[type='password'],select{
+  background:#fff!important;border:1.5px solid var(--primary)!important;border-radius:0!important;padding:10px 12px!important;color:var(--primary)!important
+}
+.btn-primary,.btn-secondary,.back-btn,.file-label,.btn-link-edit,.btn-danger,.copy-btn{
+  border-radius:0!important;box-shadow:none!important
+}
+.btn-primary{background:var(--primary)!important;color:#fff!important;border:1.5px solid var(--primary)!important}
+.copy-btn{background:var(--primary-light)!important;color:var(--primary)!important}
+.empty-hint{background:#fff;border:1.5px solid var(--primary);border-radius:0;color:var(--primary);text-align:left;padding:24px}
+.empty-hint-icon{display:none}
+#view-admin,#view-manage-rows{background:#fff;padding:22px;color:var(--primary)}
+#view-admin .view-header h1,#view-manage-rows .view-header h1{color:var(--primary)!important}
+.admin-section,.row-card,.admin-db-item,details,.table-wrap,.vis-group{background:#fff!important;border-color:var(--primary)!important;border-radius:0!important}
+label,.hint-text,.vis-hint,.admin-db-item .info div{color:#4b6fc3!important}
+th{background:#eaf1ff!important;color:var(--primary)!important}
+
+@media(max-width:820px){
+  .heart-strip{left:0;top:0;height:16px}
+  .heart-strip::after{bottom:-14px;height:28px;background-size:28px 28px;background-image:radial-gradient(circle at 14px 0,#2f63d6 14px,transparent 15px)}
+  .topbar{height:auto;min-height:62px;padding:30px 18px 10px;border-left:1.5px solid var(--primary);border-right:1.5px solid var(--primary)}
+  .app-layout{display:flex;flex-direction:column;min-height:0}
+  .sidebar{width:100%;padding:0 18px 16px;border:1.5px solid var(--primary);border-top:0;border-bottom:1.5px solid var(--primary)}
+  .sidebar .db-list{display:flex;overflow-x:auto;gap:8px;padding:8px;scrollbar-width:thin}
+  .db-card{flex:0 0 auto!important;padding:7px 10px!important;border-right:1px solid #c8d7f7!important}
+  .db-card>div:nth-child(2)::before{font-size:11px}
+  .db-card .db-name{font-size:14px!important}
+  .main-content{padding:34px 12px 24px;border-left:1.5px solid var(--primary)}
+  .view-header{margin-bottom:18px}
+  .visitor-list{gap:14px}
+  .visitor-card{padding:10px 12px!important}
+  .visitor-card-head{align-items:flex-start}
+  .visitor-name{font-size:15px!important}
+  .view-info-btn{padding:8px 14px!important}
+  .field-row{grid-template-columns:1fr;gap:4px;padding:8px 4px}
+  .field-label{font-size:12px}
+  .field-value{font-size:14px}
+  .password-row{flex-direction:column}
+  .password-row .btn-primary{width:100%}
+}
+</style>
+
+
+<style id="typography-refresh">
+  :root{
+    --font-ui:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --font-display:'Baloo 2','Inter',system-ui,sans-serif;
+  }
+
+  body,
+  input,
+  select,
+  textarea,
+  button{
+    font-family:var(--font-ui)!important;
+  }
+
+  h1,h2,h3,
+  .profile-handle,
+  .sidebar-header h2,
+  .db-card .db-name,
+  .visitor-name,
+  .result-title strong,
+  .admin-db-item .info strong,
+  .vis-group-title,
+  .btn-primary,
+  .view-info-btn,
+  .ship-info-btn{
+    font-family:var(--font-display)!important;
+  }
+
+  h1,h2,h3,
+  .db-card .db-name,
+  .visitor-name{
+    letter-spacing:.01em;
+  }
+
+  .profile-handle{
+    font-weight:600;
+  }
+
+  .db-card .db-name,
+  .visitor-name{
+    font-weight:600;
+  }
+
+  .btn-primary,
+  .view-info-btn,
+  .ship-info-btn{
+    font-weight:600;
+  }
+
+  .subtitle,
+  .db-card .db-meta,
+  .visitor-status,
+  .field-label,
+  .field-value,
+  .hint-text{
+    font-family:var(--font-ui)!important;
+  }
+</style>
+
+
+<style id="empty-db-fix">
+#db-list{
+  min-height:160px;
+  border:2px dashed #9cbcff;
+  border-radius:10px;
+  padding:12px;
+}
+#db-empty{
+  display:flex!important;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  min-height:130px;
+  border:none!important;
+  background:transparent!important;
+  margin:0!important;
+  text-align:center;
+}
+</style>
+
+
+<style id="empty-box-style-fix">
+#db-list{
+    border:2px dashed var(--primary)!important;
+    border-radius:0!important;
+    background:#fff!important;
+}
+
+#db-empty{
+    border:none!important;
+    border-radius:0!important;
+    color:var(--primary)!important;
+}
+
+#db-empty p{
+    color:var(--primary)!important;
+    margin:.35rem 0;
+    font-weight:600;
+}
+
+.empty-state,
+.empty-hint{
+    border-radius:0!important;
+}
+</style>
+
+
+
+
+
+<style id="dot-bg-fix">
+/* Let page dotted background show through */
+body{
+  background-color:#fff!important;
+  background-image:
+    radial-gradient(var(--primary) 0.45px, transparent 0.45px)!important;
+  background-size:20px 20px!important; /* smaller dots */
+}
+
+.app,
+.sidebar,
+.main-content,
+.sidebar-feature-grid,
+#db-list,
+.sidebar-image-placeholder{
+  background:transparent!important;
+}
+
+/* thinner, transparent dashed panel */
+#db-list{
+  border:1px dashed var(--primary)!important;
+}
+
+/* placeholder remains outlined but transparent */
+.sidebar-image-placeholder{
+  border:1px solid var(--primary)!important;
+}
+
+</style>
+
+
+<style id="admin-button-fix">
+.sidebar-footer{
+  display:flex!important;
+  justify-content:center;
+  margin-top:14px!important;
+  padding-top:12px!important;
+  border-top:1px dashed var(--primary)!important;
+  position:relative!important;
+  z-index:10!important;
+}
+#admin-toggle-btn{
+  display:inline-flex!important;
+  align-items:center;
+  justify-content:center;
+  padding:8px 18px!important;
+  border:1px solid var(--primary)!important;
+  background:#fff!important;
+  color:var(--primary)!important;
+  text-decoration:none!important;
+}
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style id="scallop-top-flush-fix">
+  html,body{
+    margin:0!important;
+    padding:0!important;
+  }
+
+  .app{
+    margin:0!important;
+    padding:0!important;
+  }
+
+  /* Blue strip begins at the very top; no white bar above it */
+  .heart-strip{
+    position:absolute!important;
+    top:0!important;
+    left:258px!important;
+    right:0!important;
+    height:7px!important;
+    margin:0!important;
+    padding:0!important;
+    background:var(--primary)!important;
+    color:transparent!important;
+    overflow:visible!important;
+    z-index:20!important;
+  }
+
+  .heart-strip::before{
+    content:none!important;
+    display:none!important;
+  }
+
+  .heart-strip::after{
+    content:''!important;
+    position:absolute!important;
+    left:0!important;
+    right:0!important;
+    top:6px!important;
+    bottom:auto!important;
+    height:14px!important;
+    background:
+      radial-gradient(
+        circle at 7px 0,
+        var(--primary) 0 7px,
+        transparent 7.5px
+      ) 0 0 / 14px 14px repeat-x!important;
+  }
+
+  .heart-strip span{
+    display:none!important;
+  }
+
+  /* Keep profile content below the decorative strip */
+  .topbar{
+    padding-top:22px!important;
+  }
+
+  @media(max-width:820px){
+    .heart-strip{
+      left:0!important;
+      height:6px!important;
+    }
+
+    .heart-strip::after{
+      top:5px!important;
+      height:12px!important;
+      background-size:12px 12px!important;
+      background-image:
+        radial-gradient(
+          circle at 6px 0,
+          var(--primary) 0 6px,
+          transparent 6.5px
+        )!important;
+    }
+
+    .topbar{
+      padding-top:18px!important;
+    }
+  }
+</style>
+
+
+<style id="sidebar-divider-fix">
+/* Extend the sidebar divider all the way to the top edge */
+.app-layout{
+  position:relative;
+}
+
+.sidebar{
+  position:relative!important;
+  border-right:none!important;
+}
+
+.sidebar::after{
+  content:"";
+  position:absolute;
+  top:-40px;      /* reaches into the scallop area */
+  right:-1px;
+  bottom:0;
+  width:1px;
+  background:var(--primary);
+  z-index:30;
+}
+
+@media (max-width:820px){
+  .sidebar::after{
+    display:none;
+  }
+}
+</style>
+
+
+<style id="sidebar-layout-image-top">
+.sidebar-feature-grid{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:10px !important;
+}
+
+.sidebar-image-placeholder{
+    width:84px !important;
+    aspect-ratio:1/1;
+    align-self:flex-start;
+}
+
+#db-list{
+    width:100% !important;
+    min-height:120px !important;
+}
+
+@media (max-width:820px){
+  .sidebar-feature-grid{
+      flex-direction:column !important;
+  }
+  .sidebar-image-placeholder{
+      width:92px !important;
+  }
+}
+</style>
+
+
+<style id="final-interaction-layout-update">
+  /* All primary vertical rules meet the page edges. */
+  .app{
+    min-height:100vh!important;
+    border-left:1px solid var(--primary)!important;
+    border-right:1px solid var(--primary)!important;
+  }
+
+  .app-layout{
+    align-items:stretch!important;
+    min-height:calc(100vh - 96px)!important;
+  }
+
+  .sidebar{
+    align-self:stretch!important;
+    min-height:100%!important;
+    overflow:visible!important;
+  }
+
+  .sidebar::after{
+    top:-180px!important;
+    bottom:-1px!important;
+    width:1px!important;
+    background:var(--primary)!important;
+  }
+
+  .sidebar-image-placeholder{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+  }
+
+  .placeholder-icon{
+    width:34px;
+    height:34px;
+    color:var(--primary);
+    display:block;
+  }
+
+  /* View opens by sliding its lower section down over exactly 0.25s. */
+  .public-details,
+  .locked-panel{
+    display:block!important;
+    max-height:0;
+    overflow:hidden;
+    opacity:0;
+    visibility:hidden;
+    margin-top:0!important;
+    padding-top:0!important;
+    border-top-color:transparent!important;
+    transform:translateY(-6px);
+    transition:
+      max-height .25s ease-in-out,
+      margin-top .25s ease-in-out,
+      padding-top .25s ease-in-out,
+      transform .25s ease-in-out,
+      border-color .25s ease-in-out;
+  }
+
+  .visitor-card.expanded .public-details{
+    max-height:900px;
+    margin-top:12px!important;
+    padding-top:12px!important;
+    transform:translateY(0);
+    border-top-color:var(--border)!important;
+  }
+
+  .visitor-card.expanded .locked-panel{
+    max-height:900px;
+    margin-top:14px!important;
+    padding-top:12px!important;
+    transform:translateY(0);
+    border-top-color:var(--border)!important;
+  }
+
+  /* Text appears only after the 0.25s expansion is complete. */
+  .visitor-card.content-ready .public-details,
+  .visitor-card.content-ready .locked-panel{
+    opacity:1;
+    visibility:visible;
+  }
+
+  /* One restrained but visible click pulse on every button. */
+  @keyframes singleButtonPulse{
+    0%{transform:scale(1);}
+    48%{transform:scale(.965);}
+    100%{transform:scale(1);}
+  }
+
+  button.single-click-pulse{
+    animation:singleButtonPulse .26s ease-in-out 1!important;
+  }
+
+  @media(max-width:820px){
+    .app{
+      border-left:1px solid var(--primary)!important;
+      border-right:1px solid var(--primary)!important;
+    }
+
+    .sidebar::after{
+      display:none!important;
+    }
+  }
+</style>
+
+
+<style id="sidebar-image-admin-feature">
+.sidebar-image-placeholder{overflow:hidden!important;cursor:default!important}
+.sidebar-image-placeholder img,.admin-sidebar-image-preview img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important}
+.admin-sidebar-image-preview{width:120px;aspect-ratio:1/1;border:1px solid var(--primary);display:flex;align-items:center;justify-content:center;overflow:hidden;margin:8px 0 10px;background:transparent}
+.admin-sidebar-image-preview .placeholder-icon{width:38px;height:38px;color:var(--primary)}
+#sidebar-image-input{display:block;width:100%;margin-top:6px}
+#sidebar-image-remove-btn{margin-top:8px}
+</style>
+
+<style id="sidebar-image-size-border-controls">
+.sidebar-image-placeholder,
+.admin-sidebar-image-preview{
+  transition:width .18s ease,height .18s ease,border-color .18s ease;
+}
+.sidebar-image-placeholder.border-hidden,
+.admin-sidebar-image-preview.border-hidden{
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
+.sidebar-size-control{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:12px;
+  align-items:center;
+  margin:8px 0 12px;
+}
+#sidebar-image-size{
+  width:100%;
+  accent-color:var(--primary);
+}
+#sidebar-image-size-value{
+  min-width:58px;
+  color:var(--primary);
+  font-weight:700;
+  text-align:right;
+}
+.sidebar-border-toggle{
+  display:flex!important;
+  align-items:center;
+  gap:9px;
+  margin:10px 0 12px!important;
+  color:var(--primary)!important;
+  cursor:pointer;
+}
+.sidebar-border-toggle input{
+  width:18px;
+  height:18px;
+  accent-color:var(--primary);
+  flex:0 0 auto;
+}
+</style>
+
+<style id="admin-primary-color-controls">
+.theme-color-controls{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 58px auto;
+  gap:10px;
+  align-items:stretch;
+  margin-top:8px;
+}
+#primary-color-hex{
+  margin:0!important;
+  min-width:0;
+  text-transform:uppercase;
+}
+#primary-color-picker{
+  width:58px;
+  min-width:58px;
+  height:46px;
+  padding:3px;
+  border:1.5px solid var(--primary);
+  border-radius:0;
+  background:#fff;
+  cursor:pointer;
+}
+#primary-color-picker::-webkit-color-swatch-wrapper{padding:0}
+#primary-color-picker::-webkit-color-swatch{border:0}
+#primary-color-picker::-moz-color-swatch{border:0}
+#primary-color-reset{
+  width:auto!important;
+  min-width:92px;
+  margin:0!important;
+  padding:10px 14px!important;
+}
+#primary-color-hex.invalid{
+  border-color:var(--danger)!important;
+}
+@media(max-width:620px){
+  .theme-color-controls{grid-template-columns:minmax(0,1fr) 54px}
+  #primary-color-reset{grid-column:1/-1;width:100%!important}
+  #primary-color-picker{width:54px;min-width:54px}
+}
+</style>
+
+
+<style id="remove-outer-left-right-edge-borders">
+/* Remove only the page's outer left and right edge borders.
+   All top, bottom, internal divider, panel, card and input borders remain. */
+.app{
+  border-left:none!important;
+  border-right:none!important;
+}
+.topbar{
+  border-left:none!important;
+  border-right:none!important;
+}
+.sidebar{
+  border-left:none!important;
+}
+.main-content{
+  border-right:none!important;
+}
+
+@media(max-width:820px){
+  .app{
+    border-left:none!important;
+    border-right:none!important;
+  }
+  .topbar,
+  .sidebar{
+    border-left:none!important;
+    border-right:none!important;
+  }
+  .main-content{
+    border-left:none!important;
+    border-right:none!important;
+  }
+}
+</style>
+
+
+<style id="subtle-gradient-decor">
+/* Soft theme-colored wash rising from the bottom edge.
+   The dotted pattern remains visible above the gradient. */
+body{
+  background-image:
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--primary) 14%, transparent) 0%,
+      color-mix(in srgb, var(--primary) 7%, transparent) 22%,
+      transparent 50%
+    ),
+    radial-gradient(var(--primary) 0.45px, transparent 0.45px)!important;
+  background-size:100% 100%,20px 20px!important;
+  background-repeat:no-repeat,repeat!important;
+  background-attachment:fixed,fixed!important;
+}
+
+@media(max-width:820px){
+  body{
+    background-image:
+      linear-gradient(
+        to top,
+        color-mix(in srgb, var(--primary) 13%, transparent) 0%,
+        color-mix(in srgb, var(--primary) 6%, transparent) 25%,
+        transparent 56%
+      ),
+      radial-gradient(var(--primary) 0.45px, transparent 0.45px)!important;
+  }
+}
+</style>
+
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="profile-badge">
+      <div class="profile-pic" id="profile-pic-wrap"></div>
+      <div class="profile-handle" id="profile-handle-text">@s_seoyi</div>
+    </div>
+  </div>
+  <div class="heart-strip" aria-hidden="true"><span>♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥ ♥</span></div>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header"><h2>Databases</h2></div>
+      <div class="sidebar-feature-grid">
+        <div class="sidebar-image-placeholder" id="sidebar-feature-image" aria-label="Sidebar image">
+          <svg class="placeholder-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3.5" y="4.5" width="17" height="15" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="9" cy="9" r="1.6" fill="currentColor"/>
+      <path d="M5.5 17l4.2-4.3 3.1 3 2.2-2.2 3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+        </div>
+        <div id="db-list" class="db-list"><div id="db-empty" class="empty-state" hidden>
+          <p>No databases yet.</p>
+          <p>Please contact the admin to add data.</p>
+        </div></div>
+      </div>
+      <div class="sidebar-footer">
+        <button class="link-btn" id="admin-toggle-btn">⚙ Admin</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+    <!-- VIEW: nothing selected yet -->
+    <section id="view-empty" class="view active">
+      <div class="empty-hint">
+        <div class="empty-hint-icon">👈</div>
+        <p>Select a database from the left to view its records.</p>
+      </div>
+    </section>
+
+    <!-- VIEW: database records visible to visitors -->
+    <section id="view-search" class="view">
+      <div class="view-header">
+        <h1 id="search-db-name">—</h1>
+        <p class="subtitle" id="search-db-sub"></p>
+      </div>
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="Search name or status" autocomplete="off" />
+        <button class="btn-primary" id="search-btn" type="button">Search</button>
+      </div>
+      <div id="search-results"></div>
+    </section>
+
+    <!-- VIEW: admin -->
+    <section id="view-admin" class="view">
+      <button class="back-btn" id="back-from-admin">← Back</button>
+
+      <div id="admin-login">
+        <div class="view-header"><h1>Admin Login</h1></div>
+        <label>Password</label>
+        <input type="password" id="admin-pass" placeholder="Enter password" />
+        <button class="btn-primary" id="admin-login-btn" style="margin-top:14px;">Log In</button>
+        <p class="error-text" id="admin-login-error" hidden>Incorrect password, please try again.</p>
+      </div>
+
+      <div id="admin-panel" hidden>
+        <div class="view-header"><h1>Data Administration</h1></div>
+
+        <details>
+          <summary>How this page works (read before using)</summary>
+          <p>This page is a single static HTML file with no server of its own. When you add or edit data, changes are only saved in this browser (localStorage). For visitors elsewhere to see the new data too, after saving click "Download website file" below, then upload the new .html file to your hosting (replacing the old one). Back up your data (JSON) regularly to avoid losing it if the browser storage gets cleared.</p>
+        </details>
+
+        <div class="admin-section">
+<label>Handle / display name</label>
+          <input type="text" id="profile-handle-input" placeholder="@s_seoyi" />
+
+          <label for="primary-color-hex">Primary color</label>
+          <div class="theme-color-controls">
+            <input type="text" id="primary-color-hex" value="#2F63D6" placeholder="#2F63D6" maxlength="7" spellcheck="false" aria-label="Primary color HEX value" />
+            <input type="color" id="primary-color-picker" value="#2f63d6" aria-label="Choose primary color" />
+            <button class="btn-secondary" id="primary-color-reset" type="button">Reset</button>
+          </div>
+          <p class="hint-text">Enter a HEX color or use the color picker. Reset restores the default blue.</p>
+
+          <label>Sidebar square image</label>
+          <div class="admin-sidebar-image-preview" id="admin-sidebar-image-preview"></div>
+          <input type="file" id="sidebar-image-input" accept="image/*" />
+
+          <label for="sidebar-image-size">Sidebar image size</label>
+          <div class="sidebar-size-control">
+            <input type="range" id="sidebar-image-size" min="56" max="220" step="2" value="84" />
+            <output id="sidebar-image-size-value">84 px</output>
+          </div>
+
+          <label class="sidebar-border-toggle">
+            <input type="checkbox" id="sidebar-image-border-toggle" checked />
+            <span>Show border</span>
+          </label>
+
+          <button class="btn-secondary" id="sidebar-image-remove-btn" type="button">Remove sidebar image</button>
+          <p class="hint-text">Only administrators can change this image. Its size and border can be adjusted here.</p>
+
+          <button class="btn-primary" id="profile-save-btn" style="margin-top:14px; width:100%;">Save Profile &amp; Theme</button>
+        </div>
+
+        <hr/>
+
+        <div class="admin-section">
+          <h2>Existing Databases</h2>
+          <div id="admin-db-list"></div>
+        </div>
+
+        <hr/>
+
+        <div class="admin-section">
+          <h2>Add New Database</h2>
+          <label>Database name</label>
+          <input type="text" id="new-db-name" placeholder="e.g. June customer list" />
+          <label>Choose file (.xlsx, .xls, .csv)</label>
+          <input type="file" id="file-input" accept=".xlsx,.xls,.csv" />
+          <label>Database icon (optional)</label>
+          <input type="file" id="import-icon-input" accept="image/*" />
+          <p class="hint-text">If you don't choose an image, the default blue folder icon will be used.</p>
+
+          <div id="preview-area" hidden>
+            <label>Name column shown to visitors</label>
+            <select id="key-column-select"></select>
+            <label>Status column shown in visitor list</label>
+            <select id="status-column-select"></select>
+            <label>Password column (optional; default password is 1234 if empty/missing)</label>
+            <select id="password-column-select"></select>
+            <label>Field visibility</label>
+            <p class="vis-hint">Check each field into exactly one group below: <strong>Public</strong> = visible right after clicking a name, no password needed. <strong>Locked 🔒</strong> = only shown after the visitor enters the record's password. <strong>Hidden</strong> = never shown to visitors.</p>
+            <div id="visible-columns-checks" class="column-checks"></div>
+            <div class="table-wrap" id="preview-table-wrap"></div>
+            <button class="btn-primary" id="save-db-btn" style="margin-top:14px; width:100%;">Save Database</button>
+          </div>
+        </div>
+
+        <hr/>
+
+        <div class="admin-section">
+          <h2>Create a Database Manually (no file needed)</h2>
+          <p class="hint-text">Use this if you'd rather type data directly on the page, no Excel/CSV file needed.</p>
+          <label>Database name</label>
+          <input type="text" id="manual-db-name" placeholder="e.g. Event registration list" />
+          <label>Data columns</label>
+          <div id="manual-columns-list" class="chip-list"></div>
+          <button class="btn-secondary" id="manual-add-column-btn" type="button">+ Add column</button>
+          <div id="manual-key-column-wrap" hidden>
+            <label>Name column shown to visitors</label>
+            <select id="manual-key-column-select"></select>
+            <label>Status column shown in visitor list</label>
+            <select id="manual-status-column-select"></select>
+            <label>Password column (optional; default password is 1234 if empty/missing)</label>
+            <select id="manual-password-column-select"></select>
+            <label>Field visibility</label>
+            <p class="vis-hint">Check each field into exactly one group below: <strong>Public</strong> = visible right after clicking a name, no password needed. <strong>Locked 🔒</strong> = only shown after the visitor enters the record's password. <strong>Hidden</strong> = never shown to visitors.</p>
+            <div id="manual-visible-columns-checks" class="column-checks"></div>
+          </div>
+          <label>Database icon (optional)</label>
+          <input type="file" id="manual-icon-input" accept="image/*" />
+          <p class="hint-text">If you don't choose an image, the default blue folder icon will be used.</p>
+          <button class="btn-primary" id="manual-create-db-btn" style="margin-top:14px;width:100%;">Create Database</button>
+        </div>
+
+        <hr/>
+
+        <div class="admin-section">
+          <h2>Publish Website</h2>
+          <p class="hint-text">Click the button below to download the .html file with your latest data, then upload it to your hosting.</p>
+          <button class="btn-secondary" id="export-site-btn">⬇ Download website file (.html)</button>
+        </div>
+
+        <div class="admin-section">
+          <h2>Backup / Restore</h2>
+          <button class="btn-secondary" id="export-json-btn">⬇ Export data (JSON)</button>
+          <label class="file-label" for="import-json-input">⬆ Restore from JSON file</label>
+          <input type="file" id="import-json-input" accept=".json" hidden />
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: manage individual records (add/edit/delete manually) -->
+    <section id="view-manage-rows" class="view">
+      <button class="back-btn" id="back-from-manage-rows">← Back</button>
+      <div class="view-header">
+        <h1 id="manage-db-name">—</h1>
+        <p class="subtitle" id="manage-db-sub"></p>
+      </div>
+
+      <button class="btn-secondary" id="manage-add-column-btn" type="button">+ Add new column</button>
+
+      <div class="admin-section" style="margin-top:18px;">
+        <h2>Database icon</h2>
+        <div style="display:flex; align-items:center; gap:14px;">
+          <div class="db-icon" id="manage-icon-preview" style="width:56px;height:56px;"></div>
+          <div style="flex:1;">
+            <input type="file" id="manage-icon-input" accept="image/*" />
+            <button class="btn-secondary" id="manage-icon-reset-btn" type="button" style="margin-top:8px;">Use default icon</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-section" style="margin-top:18px;">
+        <h2>Visitor Display Settings</h2>
+        <label>Name column shown to visitors</label>
+        <select id="manage-key-column-select"></select>
+        <label>Status column shown in visitor list</label>
+        <select id="manage-status-column-select"></select>
+        <label>Password column (optional; default password is 1234 if empty/missing)</label>
+        <select id="manage-password-column-select"></select>
+        <label>Field visibility</label>
+        <p class="vis-hint">Check each field into exactly one group below: <strong>Public</strong> = visible right after clicking a name, no password needed. <strong>Locked 🔒</strong> = only shown after the visitor enters the record's password. <strong>Hidden</strong> = never shown to visitors.</p>
+        <div id="manage-visible-columns-checks" class="column-checks"></div>
+        <button class="btn-secondary" id="manage-settings-save-btn" type="button">Save Visitor Settings</button>
+      </div>
+
+      <div class="admin-section" style="margin-top:18px;">
+        <h2>Add New Record</h2>
+        <div id="add-row-fields"></div>
+        <button class="btn-primary" id="add-row-save-btn" style="margin-top:10px;width:100%;">Save Record</button>
+      </div>
+
+      <hr/>
+
+      <div class="admin-section">
+        <h2>Records</h2>
+        <div id="rows-list"></div>
+      </div>
+    </section>
+    </main>
+  </div>
+</div>
+
+<script id="embedded-data" type="application/json">[]</script>
+<script id="embedded-site-settings" type="application/json">{}</script>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- CONFIG ----
+  // Change the admin password here. NOTE: this is NOT real security
+  // (anyone who views the page source can see this password).
+  const ADMIN_PASSWORD = "ssi551";
+  const STORAGE_KEY = "ffs_databases_v1";
+  const SITE_SETTINGS_KEY = "ffs_site_settings_v1";
+  const DEFAULT_PRIMARY_COLOR = "#2f63d6";
+
+  // ---- STATE ----
+  let databases = [];
+  let currentDbIndex = null;
+  let parsedImport = { columns: [], rows: [] };
+  let isAdminAuthed = false;
+  let manualColumns = [];
+  let manageDbIndex = null;
+  let editingRowIdx = null;
+  let importIconDataUrl = null;
+  let manualIconDataUrl = null;
+  let profilePicDataUrl = null; // staged upload in the admin Site Profile form
+  let sidebarImageDataUrl = null; // staged sidebar image upload
+  let siteSettings = { profileImage: null, profileHandle: '@s_seoyi', sidebarImage: null, sidebarImageSize: 84, sidebarImageBorder: true, primaryColor: DEFAULT_PRIMARY_COLOR };
+
+  // ---- ELEMENTS ----
+  const views = {
+    empty: document.getElementById('view-empty'),
+    search: document.getElementById('view-search'),
+    admin: document.getElementById('view-admin'),
+    manageRows: document.getElementById('view-manage-rows'),
+  };
+  const dbListEl = document.getElementById('db-list');
+  const dbEmptyEl = document.getElementById('db-empty');
+  const searchDbName = document.getElementById('search-db-name');
+  const searchDbSub = document.getElementById('search-db-sub');
+  const searchResults = document.getElementById('search-results');
+  const searchInput = document.getElementById('search-input');
+  const searchBtn = document.getElementById('search-btn');
+  const adminLoginBox = document.getElementById('admin-login');
+  const adminPanel = document.getElementById('admin-panel');
+  const adminDbList = document.getElementById('admin-db-list');
+  const previewArea = document.getElementById('preview-area');
+  const keyColumnSelect = document.getElementById('key-column-select');
+  const statusColumnSelect = document.getElementById('status-column-select');
+  const passwordColumnSelect = document.getElementById('password-column-select');
+  const visibleColumnsChecks = document.getElementById('visible-columns-checks');
+  const previewTableWrap = document.getElementById('preview-table-wrap');
+  const manageKeyColumnSelect = document.getElementById('manage-key-column-select');
+  const manageStatusColumnSelect = document.getElementById('manage-status-column-select');
+  const managePasswordColumnSelect = document.getElementById('manage-password-column-select');
+  const manageVisibleColumnsChecks = document.getElementById('manage-visible-columns-checks');
+
+  // ---- UTIL: view switching ----
+  function showView(name){
+    Object.values(views).forEach(v => v.classList.remove('active'));
+    views[name].classList.add('active');
+  }
+
+  // ---- UTIL: text normalization (strip Vietnamese diacritics) ----
+  function normalize(str){
+    return String(str || "")
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g,'d').replace(/Đ/g,'D')
+      .toLowerCase()
+      .replace(/\s+/g,' ')
+      .trim();
+  }
+
+  // ---- UTIL: Levenshtein distance + similarity ----
+  function levenshtein(a, b){
+    const m = a.length, n = b.length;
+    if(m === 0) return n;
+    if(n === 0) return m;
+    let prev = new Array(n+1);
+    for(let j=0;j<=n;j++) prev[j] = j;
+    for(let i=1;i<=m;i++){
+      let cur = [i];
+      for(let j=1;j<=n;j++){
+        const cost = a[i-1] === b[j-1] ? 0 : 1;
+        cur[j] = Math.min(prev[j]+1, cur[j-1]+1, prev[j-1]+cost);
+      }
+      prev = cur;
+    }
+    return prev[n];
+  }
+  function similarity(a, b){
+    if(a === b) return 1;
+    const maxLen = Math.max(a.length, b.length) || 1;
+    return 1 - levenshtein(a, b) / maxLen;
+  }
+
+  // ---- PERSISTENCE ----
+  function loadDatabases(){
+    let local = null;
+    try{ local = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); }catch(e){ local = null; }
+    if(local && Array.isArray(local)) return local;
+    try{
+      const embedded = JSON.parse(document.getElementById('embedded-data').textContent || '[]');
+      if(Array.isArray(embedded)) return embedded;
+    }catch(e){}
+    return [];
+  }
+  function saveDatabases(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(databases));
+    }catch(e){
+      alert('Could not save to browser storage (it may be full or blocked). Try exporting JSON to back up manually.');
+    }
+  }
+
+  // ---- Site profile (avatar + handle shown top-left) ----
+  function defaultSiteSettings(){
+    return {
+      profileImage: null,
+      profileHandle: '@s_seoyi',
+      sidebarImage: null,
+      sidebarImageSize: 84,
+      sidebarImageBorder: true,
+      primaryColor: DEFAULT_PRIMARY_COLOR
+    };
+  }
+
+  function normalizeHexColor(value){
+    let hex = String(value || '').trim().replace(/^#/, '');
+    if(/^[0-9a-fA-F]{3}$/.test(hex)) hex = hex.split('').map(ch => ch + ch).join('');
+    if(!/^[0-9a-fA-F]{6}$/.test(hex)) return null;
+    return '#' + hex.toLowerCase();
+  }
+
+  function hexToRgb(hex){
+    const value = normalizeHexColor(hex) || DEFAULT_PRIMARY_COLOR;
+    return {
+      r: parseInt(value.slice(1, 3), 16),
+      g: parseInt(value.slice(3, 5), 16),
+      b: parseInt(value.slice(5, 7), 16)
+    };
+  }
+
+  function rgbToHex(r, g, b){
+    const channel = value => Math.max(0, Math.min(255, Math.round(value))).toString(16).padStart(2, '0');
+    return '#' + channel(r) + channel(g) + channel(b);
+  }
+
+  function mixHex(baseHex, mixHexValue, amount){
+    const base = hexToRgb(baseHex);
+    const mix = hexToRgb(mixHexValue);
+    const ratio = Math.max(0, Math.min(1, amount));
+    return rgbToHex(
+      base.r + (mix.r - base.r) * ratio,
+      base.g + (mix.g - base.g) * ratio,
+      base.b + (mix.b - base.b) * ratio
+    );
+  }
+
+  function readableTextColor(hex){
+    const { r, g, b } = hexToRgb(hex);
+    const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    return luminance > 0.66 ? '#14204f' : '#ffffff';
+  }
+
+  function applyPrimaryColor(value){
+    const primary = normalizeHexColor(value) || DEFAULT_PRIMARY_COLOR;
+    const root = document.documentElement.style;
+    root.setProperty('--primary', primary);
+    root.setProperty('--primary-dark', mixHex(primary, '#000000', 0.18));
+    root.setProperty('--primary-light', mixHex(primary, '#ffffff', 0.92));
+    root.setProperty('--accent', primary);
+    root.setProperty('--accent2', mixHex(primary, '#ffffff', 0.82));
+    root.setProperty('--text', mixHex(primary, '#000000', 0.08));
+    root.setProperty('--text-muted', mixHex(primary, '#ffffff', 0.25));
+    root.setProperty('--border', mixHex(primary, '#ffffff', 0.40));
+    root.setProperty('--ink', primary);
+    root.setProperty('--cta', primary);
+    root.setProperty('--cta-text', readableTextColor(primary));
+    root.setProperty('--success', primary);
+    return primary;
+  }
+
+  function loadSiteSettings(){
+    const defaults = defaultSiteSettings();
+    let local = null;
+    try{ local = JSON.parse(localStorage.getItem(SITE_SETTINGS_KEY) || 'null'); }catch(e){ local = null; }
+    if(local && typeof local === 'object') return Object.assign(defaults, local);
+    try{
+      const embeddedEl = document.getElementById('embedded-site-settings');
+      const embedded = JSON.parse((embeddedEl && embeddedEl.textContent) || '{}');
+      if(embedded && typeof embedded === 'object') return Object.assign(defaults, embedded);
+    }catch(e){}
+    return defaults;
+  }
+  function saveSiteSettings(){
+    try{
+      localStorage.setItem(SITE_SETTINGS_KEY, JSON.stringify(siteSettings));
+    }catch(e){
+      alert('Could not save to browser storage (it may be full or blocked).');
+    }
+  }
+  function renderProfileBadge(){
+    siteSettings.primaryColor = applyPrimaryColor(siteSettings.primaryColor);
+    const picWrap = document.getElementById('profile-pic-wrap');
+    const handleEl = document.getElementById('profile-handle-text');
+    if(picWrap){
+      picWrap.innerHTML = siteSettings.profileImage
+        ? `<img src="${siteSettings.profileImage}" alt="" />`
+        : `<div class="profile-pic-placeholder">🌸</div>`;
+    }
+    if(handleEl) handleEl.textContent = siteSettings.profileHandle || '@s_seoyi';
+const handleInput = document.getElementById('profile-handle-input');
+    if(handleInput && document.activeElement !== handleInput) handleInput.value = siteSettings.profileHandle || '';
+
+    const sidebarBox = document.getElementById('sidebar-feature-image');
+    if(sidebarBox){
+      sidebarBox.innerHTML = siteSettings.sidebarImage
+        ? `<img src="${siteSettings.sidebarImage}" alt="" />`
+        : `<svg class="placeholder-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="9" r="1.6" fill="currentColor"/><path d="M5.5 17l4.2-4.3 3.1 3 2.2-2.2 3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    }
+    const sidebarPreview = document.getElementById('admin-sidebar-image-preview');
+    if(sidebarPreview){
+      const previewImage = sidebarImageDataUrl !== null ? sidebarImageDataUrl : siteSettings.sidebarImage;
+      sidebarPreview.innerHTML = previewImage
+        ? `<img src="${previewImage}" alt="" />`
+        : `<svg class="placeholder-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="9" r="1.6" fill="currentColor"/><path d="M5.5 17l4.2-4.3 3.1 3 2.2-2.2 3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    }
+    const sidebarSize = Math.max(56, Math.min(220, Number(siteSettings.sidebarImageSize) || 84));
+    const sidebarBorder = siteSettings.sidebarImageBorder !== false;
+
+    if(sidebarBox){
+      sidebarBox.style.width = sidebarSize + 'px';
+      sidebarBox.style.height = sidebarSize + 'px';
+      sidebarBox.classList.toggle('border-hidden', !sidebarBorder);
+    }
+
+    if(sidebarPreview){
+      const previewSize = Math.min(sidebarSize, 180);
+      sidebarPreview.style.width = previewSize + 'px';
+      sidebarPreview.style.height = previewSize + 'px';
+      sidebarPreview.classList.toggle('border-hidden', !sidebarBorder);
+    }
+
+    const sizeInput = document.getElementById('sidebar-image-size');
+    const sizeOutput = document.getElementById('sidebar-image-size-value');
+    const borderToggle = document.getElementById('sidebar-image-border-toggle');
+    if(sizeInput && document.activeElement !== sizeInput) sizeInput.value = sidebarSize;
+    if(sizeOutput) sizeOutput.textContent = sidebarSize + ' px';
+    if(borderToggle) borderToggle.checked = sidebarBorder;
+
+    const colorHexInput = document.getElementById('primary-color-hex');
+    const colorPicker = document.getElementById('primary-color-picker');
+    if(colorHexInput && document.activeElement !== colorHexInput){
+      colorHexInput.value = siteSettings.primaryColor.toUpperCase();
+      colorHexInput.classList.remove('invalid');
+    }
+    if(colorPicker) colorPicker.value = siteSettings.primaryColor;
+
+  }
+
+  // ---- UTIL: database icon (custom image or default blue folder) ----
+  function folderIconSvg(){
+    return '<svg viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.379a1.5 1.5 0 0 1 1.06.44L11.5 7H19.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5v-11Z" style="fill:var(--primary)"/></svg>';
+  }
+  function dbIconHtml(db){
+    return db.icon ? `<img src="${db.icon}" alt="" />` : folderIconSvg();
+  }
+
+  // ---- RENDER: database select list ----
+  function renderSelectList(){
+    dbListEl.innerHTML = '';
+    if(!databases.length){
+      dbEmptyEl.hidden = false;
+      return;
+    }
+    dbEmptyEl.hidden = true;
+    databases.forEach((db, idx) => {
+      const card = document.createElement('button');
+      card.className = 'db-card' + (idx === currentDbIndex ? ' active' : '');
+      card.innerHTML = `
+        <div class="db-icon">${dbIconHtml(db)}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="db-name">${escapeHtml(db.name)}</div>
+          <div class="db-meta">${db.rows.length} records</div>
+        </div>
+        <div class="arrow">→</div>`;
+      card.addEventListener('click', () => openDatabase(idx));
+      dbListEl.appendChild(card);
+    });
+  }
+
+  function openDatabase(idx){
+    currentDbIndex = idx;
+    const db = ensureDbDefaults(databases[idx]);
+    searchDbName.textContent = db.name;
+    searchDbSub.textContent = db.rows.length + ' records · search, then tap a name or VIEW INFO to see details';
+    searchInput.value = '';
+    renderVisitorList(db);
+    renderSelectList();
+    showView('search');
+    setTimeout(() => searchInput.focus(), 50);
+  }
+
+  function ensureDbDefaults(db){
+    db.columns = Array.isArray(db.columns) ? db.columns : inferColumns(db.rows || []);
+    if(!db.keyColumn || !db.columns.includes(db.keyColumn)) db.keyColumn = db.columns[0] || 'Name';
+    if(!('statusColumn' in db)) db.statusColumn = guessColumn(db.columns, ['status', 'trạng thái', 'trang thai']);
+    if(!('passwordColumn' in db)) db.passwordColumn = guessColumn(db.columns, ['password', 'pass', 'mật khẩu', 'mat khau']);
+    // Migrate old single-list "visibleColumns" (everything required a password) into the
+    // new public/locked split. Existing data keeps its old behavior (all fields locked)
+    // until the admin explicitly marks some fields as Public.
+    if(!Array.isArray(db.publicColumns) && !Array.isArray(db.lockedColumns)){
+      const legacyVisible = Array.isArray(db.visibleColumns) && db.visibleColumns.length
+        ? db.visibleColumns
+        : db.columns.filter(c => c !== db.passwordColumn);
+      db.publicColumns = [];
+      db.lockedColumns = legacyVisible.filter(c => c !== db.passwordColumn);
+    }
+    if(!Array.isArray(db.publicColumns)) db.publicColumns = [];
+    if(!Array.isArray(db.lockedColumns)) db.lockedColumns = [];
+    // Keep lists valid: columns must exist, never include the password column,
+    // and a field can't be both public and locked (public wins).
+    db.publicColumns = db.publicColumns.filter(c => db.columns.includes(c) && c !== db.passwordColumn);
+    db.lockedColumns = db.lockedColumns.filter(c => db.columns.includes(c) && c !== db.passwordColumn && !db.publicColumns.includes(c));
+    return db;
+  }
+
+  function inferColumns(rows){
+    const set = new Set();
+    (rows || []).forEach(r => Object.keys(r || {}).forEach(k => set.add(k)));
+    return [...set];
+  }
+
+  function guessColumn(columns, names){
+    return (columns || []).find(c => names.some(n => normalize(c).includes(normalize(n)))) || '';
+  }
+
+  function getMvdColumn(db){
+    return (db.columns || []).find(c => normalize(c) === 'mvd' || normalize(c).includes('mvd')) || '';
+  }
+
+  function renderVisitorList(db, filterText){
+    searchResults.innerHTML = '';
+    if(!db.rows.length){
+      searchResults.innerHTML = '<div class="hint-box">No records in this database yet.</div>';
+      return;
+    }
+    const q = normalize(filterText || '');
+    const filteredRows = q ? db.rows.filter(row => {
+      const name = normalize(row[db.keyColumn]);
+      const status = db.statusColumn ? normalize(row[db.statusColumn]) : '';
+      return name.includes(q) || status.includes(q);
+    }) : db.rows;
+    if(!filteredRows.length){
+      searchResults.innerHTML = '<div class="hint-box none">No matching names or status found.</div>';
+      return;
+    }
+    const wrap = document.createElement('div');
+    wrap.className = 'visitor-list';
+    filteredRows.forEach((row, idx) => {
+      const name = row[db.keyColumn] || 'Unnamed record';
+      const status = db.statusColumn ? (row[db.statusColumn] || '—') : '—';
+      const hasLocked = !!(db.lockedColumns && db.lockedColumns.length);
+      const card = document.createElement('div');
+      card.className = 'visitor-card';
+      card.innerHTML = `
+        <div class="visitor-card-head">
+          <div class="visitor-main">
+            <div class="visitor-name" tabindex="0">${escapeHtml(name)}</div>
+            <div class="visitor-status">Status: <span class="status-pill">${escapeHtml(status)}</span></div>
+          </div>
+          <button class="view-info-btn" type="button">View</button>
+        </div>
+        <div class="public-details"></div>
+        ${hasLocked ? `
+        <div class="locked-panel">
+          <div class="locked-label">🔒 More info — password required</div>
+          <div class="ship-info-row">
+            <button class="ship-info-btn" type="button">📦 Xem thông tin ship</button>
+            <div class="password-row" style="display:none;">
+              <input type="password" class="record-password-input" placeholder="Enter password" autocomplete="current-password" />
+              <button class="btn-primary unlock-inline-btn" type="button">Unlock</button>
+            </div>
+          </div>
+          <div class="inline-error">Incorrect password. Please try again.</div>
+          <div class="inline-details"></div>
+        </div>` : ''}`;
+      const expand = () => expandCard(card, db, row);
+      card.querySelector('.visitor-name').addEventListener('click', expand);
+      card.querySelector('.visitor-name').addEventListener('keydown', e => { if(e.key === 'Enter') expand(); });
+      card.querySelector('.view-info-btn').addEventListener('click', expand);
+      if(hasLocked){
+        const shipBtn = card.querySelector('.ship-info-btn');
+        const input = card.querySelector('.record-password-input');
+        const unlockBtn = card.querySelector('.unlock-inline-btn');
+        const unlock = () => unlockInlineRecord(db, row, card);
+        shipBtn.addEventListener('click', () => revealShipPasswordBox(card));
+        unlockBtn.addEventListener('click', unlock);
+        input.addEventListener('keydown', e => { if(e.key === 'Enter') unlock(); });
+      }
+      wrap.appendChild(card);
+    });
+    searchResults.appendChild(wrap);
+  }
+
+  // "Xem thông tin ship" button slides out to the right, then the password
+  // field pops in from the bottom-left of its bounding box, like a chat bubble.
+  function revealShipPasswordBox(card){
+    const btn = card.querySelector('.ship-info-btn');
+    const row = card.querySelector('.password-row');
+    if(!btn || !row || btn.classList.contains('slide-out')) return;
+    playPopSound();
+    btn.classList.add('slide-out');
+    setTimeout(() => {
+      btn.style.display = 'none';
+      row.style.display = 'flex';
+      void row.offsetWidth; // force reflow so the pop-in animation replays
+      row.classList.add('pop-visible');
+      const input = row.querySelector('.record-password-input');
+      if(input) setTimeout(() => input.focus(), 180);
+    }, 230);
+  }
+
+  // Small synthesized "pop" sound (no external audio files needed).
+  let sharedAudioCtx = null;
+  function playPopSound(){
+    try{
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if(!Ctx) return;
+      sharedAudioCtx = sharedAudioCtx || new Ctx();
+      const ctx = sharedAudioCtx;
+      if(ctx.state === 'suspended') ctx.resume();
+      const t0 = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(560, t0);
+      osc.frequency.exponentialRampToValueAtTime(920, t0 + 0.09);
+      gain.gain.setValueAtTime(0.0001, t0);
+      gain.gain.exponentialRampToValueAtTime(0.32, t0 + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.19);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(t0);
+      osc.stop(t0 + 0.2);
+    }catch(e){ /* audio unsupported or blocked — fail silently */ }
+  }
+
+  // Expanding a card immediately reveals the Public fields (no password needed).
+  // If the database has any Locked fields configured, a password box appears
+  // at the bottom of the card to unlock those.
+  function expandCard(card, db, row){
+    const wasExpanded = card.classList.contains('expanded');
+
+    document.querySelectorAll('.visitor-card.expanded').forEach(c => {
+      if(c !== card){
+        c.classList.remove('content-ready');
+        c.classList.remove('expanded');
+      }
+    });
+
+    if(wasExpanded){
+      card.classList.remove('content-ready');
+      card.classList.remove('expanded');
+      return;
+    }
+
+    const publicContainer = card.querySelector('.public-details');
+    if(publicContainer && !publicContainer.dataset.rendered){
+      renderPublicFields(row, db, publicContainer);
+      publicContainer.dataset.rendered = '1';
+    }
+
+    card.classList.remove('content-ready');
+    card.classList.add('expanded');
+
+    window.clearTimeout(card._expandRevealTimer);
+    card._expandRevealTimer = window.setTimeout(() => {
+      if(card.classList.contains('expanded')){
+        card.classList.add('content-ready');
+        const input = card.querySelector('.record-password-input');
+        if(input && input.offsetParent !== null) input.focus();
+      }
+    }, 250);
+  }
+
+  function rowPassword(db, row){
+    const fromColumn = db.passwordColumn && row[db.passwordColumn] !== undefined && String(row[db.passwordColumn]).trim() !== ''
+      ? String(row[db.passwordColumn]).trim()
+      : '1234';
+    return fromColumn;
+  }
+
+  function unlockInlineRecord(db, row, card){
+    const input = card.querySelector('.record-password-input');
+    const error = card.querySelector('.inline-error');
+    const entered = input ? input.value : '';
+    if(String(entered).trim() !== rowPassword(db, row)){
+      error.style.display = 'block';
+      if(input) input.select();
+      return;
+    }
+    error.style.display = 'none';
+    renderLockedFields(row, db, card.querySelector('.inline-details'));
+  }
+
+  // Shared renderer for a single field row (used by public info, locked info,
+  // and the legacy result card).
+  function fieldRowHtml(key, value, isMvd){
+    const v = value === '' || value === undefined || value === null ? '—' : value;
+    return `
+      <div class="field-row ${isMvd ? 'mvd-row' : ''}">
+        <div class="field-label">${escapeHtml(key)}</div>
+        <div class="field-value">${escapeHtml(v)}${isMvd && v !== '—' ? `<button class="copy-btn" data-copy="${escapeHtml(v)}">Copy</button>` : ''}</div>
+      </div>`;
+  }
+
+  // Fields visible to everyone immediately, no password needed.
+  function renderPublicFields(row, db, container){
+    const mvdColumn = getMvdColumn(db);
+    const cols = db.publicColumns || [];
+    if(!cols.length){
+      container.innerHTML = '<p class="hint-text" style="margin:2px 0 0;">No public information for this record.</p>';
+      return;
+    }
+    container.innerHTML = cols.map(k => fieldRowHtml(k, row[k], mvdColumn === k)).join('');
+    container.querySelectorAll('.copy-btn').forEach(btn => wireCopyButton(btn));
+  }
+
+  // Fields revealed only after the correct per-record password is entered.
+  function renderLockedFields(row, db, container){
+    const mvdColumn = getMvdColumn(db);
+    const cols = db.lockedColumns || [];
+    container.innerHTML = cols.map(k => fieldRowHtml(k, row[k], mvdColumn === k)).join('');
+    container.querySelectorAll('.copy-btn').forEach(btn => wireCopyButton(btn));
+  }
+
+  // ---- VISITOR RECORD DETAILS ----
+  function wireCopyButton(btn){
+    btn.addEventListener('click', async () => {
+      const val = btn.getAttribute('data-copy') || '';
+      try{
+        await navigator.clipboard.writeText(val);
+        btn.textContent = 'Copied';
+        setTimeout(() => btn.textContent = 'Copy', 1200);
+      }catch(e){
+        btn.textContent = 'Select manually';
+        setTimeout(() => btn.textContent = 'Copy', 1600);
+      }
+    });
+  }
+
+  function renderResultCard(row, db){
+    searchResults.innerHTML = '';
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    const mvdColumn = getMvdColumn(db);
+    const visible = [...(db.publicColumns || []), ...(db.lockedColumns || [])];
+    const fields = visible.map(k => fieldRowHtml(k, row[k], mvdColumn === k)).join('');
+    card.innerHTML = `
+      <div class="result-title"><span class="check-badge">✓</span><strong>Information found</strong></div>
+      ${fields}`;
+    card.querySelectorAll('.copy-btn').forEach(btn => wireCopyButton(btn));
+    searchResults.appendChild(card);
+  }
+
+  // ---- ADMIN: database list ----
+  function renderAdminDbList(){
+    adminDbList.innerHTML = '';
+    if(!databases.length){
+      adminDbList.innerHTML = '<p class="hint-text">No databases yet.</p>';
+      return;
+    }
+    databases.forEach((db, idx) => {
+      const item = document.createElement('div');
+      item.className = 'admin-db-item';
+      item.innerHTML = `
+        <div class="info">
+          <strong>${escapeHtml(db.name)}</strong>
+          <div>${db.rows.length} records · name: ${escapeHtml(db.keyColumn)} · status: ${escapeHtml(db.statusColumn || '—')}<br/>public: ${escapeHtml((db.publicColumns || []).join(', ') || '—')} · locked 🔒: ${escapeHtml((db.lockedColumns || []).join(', ') || '—')}</div>
+        </div>
+        <div class="row-actions">
+          <button class="btn-link-edit" data-action="manage" data-idx="${idx}">Manage Records</button>
+          <button class="btn-danger" data-action="delete" data-idx="${idx}">Delete</button>
+        </div>`;
+      item.querySelector('[data-action="manage"]').addEventListener('click', () => openManageRows(idx));
+      item.querySelector('[data-action="delete"]').addEventListener('click', () => deleteDatabase(idx));
+      adminDbList.appendChild(item);
+    });
+  }
+
+  function deleteDatabase(idx){
+    if(!confirm('Delete database "' + databases[idx].name + '"? This action cannot be undone.')) return;
+    databases.splice(idx, 1);
+    if(currentDbIndex === idx){
+      currentDbIndex = null;
+    } else if(currentDbIndex !== null && currentDbIndex > idx){
+      currentDbIndex -= 1;
+    }
+    saveDatabases();
+    renderAdminDbList();
+    renderSelectList();
+  }
+
+  // ---- ADMIN: import spreadsheet ----
+  function resetImportForm(){
+    document.getElementById('new-db-name').value = '';
+    document.getElementById('file-input').value = '';
+    document.getElementById('import-icon-input').value = '';
+    parsedImport = { columns: [], rows: [] };
+    importIconDataUrl = null;
+    previewArea.hidden = true;
+  }
+
+  document.getElementById('import-icon-input').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(!file){ importIconDataUrl = null; return; }
+    const reader = new FileReader();
+    reader.onload = function(evt){ importIconDataUrl = evt.target.result; };
+    reader.readAsDataURL(file);
+  });
+
+  function fillColumnSelect(selectEl, columns, includeNone, selected){
+    selectEl.innerHTML = '';
+    if(includeNone){
+      const opt = document.createElement('option');
+      opt.value = ''; opt.textContent = 'None / use default';
+      selectEl.appendChild(opt);
+    }
+    columns.forEach(col => {
+      const opt = document.createElement('option');
+      opt.value = col; opt.textContent = col;
+      selectEl.appendChild(opt);
+    });
+    if(selected !== undefined && columns.includes(selected)) selectEl.value = selected;
+  }
+
+  // Per-column visitor visibility control: for each data column (except the
+  // password column, which is never shown to visitors), the admin checks it
+  // into exactly one of three groups:
+  //   Public  -> shown immediately when a visitor clicks a name / View Info, no password
+  //   Locked  -> shown only after the visitor enters the record's password
+  //   Hidden  -> never shown to visitors
+  // Checking a field's box in one group automatically unchecks it in the other two.
+  function renderColumnVisibilityControls(container, columns, publicColumns, lockedColumns, passwordColumn){
+    const cols = columns.filter(c => c !== passwordColumn);
+    const publicSet = new Set(publicColumns || []);
+    const lockedSet = new Set(lockedColumns || []);
+
+    container.innerHTML = `
+      <div class="vis-groups">
+        <div class="vis-group vis-group-public">
+          <div class="vis-group-title">🌐 Public <span>— visible right away, no password</span></div>
+          <div class="vis-checklist" data-group-list="public"></div>
+        </div>
+        <div class="vis-group vis-group-locked">
+          <div class="vis-group-title">🔒 Locked <span>— shown after the record's password</span></div>
+          <div class="vis-checklist" data-group-list="locked"></div>
+        </div>
+        <div class="vis-group vis-group-hidden">
+          <div class="vis-group-title">🙈 Hidden <span>— never shown to visitors</span></div>
+          <div class="vis-checklist" data-group-list="hidden"></div>
+        </div>
+      </div>`;
+
+    const publicList = container.querySelector('[data-group-list="public"]');
+    const lockedList = container.querySelector('[data-group-list="locked"]');
+    const hiddenList = container.querySelector('[data-group-list="hidden"]');
+
+    if(!cols.length){
+      const msg = '<p class="hint-text" style="margin:4px 0;">No fields yet.</p>';
+      publicList.innerHTML = msg; lockedList.innerHTML = msg; hiddenList.innerHTML = msg;
+      return;
+    }
+
+    cols.forEach(col => {
+      const groupKey = publicSet.has(col) ? 'public' : (lockedSet.has(col) ? 'locked' : 'hidden');
+      const makeOption = () => {
+        const label = document.createElement('label');
+        label.className = 'check-option';
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        const span = document.createElement('span');
+        span.textContent = col;
+        label.appendChild(input);
+        label.appendChild(span);
+        return { label, input };
+      };
+      const pub = makeOption(), lock = makeOption(), hide = makeOption();
+      pub.input.checked = groupKey === 'public';
+      lock.input.checked = groupKey === 'locked';
+      hide.input.checked = groupKey === 'hidden';
+      const trio = [pub.input, lock.input, hide.input];
+      trio.forEach(inp => {
+        inp.addEventListener('change', function(){
+          if(this.checked){
+            trio.forEach(other => { if(other !== this) other.checked = false; });
+          } else if(!trio.some(other => other.checked)){
+            // Never leave a field with no group checked — fall back to Hidden.
+            hide.input.checked = true;
+          }
+        });
+      });
+      publicList.appendChild(pub.label);
+      lockedList.appendChild(lock.label);
+      hiddenList.appendChild(hide.label);
+    });
+  }
+
+  function getColumnVisibilitySelections(container){
+    const publicColumns = [...container.querySelectorAll('[data-group-list="public"] input:checked')]
+      .map(inp => inp.nextElementSibling.textContent);
+    const lockedColumns = [...container.querySelectorAll('[data-group-list="locked"] input:checked')]
+      .map(inp => inp.nextElementSibling.textContent);
+    return { publicColumns, lockedColumns };
+  }
+
+  function renderPreview(){
+    const cols = parsedImport.columns;
+    fillColumnSelect(keyColumnSelect, cols, false, cols[0]);
+    fillColumnSelect(statusColumnSelect, cols, true, guessColumn(cols, ['status', 'trạng thái', 'trang thai']));
+    fillColumnSelect(passwordColumnSelect, cols, true, guessColumn(cols, ['password', 'pass', 'mật khẩu', 'mat khau']));
+    // Default: everything Locked (safe by default) except the password column; admin can switch fields to Public.
+    renderColumnVisibilityControls(visibleColumnsChecks, cols, [], cols.filter(c => c !== passwordColumnSelect.value), passwordColumnSelect.value);
+    passwordColumnSelect.onchange = () => {
+      const sel = getColumnVisibilitySelections(visibleColumnsChecks);
+      renderColumnVisibilityControls(visibleColumnsChecks, cols, sel.publicColumns, sel.lockedColumns, passwordColumnSelect.value);
+    };
+    const sampleRows = parsedImport.rows.slice(0, 5);
+    let tableHtml = '<table><thead><tr>' +
+      parsedImport.columns.map(c => `<th>${escapeHtml(c)}</th>`).join('') +
+      '</tr></thead><tbody>' +
+      sampleRows.map(r => '<tr>' + parsedImport.columns.map(c => `<td>${escapeHtml(r[c])}</td>`).join('') + '</tr>').join('') +
+      '</tbody></table>';
+    previewTableWrap.innerHTML = tableHtml;
+    previewArea.hidden = false;
+  }
+
+  document.getElementById('file-input').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt){
+      try{
+        const data = new Uint8Array(evt.target.result);
+        const wb = XLSX.read(data, { type: 'array' });
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+        if(!rows.length){
+          alert('The file has no data or is missing a header row.');
+          return;
+        }
+        parsedImport = { columns: Object.keys(rows[0]), rows: rows };
+        renderPreview();
+      }catch(err){
+        alert('Could not read the file. Please check the format (.xlsx, .xls, or .csv) and try again.');
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  });
+
+  document.getElementById('save-db-btn').addEventListener('click', function(){
+    const name = document.getElementById('new-db-name').value.trim();
+    if(!name){ alert('Please enter a database name.'); return; }
+    if(!parsedImport.rows.length){ alert('Please choose a data file first.'); return; }
+    const keyColumn = keyColumnSelect.value;
+    const existingIdx = databases.findIndex(d => d.name === name);
+    if(existingIdx !== -1){
+      if(!confirm('The name "' + name + '" already exists. Overwrite the old data?')) return;
+      databases.splice(existingIdx, 1);
+    }
+    const visSel = getColumnVisibilitySelections(visibleColumnsChecks);
+    databases.push({ name, keyColumn, statusColumn: statusColumnSelect.value, passwordColumn: passwordColumnSelect.value, publicColumns: visSel.publicColumns, lockedColumns: visSel.lockedColumns, columns: parsedImport.columns, rows: parsedImport.rows, icon: importIconDataUrl || null });
+    saveDatabases();
+    resetImportForm();
+    renderAdminDbList();
+    renderSelectList();
+    alert('Saved database "' + name + '". Don\'t forget to click "Download website file" to publish the changes.');
+  });
+
+  // ---- ADMIN: manual database creation (no spreadsheet needed) ----
+  const manualColumnsList = document.getElementById('manual-columns-list');
+  const manualKeyColumnWrap = document.getElementById('manual-key-column-wrap');
+  const manualKeyColumnSelect = document.getElementById('manual-key-column-select');
+  const manualStatusColumnSelect = document.getElementById('manual-status-column-select');
+  const manualPasswordColumnSelect = document.getElementById('manual-password-column-select');
+  const manualVisibleColumnsChecks = document.getElementById('manual-visible-columns-checks');
+
+  function renderManualColumns(){
+    manualColumnsList.innerHTML = '';
+    manualColumns.forEach((col, idx) => {
+      const chip = document.createElement('span');
+      chip.className = 'chip';
+      chip.innerHTML = `${escapeHtml(col)} <button type="button" aria-label="Remove column" data-idx="${idx}">×</button>`;
+      chip.querySelector('button').addEventListener('click', () => {
+        manualColumns.splice(idx, 1);
+        renderManualColumns();
+      });
+      manualColumnsList.appendChild(chip);
+    });
+    fillColumnSelect(manualKeyColumnSelect, manualColumns, false, manualColumns[0]);
+    fillColumnSelect(manualStatusColumnSelect, manualColumns, true, guessColumn(manualColumns, ['status', 'trạng thái', 'trang thai']));
+    fillColumnSelect(manualPasswordColumnSelect, manualColumns, true, guessColumn(manualColumns, ['password', 'pass', 'mật khẩu', 'mat khau']));
+    renderColumnVisibilityControls(manualVisibleColumnsChecks, manualColumns, [], manualColumns.filter(c => c !== manualPasswordColumnSelect.value), manualPasswordColumnSelect.value);
+    manualPasswordColumnSelect.onchange = () => {
+      const sel = getColumnVisibilitySelections(manualVisibleColumnsChecks);
+      renderColumnVisibilityControls(manualVisibleColumnsChecks, manualColumns, sel.publicColumns, sel.lockedColumns, manualPasswordColumnSelect.value);
+    };
+    manualKeyColumnWrap.hidden = manualColumns.length === 0;
+  }
+
+  document.getElementById('manual-add-column-btn').addEventListener('click', function(){
+    const name = prompt('New column name (e.g. Facebook name, Phone number, Notes...)');
+    if(name === null) return;
+    const trimmed = name.trim();
+    if(!trimmed){ alert('Column name cannot be empty.'); return; }
+    if(manualColumns.some(c => c.toLowerCase() === trimmed.toLowerCase())){ alert('This column already exists.'); return; }
+    manualColumns.push(trimmed);
+    renderManualColumns();
+  });
+
+  document.getElementById('manual-icon-input').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(!file){ manualIconDataUrl = null; return; }
+    const reader = new FileReader();
+    reader.onload = function(evt){ manualIconDataUrl = evt.target.result; };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('manual-create-db-btn').addEventListener('click', function(){
+    const name = document.getElementById('manual-db-name').value.trim();
+    if(!name){ alert('Please enter a database name.'); return; }
+    if(!manualColumns.length){ alert('Please add at least 1 data column.'); return; }
+    const existingIdx = databases.findIndex(d => d.name === name);
+    if(existingIdx !== -1){
+      if(!confirm('The name "' + name + '" already exists. Overwrite the old data?')) return;
+      databases.splice(existingIdx, 1);
+    }
+    const manualVisSel = getColumnVisibilitySelections(manualVisibleColumnsChecks);
+    const newDb = { name, keyColumn: manualKeyColumnSelect.value, statusColumn: manualStatusColumnSelect.value, passwordColumn: manualPasswordColumnSelect.value, publicColumns: manualVisSel.publicColumns, lockedColumns: manualVisSel.lockedColumns, columns: [...manualColumns], rows: [], icon: manualIconDataUrl || null };
+    databases.push(newDb);
+    saveDatabases();
+    document.getElementById('manual-db-name').value = '';
+    document.getElementById('manual-icon-input').value = '';
+    manualIconDataUrl = null;
+    manualColumns = [];
+    renderManualColumns();
+    renderAdminDbList();
+    renderSelectList();
+    openManageRows(databases.length - 1);
+  });
+
+  // ---- ADMIN: manage rows (add / edit / delete individual records) ----
+  function openManageRows(idx){
+    manageDbIndex = idx;
+    editingRowIdx = null;
+    renderManageRows();
+    showView('manageRows');
+  }
+
+  function renderManageRows(){
+    const db = ensureDbDefaults(databases[manageDbIndex]);
+    document.getElementById('manage-db-name').textContent = db.name;
+    document.getElementById('manage-db-sub').textContent = db.rows.length + ' records · ' + db.columns.length + ' columns';
+    document.getElementById('manage-icon-preview').innerHTML = dbIconHtml(db);
+    document.getElementById('manage-icon-input').value = '';
+    renderManageVisitorSettings(db);
+    renderAddRowForm(db);
+    renderRowsList(db);
+  }
+
+  function renderManageVisitorSettings(db){
+    fillColumnSelect(manageKeyColumnSelect, db.columns, false, db.keyColumn);
+    fillColumnSelect(manageStatusColumnSelect, db.columns, true, db.statusColumn || '');
+    fillColumnSelect(managePasswordColumnSelect, db.columns, true, db.passwordColumn || '');
+    renderColumnVisibilityControls(manageVisibleColumnsChecks, db.columns, db.publicColumns, db.lockedColumns, db.passwordColumn || '');
+    managePasswordColumnSelect.onchange = () => {
+      const sel = getColumnVisibilitySelections(manageVisibleColumnsChecks);
+      renderColumnVisibilityControls(manageVisibleColumnsChecks, db.columns, sel.publicColumns, sel.lockedColumns, managePasswordColumnSelect.value);
+    };
+  }
+
+  document.getElementById('manage-settings-save-btn').addEventListener('click', function(){
+    if(manageDbIndex === null) return;
+    const db = databases[manageDbIndex];
+    db.keyColumn = manageKeyColumnSelect.value;
+    db.statusColumn = manageStatusColumnSelect.value;
+    db.passwordColumn = managePasswordColumnSelect.value;
+    const manageVisSel = getColumnVisibilitySelections(manageVisibleColumnsChecks);
+    db.publicColumns = manageVisSel.publicColumns;
+    db.lockedColumns = manageVisSel.lockedColumns;
+    saveDatabases();
+    renderManageRows();
+    renderAdminDbList();
+    renderSelectList();
+    alert('Visitor settings saved.');
+  });
+
+  document.getElementById('manage-icon-input').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(!file || manageDbIndex === null) return;
+    const reader = new FileReader();
+    reader.onload = function(evt){
+      const db = databases[manageDbIndex];
+      db.icon = evt.target.result;
+      saveDatabases();
+      document.getElementById('manage-icon-preview').innerHTML = dbIconHtml(db);
+      renderSelectList();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('manage-icon-reset-btn').addEventListener('click', function(){
+    if(manageDbIndex === null) return;
+    const db = databases[manageDbIndex];
+    db.icon = null;
+    saveDatabases();
+    document.getElementById('manage-icon-preview').innerHTML = dbIconHtml(db);
+    document.getElementById('manage-icon-input').value = '';
+    renderSelectList();
+  });
+
+  function renderAddRowForm(db){
+    const container = document.getElementById('add-row-fields');
+    container.innerHTML = db.columns.map((col, i) => `
+      <div>
+        <label>${escapeHtml(col)}</label>
+        <input type="text" class="add-row-input" data-col-idx="${i}" />
+      </div>`).join('');
+  }
+
+  document.getElementById('add-row-save-btn').addEventListener('click', function(){
+    const db = databases[manageDbIndex];
+    const inputs = document.querySelectorAll('#add-row-fields .add-row-input');
+    const row = {};
+    inputs.forEach(inp => { row[db.columns[+inp.dataset.colIdx]] = inp.value; });
+    const hasValue = Object.values(row).some(v => String(v).trim() !== '');
+    if(!hasValue){ alert('Please fill in at least 1 field.'); return; }
+    db.rows.push(row);
+    saveDatabases();
+    renderManageRows();
+  });
+
+  document.getElementById('manage-add-column-btn').addEventListener('click', function(){
+    const db = databases[manageDbIndex];
+    const name = prompt('New column name (e.g. Notes)');
+    if(name === null) return;
+    const trimmed = name.trim();
+    if(!trimmed){ alert('Column name cannot be empty.'); return; }
+    if(db.columns.some(c => c.toLowerCase() === trimmed.toLowerCase())){ alert('This column already exists.'); return; }
+    db.columns.push(trimmed);
+    db.rows.forEach(r => { if(!(trimmed in r)) r[trimmed] = ''; });
+    saveDatabases();
+    renderManageRows();
+  });
+
+  function renderRowsList(db){
+    const container = document.getElementById('rows-list');
+    container.innerHTML = '';
+    if(!db.rows.length){
+      container.innerHTML = '<p class="hint-text">No records yet. Add your first record above.</p>';
+      return;
+    }
+    db.rows.forEach((row, idx) => {
+      const card = document.createElement('div');
+      card.className = 'row-card';
+      if(editingRowIdx === idx){
+        card.innerHTML = `
+          <div class="row-card-top"><span class="row-index">Record #${idx + 1}</span></div>
+          ${db.columns.map((col, i) => `
+            <div class="row-edit-field">
+              <label>${escapeHtml(col)}</label>
+              <input type="text" class="edit-row-input" data-col-idx="${i}" value="${escapeHtml(row[col])}" />
+            </div>`).join('')}
+          <div class="row-edit-actions">
+            <button class="btn-primary save-edit-btn">Save</button>
+            <button class="btn-secondary cancel-edit-btn">Cancel</button>
+          </div>`;
+        card.querySelector('.save-edit-btn').addEventListener('click', () => {
+          const inputs = card.querySelectorAll('.edit-row-input');
+          inputs.forEach(inp => { row[db.columns[+inp.dataset.colIdx]] = inp.value; });
+          saveDatabases();
+          editingRowIdx = null;
+          renderRowsList(db);
+        });
+        card.querySelector('.cancel-edit-btn').addEventListener('click', () => {
+          editingRowIdx = null;
+          renderRowsList(db);
+        });
+      } else {
+        const fields = db.columns.map(col => `
+          <div class="field-row">
+            <div class="field-label">${escapeHtml(col)}</div>
+            <div class="field-value">${escapeHtml(row[col] === '' || row[col] === undefined ? '—' : row[col])}</div>
+          </div>`).join('');
+        card.innerHTML = `
+          <div class="row-card-top">
+            <span class="row-index">Record #${idx + 1}</span>
+            <div class="row-actions">
+              <button class="btn-link-edit edit-btn">Edit</button>
+              <button class="btn-danger delete-btn">Delete</button>
+            </div>
+          </div>
+          ${fields}`;
+        card.querySelector('.edit-btn').addEventListener('click', () => {
+          editingRowIdx = idx;
+          renderRowsList(db);
+        });
+        card.querySelector('.delete-btn').addEventListener('click', () => {
+          if(!confirm('Delete record #' + (idx + 1) + '?')) return;
+          db.rows.splice(idx, 1);
+          saveDatabases();
+          renderManageRows();
+        });
+      }
+      container.appendChild(card);
+    });
+  }
+
+  document.getElementById('back-from-manage-rows').addEventListener('click', function(){
+    renderAdminDbList();
+    showView('admin');
+  });
+
+  // ---- ADMIN: export site (bakes data into a downloadable HTML file) ----
+  document.getElementById('export-site-btn').addEventListener('click', function(){
+    const dataStr = JSON.stringify(databases).replace(/</g, '\\u003c');
+    const settingsStr = JSON.stringify(siteSettings).replace(/</g, '\\u003c');
+    let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    const reData = /(<script id="embedded-data" type="application\/json">)([\s\S]*?)(<\/script>)/;
+    html = html.replace(reData, function(match, p1, p2, p3){ return p1 + dataStr + p3; });
+    const reSettings = /(<script id="embedded-site-settings" type="application\/json">)([\s\S]*?)(<\/script>)/;
+    html = html.replace(reSettings, function(match, p1, p2, p3){ return p1 + settingsStr + p3; });
+    downloadFile(html, 'tra-cuu-du-lieu.html', 'text/html');
+  });
+
+  // ---- ADMIN: JSON backup ----
+  document.getElementById('export-json-btn').addEventListener('click', function(){
+    downloadFile(JSON.stringify(databases, null, 2), 'sao-luu-du-lieu.json', 'application/json');
+  });
+
+  document.getElementById('import-json-input').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt){
+      try{
+        const parsed = JSON.parse(evt.target.result);
+        if(!Array.isArray(parsed)) throw new Error('invalid');
+        if(!confirm('This will replace all current data with the contents of the JSON file. Continue?')) return;
+        databases = parsed;
+        saveDatabases();
+        renderAdminDbList();
+        renderSelectList();
+        alert('Data restored successfully.');
+      }catch(err){
+        alert('Invalid JSON file.');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  function downloadFile(content, filename, mime){
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // ---- ADMIN: login ----
+  document.getElementById('admin-login-btn').addEventListener('click', function(){
+    const val = document.getElementById('admin-pass').value;
+    if(val === ADMIN_PASSWORD){
+      isAdminAuthed = true;
+      adminLoginBox.hidden = true;
+      adminPanel.hidden = false;
+      document.getElementById('admin-login-error').hidden = true;
+      document.getElementById('admin-pass').value = '';
+      renderAdminDbList();
+    } else {
+      document.getElementById('admin-login-error').hidden = false;
+    }
+  });
+  document.getElementById('admin-pass').addEventListener('keydown', function(e){
+    if(e.key === 'Enter') document.getElementById('admin-login-btn').click();
+  });
+
+  // ---- NAV wiring ----
+  document.getElementById('admin-toggle-btn').addEventListener('click', function(){
+    sidebarImageDataUrl = null;
+    renderProfileBadge();
+    showView('admin');
+    if(isAdminAuthed){
+      adminLoginBox.hidden = true; adminPanel.hidden = false; renderAdminDbList();
+    } else {
+      adminLoginBox.hidden = false; adminPanel.hidden = true;
+    }
+  });
+
+  // ---- ADMIN: site profile (avatar + handle) ----
+  const primaryColorHexInput = document.getElementById('primary-color-hex');
+  const primaryColorPicker = document.getElementById('primary-color-picker');
+
+  primaryColorPicker.addEventListener('input', function(){
+    siteSettings.primaryColor = applyPrimaryColor(this.value);
+    primaryColorHexInput.value = siteSettings.primaryColor.toUpperCase();
+    primaryColorHexInput.classList.remove('invalid');
+  });
+
+  primaryColorHexInput.addEventListener('input', function(){
+    const normalized = normalizeHexColor(this.value);
+    this.classList.toggle('invalid', !normalized);
+    if(!normalized) return;
+    siteSettings.primaryColor = applyPrimaryColor(normalized);
+    primaryColorPicker.value = siteSettings.primaryColor;
+  });
+
+  primaryColorHexInput.addEventListener('blur', function(){
+    const normalized = normalizeHexColor(this.value);
+    if(normalized){
+      this.value = normalized.toUpperCase();
+      this.classList.remove('invalid');
+    }
+  });
+
+  document.getElementById('primary-color-reset').addEventListener('click', function(){
+    siteSettings.primaryColor = applyPrimaryColor(DEFAULT_PRIMARY_COLOR);
+    primaryColorHexInput.value = DEFAULT_PRIMARY_COLOR.toUpperCase();
+    primaryColorHexInput.classList.remove('invalid');
+    primaryColorPicker.value = DEFAULT_PRIMARY_COLOR;
+  });
+
+document.getElementById('sidebar-image-input').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt){
+      sidebarImageDataUrl = evt.target.result;
+      renderProfileBadge();
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('sidebar-image-remove-btn').addEventListener('click', function(){
+    sidebarImageDataUrl = '';
+    document.getElementById('sidebar-image-input').value = '';
+    renderProfileBadge();
+  });
+
+  document.getElementById('sidebar-image-size').addEventListener('input', function(){
+    siteSettings.sidebarImageSize = Math.max(56, Math.min(220, Number(this.value) || 84));
+    renderProfileBadge();
+  });
+
+  document.getElementById('sidebar-image-border-toggle').addEventListener('change', function(){
+    siteSettings.sidebarImageBorder = this.checked;
+    renderProfileBadge();
+  });
+  document.getElementById('profile-save-btn').addEventListener('click', function(){
+    const normalizedPrimary = normalizeHexColor(document.getElementById('primary-color-hex').value);
+    if(!normalizedPrimary){
+      document.getElementById('primary-color-hex').classList.add('invalid');
+      alert('Please enter a valid HEX color, for example #2F63D6.');
+      return;
+    }
+    siteSettings.primaryColor = applyPrimaryColor(normalizedPrimary);
+    if(profilePicDataUrl) siteSettings.profileImage = profilePicDataUrl;
+    const handleVal = document.getElementById('profile-handle-input').value.trim();
+    siteSettings.profileHandle = handleVal || '@s_seoyi';
+    if(sidebarImageDataUrl !== null) siteSettings.sidebarImage = sidebarImageDataUrl || null;
+    siteSettings.sidebarImageSize = Math.max(56, Math.min(220, Number(document.getElementById('sidebar-image-size').value) || 84));
+    siteSettings.sidebarImageBorder = document.getElementById('sidebar-image-border-toggle').checked;
+    saveSiteSettings();
+    renderProfileBadge();
+    profilePicDataUrl = null;
+    sidebarImageDataUrl = null;
+    document.getElementById('sidebar-image-input').value = '';
+    alert('Profile and theme saved. Don\'t forget to click "Download website file" to publish the changes.');
+  });
+  document.getElementById('back-from-admin').addEventListener('click', function(){
+    renderSelectList();
+    if(currentDbIndex !== null && databases[currentDbIndex]){
+      openDatabase(currentDbIndex);
+    } else {
+      showView('empty');
+    }
+  });
+  searchBtn.addEventListener('click', function(){
+    if(currentDbIndex === null) return;
+    renderVisitorList(databases[currentDbIndex], searchInput.value);
+  });
+  searchInput.addEventListener('input', function(){
+    if(currentDbIndex === null) return;
+    renderVisitorList(databases[currentDbIndex], searchInput.value);
+  });
+  searchInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter') searchBtn.click();
+  });
+
+  function escapeHtml(str){
+    return String(str === undefined || str === null ? '' : str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  // ---- INIT ----
+  databases = loadDatabases().map(ensureDbDefaults);
+  siteSettings = loadSiteSettings();
+  renderProfileBadge();
+  renderSelectList();
+  showView('empty');
+
+  // One subtle pulse for every button click.
+  document.addEventListener('click', function(event){
+    const button = event.target.closest('button');
+    if(!button) return;
+    button.classList.remove('single-click-pulse');
+    void button.offsetWidth;
+    button.classList.add('single-click-pulse');
+    window.setTimeout(() => button.classList.remove('single-click-pulse'), 280);
+  });
+
+})();
+</script>
+</body>
+</html>
