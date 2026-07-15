@@ -9,10 +9,13 @@
       "Cọc",
       "Còn",
       "Món",
+      "SL Gift",
       "Gift",
       "🎁"
     ],
-    "lockedColumns": [],
+    "lockedColumns": [
+      "MVĐ"
+    ],
     "columns": [
       "STT",
       "Tên FB",
