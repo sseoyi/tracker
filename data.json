@@ -7,12 +7,10 @@
     "publicColumns": [
       "Slot AET",
       "Giá ",
-      "Cọc ",
       "Còn ",
       "Slot ANM",
       "Giá",
-      "Cọc",
-      "Còn"
+      "Cọc"
     ],
     "lockedColumns": [],
     "columns": [
