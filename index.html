@@ -1226,28 +1226,30 @@
 </style>
 
 
-<style id="cover-edge-crop-fix">
-/* Crop the faint white/gray edge that is part of the source PNG itself */
+<style id="cover-restore-fix">
 .site-cover{
-  overflow:hidden !important;
-  line-height:0 !important;
+border:none!important;
+outline:none!important;
+box-shadow:none!important;
+margin:0!important;
+padding:0!important;
+background:transparent!important;
+overflow:hidden!important;
 }
-
 .site-cover img{
-  width:100% !important;
-  height:calc(100% + 10px) !important;
-  max-width:none !important;
-  object-fit:cover !important;
-  object-position:center center !important;
-  transform:translateY(-5px) scale(1.01) !important;
-  transform-origin:center center !important;
-  vertical-align:top !important;
+width:100%!important;
+height:100%!important;
+display:block!important;
+object-fit:cover!important;
+object-position:center!important;
+transform:none!important;
+margin:0!important;
 }
-
-.site-cover::after,
-.site-cover::before{
-  display:none !important;
-  content:none !important;
+.site-cover::before,.site-cover::after,.cover-fade{display:none!important;content:none!important;}
+.site-cover+.app,.app,.topbar{
+border-top:none!important;
+box-shadow:none!important;
+margin-top:0!important;
 }
 </style>
 
