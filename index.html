@@ -363,6 +363,20 @@
     .vis-checklist{ grid-template-columns:1fr 1fr; }
   }
 
+  .record-download-btn{
+    position:absolute; right:14px; bottom:12px; width:30px; height:30px; border:0; border-radius:50%;
+    background:rgba(220,250,238,.72); color:var(--primary-dark); cursor:pointer; opacity:.62;
+    display:flex; align-items:center; justify-content:center; padding:0; box-shadow:none;
+    transition:opacity .15s ease, transform .15s ease, background .15s ease;
+  }
+  .record-download-btn:hover{ opacity:1; transform:translateY(-1px); background:var(--primary-light); }
+  .record-download-btn svg{ width:15px; height:15px; }
+  .visitor-card{ position:relative; }
+  .visitor-card.has-attachment.expanded{ padding-bottom:52px; }
+  .attachment-field{ margin-top:10px; padding:12px; border:2px dashed var(--border); border-radius:var(--radius-sm); background:rgba(220,250,238,.25); }
+  .attachment-field input[type="file"]{ width:100%; }
+  .attachment-preview{ margin-top:8px; font-size:.78rem; color:var(--text-muted); font-weight:600; }
+  .admin-db-item .row-actions .btn-clear-data{ background:#fff7df; color:#b67b00; border:2px solid #ffe5a3; }
   /* Admin */
   .admin-section{
     margin-bottom:0; background:var(--surface); border:2px solid var(--border);
@@ -1264,7 +1278,11 @@ Keyring sao Luka Hyuna</td><td>455</td><td>✔</td><td>455</td><td>0</td><td>Thi
             <div class="inline-error">Incorrect password. Please try again.</div>
             <div class="inline-details"></div>
           </div>
-        </div>` : ''}`;
+        </div>` : ''}
+        ${row.__attachmentData ? `<button class="record-download-btn" type="button" aria-label="Download attachment" title="Download attachment"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11 4h2v9.17l2.59-2.58L17 12l-5 5-5-5 1.41-1.41L11 13.17V4ZM5 19h14v2H5v-2Z"/></svg></button>` : ''}`;
+      if(row.__attachmentData) card.classList.add('has-attachment');
+      const downloadBtn = card.querySelector('.record-download-btn');
+      if(downloadBtn) downloadBtn.addEventListener('click', e => { e.stopPropagation(); downloadRecordAttachment(row, name); });
       const expand = () => expandCard(card, db, row);
       card.querySelector('.visitor-name').addEventListener('click', expand);
       card.querySelector('.visitor-name').addEventListener('keydown', e => { if(e.key === 'Enter') expand(); });
@@ -1280,6 +1298,21 @@ Keyring sao Luka Hyuna</td><td>455</td><td>✔</td><td>455</td><td>0</td><td>Thi
       wrap.appendChild(card);
     });
     searchResults.appendChild(wrap);
+  }
+
+
+  function safeFilename(value){
+    return String(value || 'attachment').replace(/[\\/:*?"<>|]+/g, '-').replace(/\s+/g, ' ').trim() || 'attachment';
+  }
+
+  function downloadRecordAttachment(row, itemName){
+    if(!row || !row.__attachmentData) return;
+    const a = document.createElement('a');
+    a.href = row.__attachmentData;
+    a.download = row.__attachmentName || (safeFilename(itemName) + '.jpg');
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
   }
 
   // Expanding a card immediately reveals the Public fields (no password needed),
@@ -1423,12 +1456,30 @@ Keyring sao Luka Hyuna</td><td>455</td><td>✔</td><td>455</td><td>0</td><td>Thi
         </div>
         <div class="row-actions">
           <button class="btn-link-edit" data-action="manage" data-idx="${idx}">Manage Records</button>
-          <button class="btn-danger" data-action="delete" data-idx="${idx}">Delete</button>
+          <button class="btn-link-edit btn-clear-data" data-action="clear" data-idx="${idx}">Clear Data</button>
+          <button class="btn-danger" data-action="delete" data-idx="${idx}">Delete Database</button>
         </div>`;
       item.querySelector('[data-action="manage"]').addEventListener('click', () => openManageRows(idx));
+      item.querySelector('[data-action="clear"]').addEventListener('click', () => clearDatabaseData(idx));
       item.querySelector('[data-action="delete"]').addEventListener('click', () => deleteDatabase(idx));
       adminDbList.appendChild(item);
     });
+  }
+
+
+  function clearDatabaseData(idx){
+    const db = databases[idx];
+    if(!db || !db.rows.length){
+      alert('This database is already empty.');
+      return;
+    }
+    if(!confirm('Delete all ' + db.rows.length + ' records inside "' + db.name + '"? The database, columns, display settings, links, and icon will be kept.')) return;
+    db.rows = [];
+    saveDatabases();
+    renderAdminDbList();
+    renderSelectList();
+    if(currentDbIndex === idx) openDatabase(idx);
+    alert('All records were removed. The database itself was kept.');
   }
 
   function deleteDatabase(idx){
@@ -1789,7 +1840,12 @@ Keyring sao Luka Hyuna</td><td>455</td><td>✔</td><td>455</td><td>0</td><td>Thi
       <div>
         <label>${escapeHtml(col)}</label>
         <input type="text" class="add-row-input" data-col-idx="${i}" />
-      </div>`).join('');
+      </div>`).join('') + `
+      <div class="attachment-field" style="grid-column:1 / -1;">
+        <label style="margin-top:0;">Image attachment (optional)</label>
+        <input type="file" class="add-row-attachment" accept="image/*" />
+        <div class="attachment-preview">The download icon is shown only when an image is attached.</div>
+      </div>`;
   }
 
   function openAddRowModal(){
@@ -1817,13 +1873,19 @@ Keyring sao Luka Hyuna</td><td>455</td><td>✔</td><td>455</td><td>0</td><td>Thi
     if(e.key === 'Escape' && !document.getElementById('add-row-modal').hidden) closeAddRowModal();
   });
 
-  document.getElementById('add-row-save-btn').addEventListener('click', function(){
+  document.getElementById('add-row-save-btn').addEventListener('click', async function(){
     const db = databases[manageDbIndex];
     const inputs = document.querySelectorAll('#add-row-fields .add-row-input');
     const row = {};
     inputs.forEach(inp => { row[db.columns[+inp.dataset.colIdx]] = inp.value; });
-    const hasValue = Object.values(row).some(v => String(v).trim() !== '');
-    if(!hasValue){ alert('Please fill in at least 1 field.'); return; }
+    const fileInput = document.querySelector('#add-row-fields .add-row-attachment');
+    const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+    const hasValue = Object.values(row).some(v => String(v).trim() !== '') || !!file;
+    if(!hasValue){ alert('Please fill in at least 1 field or attach an image.'); return; }
+    if(file){
+      row.__attachmentData = await fileToDataUrl(file);
+      row.__attachmentName = file.name;
+    }
     db.rows.push(row);
     saveDatabases();
     closeAddRowModal();
@@ -1842,6 +1904,16 @@ Keyring sao Luka Hyuna</td><td>455</td><td>✔</td><td>455</td><td>0</td><td>Thi
     saveDatabases();
     renderManageRows();
   });
+
+
+  function fileToDataUrl(file){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(reader.error || new Error('Could not read image.'));
+      reader.readAsDataURL(file);
+    });
+  }
 
   function renderRowsList(db){
     const container = document.getElementById('rows-list');
@@ -1874,14 +1946,31 @@ Keyring sao Luka Hyuna</td><td>455</td><td>✔</td><td>455</td><td>0</td><td>Thi
                 <label>${escapeHtml(col)}</label>
                 <input type="text" class="edit-row-input" data-col-idx="${i}" value="${escapeHtml(row[col])}" />
               </div>`).join('')}
+            <div class="attachment-field">
+              <label style="margin-top:0;">Image attachment</label>
+              <input type="file" class="edit-row-attachment" accept="image/*" />
+              <div class="attachment-preview">${row.__attachmentData ? 'Image attached: ' + escapeHtml(row.__attachmentName || 'image') : 'No image attached'}</div>
+              ${row.__attachmentData ? '<button class="btn-secondary remove-attachment-btn" type="button">Remove image</button>' : ''}
+            </div>
             <div class="row-edit-actions">
               <button class="btn-primary save-edit-btn">Save</button>
               <button class="btn-secondary cancel-edit-btn">Cancel</button>
             </div>
           </div>`;
-        card.querySelector('.save-edit-btn').addEventListener('click', () => {
+        let removeAttachmentRequested = false;
+        const removeAttachmentBtn = card.querySelector('.remove-attachment-btn');
+        if(removeAttachmentBtn) removeAttachmentBtn.addEventListener('click', () => {
+          removeAttachmentRequested = true;
+          removeAttachmentBtn.textContent = 'Image will be removed';
+          removeAttachmentBtn.disabled = true;
+        });
+        card.querySelector('.save-edit-btn').addEventListener('click', async () => {
           const inputs = card.querySelectorAll('.edit-row-input');
           inputs.forEach(inp => { row[db.columns[+inp.dataset.colIdx]] = inp.value; });
+          const fileInput = card.querySelector('.edit-row-attachment');
+          const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+          if(removeAttachmentRequested){ delete row.__attachmentData; delete row.__attachmentName; }
+          if(file){ row.__attachmentData = await fileToDataUrl(file); row.__attachmentName = file.name; }
           saveDatabases();
           editingRowIdx = null;
           renderRowsList(db);
@@ -1909,7 +1998,9 @@ Keyring sao Luka Hyuna</td><td>455</td><td>✔</td><td>455</td><td>0</td><td>Thi
           <div class="row-card-body" hidden>
             ${fields}
             <div class="row-actions row-card-actions">
+              <button class="btn-link-edit rename-btn" type="button">Rename</button>
               <button class="btn-link-edit edit-btn" type="button">Edit</button>
+              ${row.__attachmentData ? '<button class="record-download-btn admin-record-download-btn" type="button" aria-label="Download attachment" title="Download attachment" style="position:static;margin-left:auto;"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11 4h2v9.17l2.59-2.58L17 12l-5 5-5-5 1.41-1.41L11 13.17V4ZM5 19h14v2H5v-2Z"/></svg></button>' : ''}
               <button class="btn-danger delete-btn" type="button">Delete</button>
             </div>
           </div>`;
@@ -1929,6 +2020,19 @@ Keyring sao Luka Hyuna</td><td>455</td><td>✔</td><td>455</td><td>0</td><td>Thi
           card.classList.toggle('expanded', willExpand);
           summary.setAttribute('aria-expanded', String(willExpand));
         });
+        card.querySelector('.rename-btn').addEventListener('click', () => {
+          const currentName = row[db.keyColumn] === undefined || row[db.keyColumn] === null ? '' : String(row[db.keyColumn]);
+          const renamed = prompt('Rename this record', currentName);
+          if(renamed === null) return;
+          const trimmed = renamed.trim();
+          if(!trimmed){ alert('Record name cannot be empty.'); return; }
+          row[db.keyColumn] = trimmed;
+          saveDatabases();
+          renderRowsList(db);
+          renderSelectList();
+        });
+        const adminDownload = card.querySelector('.admin-record-download-btn');
+        if(adminDownload) adminDownload.addEventListener('click', () => downloadRecordAttachment(row, itemName));
         card.querySelector('.edit-btn').addEventListener('click', () => {
           editingRowIdx = idx;
           renderRowsList(db);
