@@ -254,11 +254,10 @@
     "publicColumns": [
       "Giá",
       "Món",
-      "Gift"
-    ],
-    "lockedColumns": [
+      "Gift",
       "MVĐ"
     ],
+    "lockedColumns": [],
     "columns": [
       "STT",
       "Tên FB",
