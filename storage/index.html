@@ -131,15 +131,15 @@
     font-family:var(--font); width:120px;
   }
 
-  /* color swatch picker */
-  .swatch-row{ display:flex; gap:8px; flex-wrap:wrap; }
-  .swatch{
-    width:26px; height:26px; border-radius:50%; cursor:pointer; border:2px solid transparent; position:relative;
-  }
-  .swatch.selected{ border-color:var(--text); }
-  .swatch.selected::after{
-    content:'✓'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; font-size:.7rem; font-weight:800;
-  }
+  /* model rows (Add Item -> Models section) */
+  .model-rows{ display:flex; flex-direction:column; gap:8px; }
+  .model-row{ border:1px solid var(--border); border-left:3px solid transparent; border-radius:var(--radius-sm); padding:8px; transition:border-left-color .12s ease; }
+  .model-row-top{ display:flex; gap:6px; align-items:center; }
+  .model-row-top .model-name-input{ flex:1.4; min-width:0; }
+  .model-row-top .model-qty-input{ flex:1; min-width:56px; }
+  .model-row-top .model-remove-btn{ width:26px; height:26px; font-size:.8rem; flex-shrink:0; }
+  .model-quick-row{ margin-top:7px; }
+  .model-quick-row .coll-chip{ padding:3px 9px; font-size:.68rem; }
 
   /* ================= ORDER BOARD ================= */
   .toolbar{ display:flex; gap:8px; margin-bottom:10px; }
@@ -208,9 +208,7 @@
   .name-group[open] summary{ border-bottom:1px solid var(--border); }
   .name-group-items{ padding:8px 10px; display:flex; flex-direction:column; gap:6px; }
 
-  /* ---- Quick-select chips for item name field ---- */
-  .name-quick-row{ margin-top:6px; }
-  .name-quick-row .coll-chip{ padding:4px 11px; font-size:.72rem; }
+
   .item-card{ border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px 10px; display:flex; align-items:center; gap:10px; }
   .item-card .avatar,.item-card .avatar-ph{ width:34px; height:34px; font-size:.85rem; }
   .ic-info{ flex:1; min-width:0; }
@@ -292,32 +290,21 @@
       <div class="mg-form">
         <h2 id="item-form-title">Add Item</h2>
         <input id="edit-item-id" type="hidden"/>
-        <div class="mg-row">
-          <div class="field">
-            <label>Item name</label>
-            <input id="item-name-input" placeholder="e.g. Choco Cookie" type="text"/>
-            <div class="chip-select-row name-quick-row" id="name-quick-row"></div>
-          </div>
-          <div class="field">
-            <label>Category</label>
-            <input id="item-cat-input" type="hidden"/>
-            <div class="chip-select-row" id="category-chip-row"></div>
-          </div>
+        <div class="field" style="margin-bottom:10px;">
+          <label>Item</label>
+          <input id="item-cat-input" type="hidden"/>
+          <div class="chip-select-row" id="category-chip-row"></div>
+        </div>
+        <div class="field" style="margin-bottom:10px;">
+          <label>Models</label>
+          <div class="model-rows" id="model-rows"></div>
+          <button class="btn btn-secondary" id="add-model-row-btn" style="margin-top:8px;" type="button">+ Add model</button>
         </div>
         <div class="mg-row">
-          <div class="field">
-            <label>Quantity in stock</label>
-            <input id="item-qty-input" min="0" placeholder="0" type="number"/>
-          </div>
           <div class="field">
             <label>Price</label>
             <input id="item-price-input" min="0" placeholder="0.00" step="0.01" type="number"/>
           </div>
-        </div>
-        <div class="field" style="margin-bottom:8px;">
-          <label>Color</label>
-          <input id="item-color-input" type="hidden"/>
-          <div class="swatch-row" id="color-swatch-row"></div>
         </div>
         <div class="field" style="margin-bottom:8px;">
           <label>Collection</label>
@@ -429,7 +416,6 @@
   const findItem = id => state.items.find(i => i.id === id);
   const findCustomer = id => state.customers.find(c => c.id === id);
 
-  const COLORS = ['purple','pink','red','mint','yellow','brown','gray','green'];
   const NAME_COLOR_MAP = { sua:'purple', mizi:'pink', ivan:'red', till:'mint', luka:'yellow', hyuna:'brown' };
   const NAME_QUICK = ['Sua', 'Mizi', 'Ivan', 'Till', 'Luka', 'Hyuna'];
   function colorFg(key){ return `var(--clr-${key || 'gray'}-fg)`; }
@@ -508,27 +494,12 @@
 
   // ================= MANAGE ITEMS =================
   const form = {
-    id: el('edit-item-id'), name: el('item-name-input'), cat: el('item-cat-input'), qty: el('item-qty-input'),
-    price: el('item-price-input'), color: el('item-color-input'), collection: el('item-collection-input'),
-    imgInput: el('item-img-input'), imgPreview: el('item-img-preview'),
+    id: el('edit-item-id'), cat: el('item-cat-input'), price: el('item-price-input'),
+    collection: el('item-collection-input'), imgInput: el('item-img-input'), imgPreview: el('item-img-preview'),
     title: el('item-form-title'), cancelBtn: el('cancel-edit-btn')
   };
   let pendingImage = '';
-  let colorManuallySet = false;
 
-  const swatchRow = el('color-swatch-row');
-  swatchRow.innerHTML = COLORS.map(c => `<div class="swatch" data-color="${c}" style="background:${colorFg(c)}" title="${c}"></div>`).join('');
-  function setColor(key, manual){
-    form.color.value = key || '';
-    if(manual) colorManuallySet = true;
-    swatchRow.querySelectorAll('.swatch').forEach(s => s.classList.toggle('selected', s.dataset.color === key));
-  }
-  swatchRow.addEventListener('click', e => {
-    const sw = e.target.closest('.swatch');
-    if(!sw) return;
-    const key = sw.dataset.color;
-    setColor(form.color.value === key ? '' : key, true);
-  });
   function makeChipPicker({ rowEl, inputEl, listKey }){
     function get(){ return inputEl.value; }
     function set(key){
@@ -578,26 +549,84 @@
   function setCollection(key){ collectionPicker.set(key); }
   function setCategory(key){ categoryPicker.set(key); }
 
-  const nameQuickRow = el('name-quick-row');
-  nameQuickRow.innerHTML = NAME_QUICK.map(n => `<div class="coll-chip" data-name="${n}">${n}</div>`).join('');
-  function updateNameQuickSelection(){
-    const val = form.name.value.trim().toLowerCase();
-    nameQuickRow.querySelectorAll('.coll-chip').forEach(c => c.classList.toggle('selected', c.dataset.name.toLowerCase() === val));
-  }
-  nameQuickRow.addEventListener('click', e => {
-    const chip = e.target.closest('.coll-chip');
-    if(!chip) return;
-    const already = form.name.value.trim().toLowerCase() === chip.dataset.name.toLowerCase();
-    form.name.value = already ? '' : chip.dataset.name;
-    form.name.dispatchEvent(new Event('input'));
-    form.name.focus();
-  });
+  // ---- Models: repeatable name+qty rows, color auto-assigned from name ----
+  const modelRowsEl = el('model-rows');
+  const addModelRowBtn = el('add-model-row-btn');
+  let modelRowSeq = 0;
 
-  form.name.addEventListener('input', () => {
-    updateNameQuickSelection();
-    if(colorManuallySet) return;
-    const match = NAME_COLOR_MAP[form.name.value.trim().toLowerCase()];
-    if(match) setColor(match, false);
+  function modelRowHtml(rowId, name, qty){
+    const chips = NAME_QUICK.map(n => `<div class="coll-chip" data-name="${n}">${n}</div>`).join('');
+    return `
+      <div class="model-row" data-row-id="${rowId}">
+        <div class="model-row-top">
+          <input class="model-name-input" placeholder="Model name" type="text" value="${escapeHtml(name)}"/>
+          <input class="model-qty-input" min="0" placeholder="Qty" type="number" value="${escapeHtml(qty)}"/>
+          <button class="round-btn ghost model-remove-btn" title="Remove model" type="button">×</button>
+        </div>
+        <div class="chip-select-row model-quick-row">${chips}</div>
+      </div>
+    `;
+  }
+  function addModelRow(name, qty){
+    const rowId = 'r' + (++modelRowSeq);
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = modelRowHtml(rowId, name || '', qty === undefined || qty === '' ? '' : String(qty)).trim();
+    const rowEl = wrapper.firstChild;
+    modelRowsEl.appendChild(rowEl);
+    updateModelRow(rowEl);
+    rowEl.querySelector('.model-name-input').focus();
+    return rowEl;
+  }
+  function updateModelRow(rowEl){
+    const nameInput = rowEl.querySelector('.model-name-input');
+    const val = nameInput.value.trim().toLowerCase();
+    const color = NAME_COLOR_MAP[val] || '';
+    rowEl.dataset.color = color;
+    rowEl.style.borderLeftColor = color ? colorFg(color) : 'transparent';
+    rowEl.querySelectorAll('.model-quick-row .coll-chip').forEach(c =>
+      c.classList.toggle('selected', c.dataset.name.toLowerCase() === val)
+    );
+  }
+  function resetModelRows(){
+    modelRowsEl.innerHTML = '';
+    modelRowSeq = 0;
+    addModelRow('', '');
+  }
+  addModelRowBtn.addEventListener('click', () => addModelRow('', ''));
+  modelRowsEl.addEventListener('click', e => {
+    const removeBtn = e.target.closest('.model-remove-btn');
+    if(removeBtn){
+      const row = removeBtn.closest('.model-row');
+      if(modelRowsEl.children.length > 1){
+        row.remove();
+      } else {
+        row.querySelector('.model-name-input').value = '';
+        row.querySelector('.model-qty-input').value = '';
+        updateModelRow(row);
+      }
+      return;
+    }
+    const chip = e.target.closest('.coll-chip');
+    if(chip){
+      const row = chip.closest('.model-row');
+      const nameInput = row.querySelector('.model-name-input');
+      const already = nameInput.value.trim().toLowerCase() === chip.dataset.name.toLowerCase();
+      nameInput.value = already ? '' : chip.dataset.name;
+      updateModelRow(row);
+      nameInput.focus();
+    }
+  });
+  modelRowsEl.addEventListener('input', e => {
+    if(e.target.classList.contains('model-name-input')) updateModelRow(e.target.closest('.model-row'));
+  });
+  modelRowsEl.addEventListener('keydown', e => {
+    if(e.key !== 'Enter') return;
+    if(!e.target.classList.contains('model-qty-input') && !e.target.classList.contains('model-name-input')) return;
+    const rows = [...modelRowsEl.querySelectorAll('.model-row')];
+    if(e.target.closest('.model-row') === rows[rows.length - 1] && addModelRowBtn.style.display !== 'none'){
+      e.preventDefault();
+      addModelRow('', '');
+    }
   });
 
   form.imgInput.addEventListener('change', () => {
@@ -617,37 +646,47 @@
   });
 
   function resetItemForm(){
-    form.id.value = ''; form.name.value = ''; form.qty.value = ''; form.price.value = '';
+    form.id.value = ''; form.price.value = '';
     pendingImage = ''; form.imgInput.value = ''; form.imgPreview.innerHTML = '🖼️';
-    colorManuallySet = false; setColor('', false);
     setCategory('');
     setCollection('');
+    resetModelRows();
+    addModelRowBtn.style.display = '';
     form.title.textContent = 'Add Item';
     form.cancelBtn.style.display = 'none';
-    updateNameQuickSelection();
   }
   form.cancelBtn.addEventListener('click', resetItemForm);
 
   el('save-item-btn').addEventListener('click', () => {
-    const name = form.name.value.trim();
     const category = form.cat.value.trim();
-    const qty = parseInt(form.qty.value, 10);
     const price = parseFloat(form.price.value);
-    if(!name) return showToast('Please enter an item name.');
-    if(!(qty >= 0)) return showToast('Please enter a valid quantity.');
     if(!(price >= 0)) return showToast('Please enter a valid price.');
 
+    const models = [...modelRowsEl.querySelectorAll('.model-row')]
+      .map(row => ({
+        name: row.querySelector('.model-name-input').value.trim(),
+        qty: parseInt(row.querySelector('.model-qty-input').value, 10),
+        color: row.dataset.color || ''
+      }))
+      .filter(m => m.name);
+    if(models.length === 0) return showToast('Please add at least one model with a name.');
+    for(const m of models){
+      if(!(m.qty >= 0)) return showToast(`Please enter a valid quantity for "${m.name}".`);
+    }
+
     const editId = form.id.value;
-    const color = form.color.value || '';
     const collection = form.collection.value || '';
     if(editId){
       const item = findItem(editId);
+      const m = models[0];
       if(item){
-        Object.assign(item, { name, category, qty, price, color, collection });
+        Object.assign(item, { name: m.name, category, qty: m.qty, price, color: m.color, collection });
         if(pendingImage) item.image = pendingImage;
       }
     } else {
-      state.items.push({ id: uid(), name, category, qty, price, color, collection, image: pendingImage });
+      models.forEach(m => {
+        state.items.push({ id: uid(), name: m.name, category, qty: m.qty, price, color: m.color, collection, image: pendingImage });
+      });
     }
     saveState();
     resetItemForm();
@@ -659,18 +698,17 @@
     const item = findItem(id);
     if(!item) return;
     form.id.value = item.id;
-    form.name.value = item.name;
-    form.qty.value = item.qty;
     form.price.value = item.price;
-    colorManuallySet = true; setColor(item.color || '', true);
     setCategory(item.category || '');
     setCollection(item.collection || '');
     pendingImage = item.image || '';
     form.imgPreview.innerHTML = item.image ? `<img src="${item.image}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">` : '🖼️';
+    modelRowsEl.innerHTML = '';
+    modelRowSeq = 0;
+    addModelRow(item.name, item.qty);
+    addModelRowBtn.style.display = 'none';
     form.title.textContent = 'Edit Item';
     form.cancelBtn.style.display = 'inline-block';
-    updateNameQuickSelection();
-    form.name.focus();
   }
 
   async function deleteItem(id){
@@ -689,6 +727,8 @@
     if(btn.dataset.action === 'edit') startEditItem(id);
     if(btn.dataset.action === 'delete') deleteItem(id);
   });
+
+  resetModelRows();
 
   function itemCardHtml(item){
     return `
