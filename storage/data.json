@@ -29,7 +29,7 @@
       "cost": 0,
       "id": "mscyi9i6o48u2n",
       "name": "Ivan",
-      "qty": 10,
+      "qty": 7,
       "price": 15,
       "image": ""
     },
@@ -40,7 +40,7 @@
       "cost": 0,
       "id": "mscyi9i6zkjnez",
       "name": "Till",
-      "qty": 9,
+      "qty": 6,
       "price": 15,
       "image": ""
     },
@@ -95,7 +95,7 @@
       "cost": 0,
       "id": "mscyjcgmkf0auk",
       "name": "Mizi",
-      "qty": 4,
+      "qty": 3,
       "price": 30,
       "image": ""
     },
@@ -106,7 +106,7 @@
       "cost": 0,
       "id": "mscyjcgmnzw0y6",
       "name": "Ivan",
-      "qty": 6,
+      "qty": 4,
       "price": 30,
       "image": ""
     },
@@ -117,7 +117,7 @@
       "cost": 0,
       "id": "mscyjcgm6mmso9",
       "name": "Till",
-      "qty": 7,
+      "qty": 5,
       "price": 30,
       "image": ""
     },
@@ -172,7 +172,7 @@
       "cost": 0,
       "id": "mscyjt2ergfjds",
       "name": "Ivan",
-      "qty": 1,
+      "qty": 0,
       "price": 15,
       "image": ""
     },
@@ -227,7 +227,7 @@
       "cost": 13,
       "id": "mscz76tjdl3k53",
       "name": "B - Chocomint",
-      "qty": 4,
+      "qty": 2,
       "price": 15,
       "image": ""
     },
@@ -282,7 +282,7 @@
       "cost": 8,
       "id": "msd0s1py59zvwk",
       "name": "Ivan",
-      "qty": 5,
+      "qty": 3,
       "price": 35,
       "image": ""
     },
@@ -293,7 +293,7 @@
       "cost": 8,
       "id": "msd0s1pyibgqa1",
       "name": "Till",
-      "qty": 3,
+      "qty": 2,
       "price": 35,
       "image": ""
     },
@@ -655,6 +655,200 @@
           "collectionSnapshot": "Clique",
           "priceSnapshot": 15,
           "costSnapshot": 0
+        }
+      ]
+    },
+    {
+      "id": "msd2wtsvpofnk5",
+      "name": "Emerald Suspect",
+      "chips": [
+        {
+          "id": "msd2wtsvbb6ioi",
+          "itemId": "mscyjcgmkf0auk",
+          "qty": 1,
+          "nameSnapshot": "Mizi",
+          "categorySnapshot": "Key strap",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 30,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2wtsvsetztp",
+          "itemId": "mscyjcgmnzw0y6",
+          "qty": 1,
+          "nameSnapshot": "Ivan",
+          "categorySnapshot": "Key strap",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 30,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2wtsv0zkynb",
+          "itemId": "msd0s1py59zvwk",
+          "qty": 1,
+          "nameSnapshot": "Ivan",
+          "categorySnapshot": "Standee",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 35,
+          "costSnapshot": 8
+        }
+      ]
+    },
+    {
+      "id": "msd2x1zakiojaw",
+      "name": "Bánh Gạo Nếp",
+      "chips": [
+        {
+          "id": "msd2x1zao4w8m0",
+          "itemId": "mscyi9i6o48u2n",
+          "qty": 1,
+          "nameSnapshot": "Ivan",
+          "categorySnapshot": "Badge 3.2",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 15,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2x1zaecc0j6",
+          "itemId": "mscyi9i6zkjnez",
+          "qty": 1,
+          "nameSnapshot": "Till",
+          "categorySnapshot": "Badge 3.2",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 15,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2x1za2hgf3i",
+          "itemId": "mscz76tjdl3k53",
+          "qty": 1,
+          "nameSnapshot": "B - Chocomint",
+          "categorySnapshot": "Strap sổ",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 15,
+          "costSnapshot": 13
+        }
+      ]
+    },
+    {
+      "id": "msd2xcrr665luc",
+      "name": "Tiêu Dương Đạo",
+      "chips": [
+        {
+          "id": "msd2xcrr3rflqn",
+          "itemId": "mscyi9i6o48u2n",
+          "qty": 1,
+          "nameSnapshot": "Ivan",
+          "categorySnapshot": "Badge 3.2",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 15,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2xcrr71tmgi",
+          "itemId": "mscyi9i6zkjnez",
+          "qty": 1,
+          "nameSnapshot": "Till",
+          "categorySnapshot": "Badge 3.2",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 15,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2xcrrdow124",
+          "itemId": "mscyjcgm6mmso9",
+          "qty": 1,
+          "nameSnapshot": "Till",
+          "categorySnapshot": "Key strap",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 30,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2xcrri1e4fv",
+          "itemId": "mscyjt2ergfjds",
+          "qty": 1,
+          "nameSnapshot": "Ivan",
+          "categorySnapshot": "Phonecharm",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 15,
+          "costSnapshot": 0
+        }
+      ]
+    },
+    {
+      "id": "msd2y3yeafnej1",
+      "name": "Jinx Dolores",
+      "chips": [
+        {
+          "id": "msd2y3ye6qxijb",
+          "itemId": "mscyi9i6o48u2n",
+          "qty": 1,
+          "nameSnapshot": "Ivan",
+          "categorySnapshot": "Badge 3.2",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 15,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2y3yenm55ac",
+          "itemId": "mscyi9i6zkjnez",
+          "qty": 1,
+          "nameSnapshot": "Till",
+          "categorySnapshot": "Badge 3.2",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 15,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2y3yej4ppyy",
+          "itemId": "mscz76tjdl3k53",
+          "qty": 1,
+          "nameSnapshot": "B - Chocomint",
+          "categorySnapshot": "Strap sổ",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 15,
+          "costSnapshot": 13
+        },
+        {
+          "id": "msd2y3yevzqyc4",
+          "itemId": "mscyjcgm6mmso9",
+          "qty": 1,
+          "nameSnapshot": "Till",
+          "categorySnapshot": "Key strap",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 30,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2y3yemy8ylw",
+          "itemId": "mscyjcgmnzw0y6",
+          "qty": 1,
+          "nameSnapshot": "Ivan",
+          "categorySnapshot": "Key strap",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 30,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2y3ye3og86p",
+          "itemId": "msd0s1py59zvwk",
+          "qty": 1,
+          "nameSnapshot": "Ivan",
+          "categorySnapshot": "Standee",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 35,
+          "costSnapshot": 8
+        },
+        {
+          "id": "msd2y3ye8rcn2w",
+          "itemId": "msd0s1pyibgqa1",
+          "qty": 1,
+          "nameSnapshot": "Till",
+          "categorySnapshot": "Standee",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 35,
+          "costSnapshot": 8
         }
       ]
     }
