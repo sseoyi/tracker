@@ -96,6 +96,15 @@
   .panel-profit .stock-section-title{ color:var(--teal-dark); }
   .panel-customers{ background:#fff; border-color:var(--border-strong); padding:14px; }
   .panel-customers .stock-section-title{ color:var(--text-muted); }
+  .coll-tabs-row{ display:flex; gap:6px; overflow-x:auto; padding-bottom:2px; margin-bottom:10px; scrollbar-width:thin; }
+  .coll-tabs-row::-webkit-scrollbar{ height:5px; }
+  .coll-tab{
+    flex-shrink:0; background:#fff; border:1px solid var(--border-strong); color:var(--text-muted); font-weight:600; font-size:.76rem;
+    padding:6px 13px; border-radius:999px; cursor:pointer; font-family:var(--font); white-space:nowrap;
+    transition:background .12s ease,color .12s ease,border-color .12s ease;
+  }
+  .coll-tab:hover{ border-color:var(--teal-fg); color:var(--teal-dark); }
+  .coll-tab.active{ background:var(--teal-fg); color:#fff; border-color:var(--teal-fg); }
   .stock-section-title{ font-size:.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
   .coll-section{ margin-bottom:14px; grid-column:1/-1; }
   .coll-section:last-child{ margin-bottom:0; }
@@ -334,6 +343,7 @@
           </div>
           <button class="btn btn-primary" id="add-cust-btn" type="button">Add Customer</button>
         </div>
+        <div class="coll-tabs-row" id="cust-coll-tabs"></div>
         <div class="cust-list" id="cust-list"></div>
         <div class="empty-state" hidden id="main-empty">No customers yet — add one above to start tracking sales.</div>
       </div>
@@ -536,6 +546,7 @@
 
   const el = id => document.getElementById(id);
   const custListEl = el('cust-list');
+  const custCollTabsEl = el('cust-coll-tabs');
   const itemListEl = el('item-list');
   const stockGridEl = el('stock-grid');
   const mainEmptyEl = el('main-empty');
@@ -1086,7 +1097,7 @@
     if(!name) return showToast('Please enter a customer name.');
     const chips = pendingNewCust.chips.map(c => {
       const item = findItem(c.itemId);
-      return { id: uid(), itemId: c.itemId, qty: c.qty, nameSnapshot: item ? item.name : 'Removed item', categorySnapshot: item ? (item.category || '') : '', priceSnapshot: item ? item.price : 0, costSnapshot: item ? (item.cost || 0) : 0 };
+      return { id: uid(), itemId: c.itemId, qty: c.qty, nameSnapshot: item ? item.name : 'Removed item', categorySnapshot: item ? (item.category || '') : '', collectionSnapshot: item ? (item.collection || '') : '', priceSnapshot: item ? item.price : 0, costSnapshot: item ? (item.cost || 0) : 0 };
     });
     chips.forEach(c => { const item = findItem(c.itemId); if(item) item.qty -= c.qty; });
     state.customers.push({ id: uid(), name, chips });
@@ -1159,7 +1170,7 @@
     const item = findItem(itemId);
     if(!cust || !item || item.qty <= 0) return;
     item.qty -= 1;
-    cust.chips.push({ id: uid(), itemId, qty: 1, nameSnapshot: item.name, categorySnapshot: item.category || '', priceSnapshot: item.price, costSnapshot: item.cost || 0 });
+    cust.chips.push({ id: uid(), itemId, qty: 1, nameSnapshot: item.name, categorySnapshot: item.category || '', collectionSnapshot: item.collection || '', priceSnapshot: item.price, costSnapshot: item.cost || 0 });
     saveState();
     closePopover();
     renderCustomers();
@@ -1168,6 +1179,40 @@
   }
 
   let editingCustomerId = null;
+  let currentCustTab = 'all';
+
+  function chipCollectionName(chip, item){
+    if(item) return collectionOf(item);
+    return (chip.collectionSnapshot || '').trim() || 'No Collection';
+  }
+  function custCollections(cust){
+    return new Set(cust.chips.map(chip => chipCollectionName(chip, findItem(chip.itemId))));
+  }
+  function getCollectionTabNames(){
+    const names = [...new Set(state.items.map(collectionOf))];
+    names.sort((a, b) => {
+      if(a === 'No Collection') return 1;
+      if(b === 'No Collection') return -1;
+      return a.localeCompare(b);
+    });
+    return names;
+  }
+  function renderCustCollTabs(){
+    if(!custCollTabsEl) return;
+    const names = getCollectionTabNames();
+    if(names.length === 0){ custCollTabsEl.innerHTML = ''; return; }
+    if(currentCustTab !== 'all' && !names.includes(currentCustTab)) currentCustTab = 'all';
+    const tabs = ['all', ...names];
+    custCollTabsEl.innerHTML = tabs.map(t => `
+      <button class="coll-tab${t === currentCustTab ? ' active' : ''}" data-coll="${escapeHtml(t)}" type="button">${t === 'all' ? 'All' : escapeHtml(t)}</button>
+    `).join('');
+  }
+  custCollTabsEl.addEventListener('click', e => {
+    const btn = e.target.closest('.coll-tab');
+    if(!btn) return;
+    currentCustTab = btn.dataset.coll;
+    renderCustomers();
+  });
 
   custListEl.addEventListener('click', e => {
     const custRow = e.target.closest('.cust-row');
@@ -1213,13 +1258,21 @@
 
   function renderCustomers(){
     renderProfitSummary();
+    renderCustCollTabs();
     if(state.customers.length === 0){
       custListEl.innerHTML = '';
       mainEmptyEl.hidden = false;
       return;
     }
     mainEmptyEl.hidden = true;
-    custListEl.innerHTML = state.customers.map(cust => {
+    const visibleCustomers = currentCustTab === 'all'
+      ? state.customers
+      : state.customers.filter(cust => custCollections(cust).has(currentCustTab));
+    if(visibleCustomers.length === 0){
+      custListEl.innerHTML = '<div class="empty-state">No customers in this collection yet.</div>';
+      return;
+    }
+    custListEl.innerHTML = visibleCustomers.map(cust => {
       const editing = cust.id === editingCustomerId;
       return `
       <div class="cust-row${editing ? ' editing' : ''}" data-id="${cust.id}">
