@@ -94,6 +94,8 @@
   }
   .cat-box summary::-webkit-details-marker{ display:none; }
   .cat-box summary .cat-name{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cat-box summary .cat-qty-summary{ flex:1; display:flex; align-items:center; gap:4px; font-weight:700; font-size:.78rem; overflow:hidden; }
+  .cat-box summary .cat-qty-sep{ color:var(--text-faint); font-weight:600; }
   .cat-box summary .cat-count{ color:var(--text-faint); font-weight:600; font-size:.72rem; flex-shrink:0; }
   .cat-box summary .chev{ color:var(--text-faint); font-size:.7rem; transition:transform .15s ease; flex-shrink:0; }
   .cat-box[open] summary .chev{ transform:rotate(90deg); }
@@ -682,10 +684,14 @@
           <span class="qty-badge ${item.qty <= 0 ? 'zero' : ''}" style="${item.qty > 0 ? `background:${colorBg(item.color)};color:${colorFg(item.color)}` : ''}">${item.qty}</span>
         </div>
       `).join('');
+      const qtySummary = items.map(item =>
+        `<span class="cat-qty-chip" style="color:${colorFg(item.color)}">${item.qty}</span>`
+      ).join('<span class="cat-qty-sep">-</span>');
       return `
         <details class="cat-box">
           <summary>
             <span class="cat-name">${escapeHtml(cat)}</span>
+            <span class="cat-qty-summary">${qtySummary}</span>
             <span class="chev">▸</span>
           </summary>
           <div class="cat-box-items">${rows}</div>
