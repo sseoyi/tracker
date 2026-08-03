@@ -421,7 +421,11 @@
   }
 
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-  const money = n => (Math.round((n + Number.EPSILON) * 100) / 100).toFixed(2) + 'k';
+  const money = n => {
+    const rounded = Math.round((n + Number.EPSILON) * 100) / 100;
+    const str = Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
+    return str + 'k';
+  };
   const findItem = id => state.items.find(i => i.id === id);
   const findCustomer = id => state.customers.find(c => c.id === id);
 
