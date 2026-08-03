@@ -290,6 +290,15 @@
     .cust-name{ font-size:.82rem; }
   }
 
+  @media (max-width:600px){
+    .cust-chips{ order:5; flex-basis:100%; flex-direction:column; align-items:stretch; gap:2px; margin-top:6px; }
+    .chip{ background:none; border:none; border-radius:0; padding:3px 0; width:100%; justify-content:flex-start; }
+    .chip::before{ content:'–'; margin-right:5px; color:var(--text-faint); font-weight:700; }
+    .chip:hover{ background:none; border-color:transparent; }
+    .chip-qty{ margin-left:auto; }
+    .add-chip-btn{ align-self:flex-start; margin-top:2px; }
+  }
+
   /* ---- custom confirm dialog + toast (replaces native confirm/alert, which
          get silently blocked inside sandboxed preview frames) ---- */
   .confirm-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.15); z-index:60; display:flex; align-items:center; justify-content:center; padding:16px; }
