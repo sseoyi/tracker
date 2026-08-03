@@ -66,7 +66,7 @@
       "collection": "Clique",
       "id": "mscyit0ucdiqmn",
       "name": "Sticker set táo",
-      "qty": 11,
+      "qty": 10,
       "price": 30,
       "image": ""
     },
@@ -229,6 +229,66 @@
       "qty": 2,
       "price": 20,
       "image": ""
+    },
+    {
+      "id": "msd0s1py9dp0yu",
+      "name": "Sua",
+      "category": "Standee",
+      "qty": 2,
+      "price": 30,
+      "color": "purple",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "msd0s1pyn91rc4",
+      "name": "Mizi",
+      "category": "Standee",
+      "qty": 2,
+      "price": 30,
+      "color": "pink",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "msd0s1py59zvwk",
+      "name": "Ivan",
+      "category": "Standee",
+      "qty": 6,
+      "price": 30,
+      "color": "red",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "msd0s1pyibgqa1",
+      "name": "Till",
+      "category": "Standee",
+      "qty": 4,
+      "price": 30,
+      "color": "mint",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "msd0s1pygfffoz",
+      "name": "Luka",
+      "category": "Standee",
+      "qty": 0,
+      "price": 30,
+      "color": "yellow",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "msd0s1pyd0kv6m",
+      "name": "Hyuna",
+      "category": "Standee",
+      "qty": 0,
+      "price": 30,
+      "color": "brown",
+      "collection": "Clique",
+      "image": ""
     }
   ],
   "customers": [
@@ -251,6 +311,11 @@
           "priceSnapshot": 20
         }
       ]
+    },
+    {
+      "id": "msd0sos6u5tsf9",
+      "name": "Alis Charline",
+      "chips": []
     }
   ],
   "collections": [
@@ -261,6 +326,7 @@
     "Key strap",
     "Phonecharm",
     "Sticker",
-    "Strap sổ"
+    "Strap sổ",
+    "Standee"
   ]
 }
