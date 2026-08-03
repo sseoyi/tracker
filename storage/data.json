@@ -318,6 +318,160 @@
       "qty": 0,
       "price": 35,
       "image": ""
+    },
+    {
+      "id": "msddtafdw7odst",
+      "name": "Till",
+      "category": "Key",
+      "qty": 4,
+      "price": 20,
+      "cost": 0,
+      "color": "mint",
+      "collection": "Bunny",
+      "image": ""
+    },
+    {
+      "id": "msddvgz7yqn8gj",
+      "name": "Mizi ngược",
+      "category": "Key",
+      "qty": 2,
+      "price": 10,
+      "cost": 0,
+      "color": "pink",
+      "collection": "",
+      "image": ""
+    },
+    {
+      "id": "msddvgz7wnh7x2",
+      "name": "Ivan ngược",
+      "category": "Key",
+      "qty": 3,
+      "price": 10,
+      "cost": 0,
+      "color": "red",
+      "collection": "",
+      "image": ""
+    },
+    {
+      "id": "msddvgz887zkal",
+      "name": "Till ngược",
+      "category": "Key",
+      "qty": 2,
+      "price": 10,
+      "cost": 0,
+      "color": "mint",
+      "collection": "",
+      "image": ""
+    },
+    {
+      "id": "msddvgz8rnp92d",
+      "name": "Luka ngược",
+      "category": "Key",
+      "qty": 1,
+      "price": 10,
+      "cost": 0,
+      "color": "yellow",
+      "collection": "",
+      "image": ""
+    },
+    {
+      "id": "msddx24vvamwni",
+      "name": "Sua",
+      "category": "Key",
+      "qty": 1,
+      "price": 20,
+      "cost": 0,
+      "color": "purple",
+      "collection": "Crush",
+      "image": ""
+    },
+    {
+      "id": "msddx24vbzxsth",
+      "name": "Hyunwoo",
+      "category": "Key",
+      "qty": 2,
+      "price": 20,
+      "cost": 0,
+      "color": "gray",
+      "collection": "Crush",
+      "image": ""
+    },
+    {
+      "id": "msddy4c6sks8r0",
+      "name": "Mizi",
+      "category": "Block",
+      "qty": 1,
+      "price": 30,
+      "cost": 0,
+      "color": "pink",
+      "collection": "Crush",
+      "image": ""
+    },
+    {
+      "id": "msddy4c6shw10j",
+      "name": "Luka",
+      "category": "Block",
+      "qty": 4,
+      "price": 30,
+      "cost": 0,
+      "color": "yellow",
+      "collection": "Crush",
+      "image": ""
+    },
+    {
+      "id": "msddy4c6uz2jwy",
+      "name": "Hyunwoo",
+      "category": "Block",
+      "qty": 2,
+      "price": 30,
+      "cost": 0,
+      "color": "gray",
+      "collection": "Crush",
+      "image": ""
+    },
+    {
+      "id": "msddzv3pagwqbf",
+      "name": "Mizi",
+      "category": "Badge tim",
+      "qty": 1,
+      "price": 15,
+      "cost": 0,
+      "color": "pink",
+      "collection": "Crush",
+      "image": ""
+    },
+    {
+      "id": "msddzv3phjz2wn",
+      "name": "Luka",
+      "category": "Badge tim",
+      "qty": 2,
+      "price": 15,
+      "cost": 0,
+      "color": "yellow",
+      "collection": "Crush",
+      "image": ""
+    },
+    {
+      "id": "msddzv3paliqza",
+      "name": "Hyunwoo",
+      "category": "Badge tim",
+      "qty": 1,
+      "price": 15,
+      "cost": 0,
+      "color": "gray",
+      "collection": "Crush",
+      "image": ""
+    },
+    {
+      "id": "msddzv3phlq5bl",
+      "name": "Ivan",
+      "category": "Badge tim",
+      "qty": 1,
+      "price": 15,
+      "cost": 0,
+      "color": "red",
+      "collection": "Crush",
+      "image": ""
     }
   ],
   "customers": [
@@ -1188,7 +1342,9 @@
     }
   ],
   "collections": [
-    "Clique"
+    "Clique",
+    "Bunny",
+    "Crush"
   ],
   "categories": [
     "Badge 3.2",
@@ -1196,7 +1352,10 @@
     "Phonecharm",
     "Standee",
     "Sticker",
-    "Strap sổ"
+    "Strap sổ",
+    "Key",
+    "Block",
+    "Badge tim"
   ],
   "expenses": [
     {
