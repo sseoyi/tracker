@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Storage Tracker</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --bg:#ffffff; --surface:#ffffff;
+    --text:#1c1c1e; --text-muted:#8a8f98; --text-faint:#b7bcc4;
+    --border:#ececee; --border-strong:#e2e4e8;
+    --accent:#2fa572; --accent-dark:#238059; --accent-light:#eaf7f1;
+    --danger:#e0566b; --danger-light:#fdedf0;
+    --radius-lg:16px; --radius-md:12px; --radius-sm:8px;
+    --font:'Inter',system-ui,-apple-system,sans-serif;
+    /* item color palette */
+    --clr-purple-fg:#7c5cf0; --clr-purple-bg:#f2eefe;
+    --clr-pink-fg:#e0498c; --clr-pink-bg:#fdeef5;
+    --clr-red-fg:#e0453f; --clr-red-bg:#fdecec;
+    --clr-mint-fg:#22b573; --clr-mint-bg:#e9fbf3;
+    --clr-yellow-fg:#c98a12; --clr-yellow-bg:#fef8e6;
+    --clr-brown-fg:#8a5a34; --clr-brown-bg:#f6ede4;
+    --clr-gray-fg:#6b7280; --clr-gray-bg:#f1f2f4;
+    --clr-green-fg:#1f9d5c; --clr-green-bg:#eafbf0;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family:var(--font); background:var(--bg); color:var(--text);
+    min-height:100vh; -webkit-font-smoothing:antialiased; font-size:14px;
+  }
+  h1,h2,h3{ font-family:var(--font); margin:0; font-weight:600; }
+
+  .app{ max-width:760px; margin:0 auto; padding:0 14px 32px; }
+
+  /* ---- Tabs ---- */
+  .topbar{ padding:12px 0 10px; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .gh-btn{ display:inline-flex; align-items:center; gap:6px; }
+  .gh-btn .gh-dot{ width:7px; height:7px; border-radius:50%; background:var(--text-faint); flex-shrink:0; }
+  .gh-btn .gh-dot.ok{ background:var(--accent); }
+  .gh-btn .gh-dot.err{ background:var(--danger); }
+  .nav-tabs{ display:flex; gap:6px; }
+  .tab{
+    background:var(--surface); border:1px solid var(--border-strong); color:var(--text-muted); font-weight:600; font-size:.8rem;
+    padding:7px 14px; border-radius:999px; cursor:pointer; font-family:var(--font);
+    transition:background .12s ease,color .12s ease,border-color .12s ease;
+  }
+  .tab:hover{ border-color:var(--accent); color:var(--accent-dark); }
+  .tab[aria-selected="true"]{ background:var(--text); color:#fff; border-color:var(--text); }
+
+  .view{ display:none; padding-top:10px; }
+  .view.active{ display:block; }
+
+  /* ---- Buttons / inputs ---- */
+  .btn{ font-family:var(--font); font-weight:600; cursor:pointer; border-radius:var(--radius-sm); transition:background .12s ease,border-color .12s ease,color .12s ease; }
+  .btn-primary{ background:var(--accent); color:#fff; border:1px solid var(--accent); padding:9px 16px; font-size:.83rem; border-radius:999px; }
+  .btn-primary:hover{ background:var(--accent-dark); border-color:var(--accent-dark); }
+  .btn-secondary{ background:#fff; color:var(--text); border:1px solid var(--border-strong); padding:8px 14px; font-size:.8rem; }
+  .btn-secondary:hover{ border-color:var(--accent); color:var(--accent-dark); }
+  .btn-danger{ background:#fff; color:var(--danger); border:1px solid var(--border-strong); padding:6px 11px; font-size:.75rem; border-radius:999px; }
+  .btn-danger:hover{ background:var(--danger-light); border-color:var(--danger); }
+  .round-btn{ flex-shrink:0; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; border:none; cursor:pointer; }
+  .round-btn.fill{ background:var(--accent); color:#fff; }
+  .round-btn.fill:hover{ background:var(--accent-dark); }
+  .round-btn.ghost{ background:transparent; color:var(--text-faint); }
+  .round-btn.ghost:hover{ color:var(--danger); }
+  .round-btn.outline-danger{ background:#fff; color:var(--text-faint); border:1px solid var(--border); }
+  .round-btn.outline-danger:hover{ color:var(--danger); border-color:var(--danger); background:var(--danger-light); }
+
+  input,select{
+    font-family:var(--font); font-weight:500; font-size:.85rem; color:var(--text);
+    border:1px solid var(--border-strong); border-radius:var(--radius-sm); padding:9px 12px; outline:none; background:#fff; width:100%;
+  }
+  input:focus,select:focus{ border-color:var(--accent); }
+  input::placeholder{ color:var(--text-faint); }
+  label{ font-size:.72rem; font-weight:600; color:var(--text-muted); margin-bottom:4px; display:block; text-transform:uppercase; letter-spacing:.02em; }
+  .field{ margin-bottom:0; }
+
+  .avatar,.avatar-ph{ border-radius:50%; object-fit:cover; flex-shrink:0; border:1px solid var(--border); }
+  .avatar-ph{ background:var(--accent-light); display:flex; align-items:center; justify-content:center; }
+
+  .empty-state{ text-align:center; padding:32px 16px; color:var(--text-faint); font-weight:500; font-size:.85rem; }
+
+  /* ================= STOCK OVERVIEW ================= */
+  .stock-section{ margin-bottom:14px; }
+  .stock-section-title{ font-size:.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
+  .stock-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px; }
+  .cat-box{ border:1px solid var(--border); border-radius:var(--radius-md); background:#fff; overflow:hidden; }
+  .cat-box summary{
+    list-style:none; cursor:pointer; padding:9px 12px; display:flex; align-items:center; justify-content:space-between;
+    gap:8px; font-weight:600; font-size:.8rem;
+  }
+  .cat-box summary::-webkit-details-marker{ display:none; }
+  .cat-box summary .cat-name{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cat-box summary .cat-count{ color:var(--text-faint); font-weight:600; font-size:.72rem; flex-shrink:0; }
+  .cat-box summary .chev{ color:var(--text-faint); font-size:.7rem; transition:transform .15s ease; flex-shrink:0; }
+  .cat-box[open] summary .chev{ transform:rotate(90deg); }
+  .cat-box-items{ border-top:1px solid var(--border); padding:4px 12px 8px; }
+  .cat-item-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:5px 0; font-size:.78rem; }
+  .cat-item-row .name{ display:flex; align-items:center; gap:6px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cat-item-row .name.out{ text-decoration:line-through; color:var(--text-faint); }
+  .color-dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .qty-badge{ font-weight:700; border-radius:999px; padding:2px 8px; font-size:.72rem; flex-shrink:0; }
+  .qty-badge.zero{ background:var(--danger-light); color:var(--danger); }
+
+  /* color swatch picker */
+  .swatch-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .swatch{
+    width:26px; height:26px; border-radius:50%; cursor:pointer; border:2px solid transparent; position:relative;
+  }
+  .swatch.selected{ border-color:var(--text); }
+  .swatch.selected::after{
+    content:'✓'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; font-size:.7rem; font-weight:800;
+  }
+
+  /* ================= ORDER BOARD ================= */
+  .toolbar{ display:flex; gap:8px; margin-bottom:10px; }
+  .toolbar input{ flex:1; }
+  .cust-list{ display:flex; flex-direction:column; gap:6px; }
+  .cust-row{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    border:1px solid var(--border); border-radius:var(--radius-md); padding:9px 10px; background:#fff;
+  }
+  .cust-name{ font-weight:700; font-size:.85rem; flex-shrink:0; }
+  .cust-total{ font-weight:700; font-size:.78rem; color:var(--accent-dark); flex-shrink:0; }
+  .cust-chips{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; flex:1; min-width:0; }
+
+  .chip{
+    display:flex; align-items:center; gap:6px; background:#fff; border:1px solid var(--border-strong);
+    border-radius:999px; padding:4px 6px 4px 9px; font-weight:600; font-size:.76rem; color:var(--text);
+    cursor:pointer; user-select:none; transition:border-color .1s ease,background .1s ease;
+  }
+  .chip:hover{ border-color:var(--accent); background:var(--accent-light); }
+  .chip .avatar{ width:16px; height:16px; }
+  .chip-qty{ background:var(--accent-light); color:var(--accent-dark); border-radius:999px; padding:1px 6px; font-size:.68rem; }
+  .chip-x{ width:15px; height:15px; font-size:.65rem; }
+  .add-chip-btn{ width:24px; height:24px; border:1px dashed var(--border-strong); background:#fff; color:var(--text-muted); font-size:.85rem; flex-shrink:0; }
+  .add-chip-btn:hover{ border-color:var(--accent); color:var(--accent-dark); background:var(--accent-light); }
+  .cust-del{ width:22px; height:22px; font-size:.7rem; margin-left:auto; }
+
+  /* ---- Item picker popover ---- */
+  .popover-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.08); z-index:40; }
+  .popover{
+    position:fixed; z-index:41; background:#fff; border:1px solid var(--border-strong); border-radius:var(--radius-md);
+    box-shadow:0 8px 24px -8px rgba(0,0,0,.15); width:250px; max-height:340px; overflow-y:auto; padding:6px;
+  }
+  .popover h3{ font-size:.72rem; padding:6px 8px 6px; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:.03em; }
+  .picker-item{ display:flex; align-items:center; gap:9px; padding:7px 8px; border-radius:var(--radius-sm); cursor:pointer; }
+  .picker-item:hover{ background:var(--accent-light); }
+  .picker-item .avatar,.picker-item .avatar-ph{ width:28px; height:28px; font-size:.8rem; }
+  .picker-item .pi-name{ font-weight:600; font-size:.8rem; display:flex; align-items:center; gap:5px; }
+  .picker-item .pi-meta{ font-size:.7rem; color:var(--text-faint); font-weight:500; }
+  .picker-item.disabled{ opacity:.4; cursor:not-allowed; pointer-events:none; }
+  .picker-empty{ text-align:center; padding:16px; color:var(--text-faint); font-size:.8rem; }
+
+  /* ================= MANAGE ITEMS ================= */
+  .mg-form{ border:1px solid var(--border); border-radius:var(--radius-md); padding:12px; margin-bottom:12px; }
+  .mg-form h2{ font-size:.85rem; margin-bottom:10px; }
+  .mg-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+  .mg-row .field{ flex:1; min-width:120px; }
+  .img-upload-row{ display:flex; align-items:center; gap:8px; }
+  .img-preview{ width:36px; height:36px; font-size:.85rem; }
+  .form-actions{ display:flex; gap:8px; margin-top:2px; }
+  .form-actions .btn{ width:auto; }
+
+  .section-label{ font-size:.72rem; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
+  .item-list{ display:flex; flex-direction:column; gap:6px; }
+  .item-card{ border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px 10px; display:flex; align-items:center; gap:10px; }
+  .item-card .avatar,.item-card .avatar-ph{ width:34px; height:34px; font-size:.85rem; }
+  .ic-info{ flex:1; min-width:0; }
+  .ic-name-row{ display:flex; align-items:center; gap:6px; }
+  .ic-name{ font-weight:700; font-size:.83rem; display:inline-flex; align-items:center; gap:5px; }
+  .ic-cat{ font-size:.66rem; color:var(--accent-dark); background:var(--accent-light); border-radius:999px; padding:1px 7px; font-weight:600; }
+  .ic-meta{ font-size:.72rem; color:var(--text-muted); font-weight:500; margin-top:2px; }
+  .ic-meta.low{ color:var(--danger); }
+  .ic-actions{ display:flex; gap:6px; flex-shrink:0; }
+  .ic-actions .btn{ width:auto; margin:0; }
+
+  @media (max-width:480px){
+    .stock-grid{ grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); }
+    .cust-name{ font-size:.82rem; }
+  }
+
+  /* ---- custom confirm dialog + toast (replaces native confirm/alert, which
+         get silently blocked inside sandboxed preview frames) ---- */
+  .confirm-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.15); z-index:60; display:flex; align-items:center; justify-content:center; padding:16px; }
+  .confirm-box{ background:#fff; border:1px solid var(--border-strong); border-radius:var(--radius-md); padding:16px; width:100%; max-width:300px; box-shadow:0 12px 32px -10px rgba(0,0,0,.25); }
+  .confirm-msg{ font-size:.84rem; color:var(--text); margin-bottom:14px; line-height:1.4; }
+  .confirm-actions{ display:flex; gap:8px; justify-content:flex-end; }
+  .confirm-actions .btn{ width:auto; }
+  .toast{
+    position:fixed; left:50%; bottom:20px; transform:translateX(-50%) translateY(8px); z-index:70;
+    background:var(--text); color:#fff; font-size:.8rem; font-weight:600; padding:9px 16px; border-radius:999px;
+    opacity:0; transition:opacity .18s ease, transform .18s ease; pointer-events:none; max-width:88vw; text-align:center;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ---- GitHub sync modal ---- */
+  .gh-modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.15); z-index:80; display:none; align-items:center; justify-content:center; padding:16px; }
+  .gh-modal-backdrop.open{ display:flex; }
+  .gh-modal{ background:#fff; border:1px solid var(--border-strong); border-radius:var(--radius-md); padding:18px; width:100%; max-width:360px; box-shadow:0 12px 32px -10px rgba(0,0,0,.25); max-height:90vh; overflow-y:auto; }
+  .gh-modal h2{ font-size:.95rem; margin-bottom:2px; }
+  .gh-modal-sub{ font-size:.72rem; color:var(--text-faint); margin-bottom:14px; line-height:1.4; }
+  .gh-modal .field{ margin-bottom:10px; }
+  .gh-row2{ display:flex; gap:8px; }
+  .gh-row2 .field{ flex:1; min-width:0; }
+  .gh-hint{ font-size:.68rem; color:var(--text-faint); margin-top:4px; line-height:1.3; }
+  .gh-status{ font-size:.75rem; font-weight:600; color:var(--text-muted); min-height:16px; margin:8px 0 4px; }
+  .gh-status.err{ color:var(--danger); }
+  .gh-status.ok{ color:var(--accent-dark); }
+  .gh-actions{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+  .gh-actions .btn{ width:auto; flex:1; }
+  .gh-close-row{ margin-top:12px; }
+  .gh-close-row .btn{ width:100%; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="nav-tabs" role="tablist">
+      <button aria-selected="true" class="tab" data-tab="main" type="button">Order Board</button>
+      <button aria-selected="false" class="tab" data-tab="manage" type="button">Manage Items</button>
+    </div>
+    <button class="btn btn-secondary gh-btn" id="gh-open-btn" title="GitHub Sync" type="button">
+      <span class="gh-dot" id="gh-dot"></span> GitHub
+    </button>
+  </div>
+
+  <main>
+    <section class="view active" data-view="main">
+      <div class="stock-section">
+        <div class="stock-section-title">Remaining Stock</div>
+        <div class="stock-grid" id="stock-grid"></div>
+      </div>
+
+      <div class="toolbar">
+        <input id="new-cust-input" placeholder="New customer name..." type="text"/>
+        <button class="btn btn-primary" id="add-cust-btn" type="button">+ Add Customer</button>
+      </div>
+      <div class="cust-list" id="cust-list"></div>
+      <div class="empty-state" hidden id="main-empty">No customers yet — add one above to start tracking sales.</div>
+    </section>
+
+    <section class="view" data-view="manage">
+      <div class="mg-form">
+        <h2 id="item-form-title">Add Item</h2>
+        <input id="edit-item-id" type="hidden"/>
+        <div class="mg-row">
+          <div class="field">
+            <label>Item name</label>
+            <input id="item-name-input" placeholder="e.g. Choco Cookie" type="text"/>
+          </div>
+          <div class="field">
+            <label>Category</label>
+            <input id="item-cat-input" list="category-list" placeholder="e.g. Drinks" type="text"/>
+            <datalist id="category-list"></datalist>
+          </div>
+        </div>
+        <div class="mg-row">
+          <div class="field">
+            <label>Quantity in stock</label>
+            <input id="item-qty-input" min="0" placeholder="0" type="number"/>
+          </div>
+          <div class="field">
+            <label>Price</label>
+            <input id="item-price-input" min="0" placeholder="0.00" step="0.01" type="number"/>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:8px;">
+          <label>Color</label>
+          <input id="item-color-input" type="hidden"/>
+          <div class="swatch-row" id="color-swatch-row"></div>
+        </div>
+        <div class="field" style="margin-bottom:8px;">
+          <label>Image (optional)</label>
+          <div class="img-upload-row">
+            <div class="avatar-ph img-preview" id="item-img-preview">🖼️</div>
+            <input accept="image/*" id="item-img-input" type="file"/>
+            <button class="btn btn-secondary" id="item-img-clear-btn" type="button">Clear</button>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="save-item-btn" type="button">Save Item</button>
+          <button class="btn btn-secondary" id="cancel-edit-btn" style="display:none;" type="button">Cancel edit</button>
+        </div>
+      </div>
+
+      <div class="section-label">All Items</div>
+      <div class="item-list" id="item-list"></div>
+      <div class="empty-state" hidden id="manage-empty">No items yet — add your first item above.</div>
+    </section>
+  </main>
+</div>
+
+<div class="gh-modal-backdrop" id="gh-modal-backdrop">
+  <div class="gh-modal">
+    <h2>GitHub Sync</h2>
+    <div class="gh-modal-sub">index.html loads <code>data.json</code> from this repo at runtime, and can publish the current data straight back to it.</div>
+
+    <div class="gh-row2">
+      <div class="field">
+        <label>Owner</label>
+        <input id="gh-owner" placeholder="sseoyi" type="text"/>
+      </div>
+      <div class="field">
+        <label>Repo</label>
+        <input id="gh-repo" placeholder="tracker" type="text"/>
+      </div>
+    </div>
+    <div class="gh-row2">
+      <div class="field">
+        <label>Folder</label>
+        <input id="gh-folder" placeholder="storage" type="text"/>
+      </div>
+      <div class="field">
+        <label>Branch</label>
+        <input id="gh-branch" placeholder="main" type="text"/>
+      </div>
+    </div>
+    <div class="field">
+      <label>data.json path</label>
+      <input disabled="" id="gh-path-preview" type="text"/>
+    </div>
+    <div class="field">
+      <label>Personal Access Token</label>
+      <input autocomplete="off" id="gh-token" placeholder="ghp_... or github_pat_..." type="password"/>
+      <div class="gh-hint">Needs "Contents: Read and write" on this repo (fine-grained token) or the classic "repo" scope. Only needed to publish — stored locally in this browser and kept until you clear it yourself.</div>
+    </div>
+
+    <div class="gh-status" id="gh-status"></div>
+
+    <div class="gh-actions">
+      <button class="btn btn-secondary" id="gh-save-settings-btn" type="button">Save Settings</button>
+      <button class="btn btn-secondary" id="gh-fetch-btn" type="button">Fetch Latest</button>
+    </div>
+    <div class="gh-actions">
+      <button class="btn btn-primary" id="gh-publish-btn" style="flex:1 1 100%;" type="button">Publish data.json to GitHub</button>
+    </div>
+    <div class="gh-close-row">
+      <button class="btn btn-secondary" id="gh-close-btn" type="button">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  const STORAGE_KEY = 'storage_tracker_v1';
+
+  const state = loadState();
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        parsed.items = (parsed.items || []).map(i => ({ category:'', color:'', ...i }));
+        parsed.customers = parsed.customers || [];
+        return parsed;
+      }
+    }catch(e){}
+    return { items: [], customers: [] };
+  }
+  function saveState(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  }
+
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const money = n => '$' + (Math.round((n + Number.EPSILON) * 100) / 100).toFixed(2);
+  const findItem = id => state.items.find(i => i.id === id);
+  const findCustomer = id => state.customers.find(c => c.id === id);
+
+  const COLORS = ['purple','pink','red','mint','yellow','brown','gray','green'];
+  const NAME_COLOR_MAP = { sua:'purple', mizi:'pink', ivan:'red', till:'mint', luka:'yellow', hyuna:'brown' };
+  function colorFg(key){ return `var(--clr-${key || 'gray'}-fg)`; }
+  function colorBg(key){ return `var(--clr-${key || 'gray'}-bg)`; }
+  function colorDotHtml(key){
+    return key ? `<span class="color-dot" style="background:${colorFg(key)}"></span>` : '';
+  }
+
+  // ---- custom confirm/toast (native confirm()/alert() are silently blocked
+  // in sandboxed preview frames, which makes delete buttons look broken) ----
+  let toastTimer = null;
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+  function showConfirm(message){
+    return new Promise(resolve => {
+      const backdrop = document.createElement('div');
+      backdrop.className = 'confirm-backdrop';
+      backdrop.innerHTML = `
+        <div class="confirm-box">
+          <div class="confirm-msg">${escapeHtml(message)}</div>
+          <div class="confirm-actions">
+            <button class="btn btn-secondary" data-act="cancel" type="button">Cancel</button>
+            <button class="btn btn-danger" data-act="ok" style="border-color:var(--danger);color:#fff;background:var(--danger);" type="button">Delete</button>
+          </div>
+        </div>`;
+      function close(result){
+        backdrop.remove();
+        document.removeEventListener('keydown', onKey);
+        resolve(result);
+      }
+      function onKey(e){ if(e.key === 'Escape') close(false); }
+      backdrop.addEventListener('click', e => {
+        if(e.target === backdrop) return close(false);
+        const btn = e.target.closest('[data-act]');
+        if(btn) close(btn.dataset.act === 'ok');
+      });
+      document.addEventListener('keydown', onKey);
+      document.body.appendChild(backdrop);
+    });
+  }
+  function escapeHtml(str){
+    return String(str ?? '')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function avatarHtml(image, size, fallback){
+    return image
+      ? `<img class="avatar" src="${image}" style="width:${size}px;height:${size}px">`
+      : `<div class="avatar-ph" style="width:${size}px;height:${size}px">${fallback}</div>`;
+  }
+  function categoryOf(item){ return (item.category || '').trim() || 'Uncategorized'; }
+
+  const el = id => document.getElementById(id);
+  const custListEl = el('cust-list');
+  const itemListEl = el('item-list');
+  const stockGridEl = el('stock-grid');
+  const mainEmptyEl = el('main-empty');
+  const manageEmptyEl = el('manage-empty');
+
+  // ---------- Tabs ----------
+  document.querySelector('.nav-tabs').addEventListener('click', e => {
+    const btn = e.target.closest('.tab');
+    if(!btn) return;
+    const name = btn.dataset.tab;
+    document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', t === btn));
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view === name));
+    if(name === 'main') renderCustomers(); else renderItems();
+    renderStockOverview();
+  });
+
+  // ================= MANAGE ITEMS =================
+  const form = {
+    id: el('edit-item-id'), name: el('item-name-input'), cat: el('item-cat-input'), qty: el('item-qty-input'),
+    price: el('item-price-input'), color: el('item-color-input'), imgInput: el('item-img-input'), imgPreview: el('item-img-preview'),
+    title: el('item-form-title'), cancelBtn: el('cancel-edit-btn')
+  };
+  let pendingImage = '';
+  let colorManuallySet = false;
+
+  const swatchRow = el('color-swatch-row');
+  swatchRow.innerHTML = COLORS.map(c => `<div class="swatch" data-color="${c}" style="background:${colorFg(c)}" title="${c}"></div>`).join('');
+  function setColor(key, manual){
+    form.color.value = key || '';
+    if(manual) colorManuallySet = true;
+    swatchRow.querySelectorAll('.swatch').forEach(s => s.classList.toggle('selected', s.dataset.color === key));
+  }
+  swatchRow.addEventListener('click', e => {
+    const sw = e.target.closest('.swatch');
+    if(!sw) return;
+    const key = sw.dataset.color;
+    setColor(form.color.value === key ? '' : key, true);
+  });
+  form.name.addEventListener('input', () => {
+    if(colorManuallySet) return;
+    const match = NAME_COLOR_MAP[form.name.value.trim().toLowerCase()];
+    if(match) setColor(match, false);
+  });
+
+  form.imgInput.addEventListener('change', () => {
+    const file = form.imgInput.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      pendingImage = e.target.result;
+      form.imgPreview.innerHTML = `<img src="${pendingImage}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+    };
+    reader.readAsDataURL(file);
+  });
+  el('item-img-clear-btn').addEventListener('click', () => {
+    pendingImage = '';
+    form.imgInput.value = '';
+    form.imgPreview.innerHTML = '🖼️';
+  });
+
+  function resetItemForm(){
+    form.id.value = ''; form.name.value = ''; form.cat.value = ''; form.qty.value = ''; form.price.value = '';
+    pendingImage = ''; form.imgInput.value = ''; form.imgPreview.innerHTML = '🖼️';
+    colorManuallySet = false; setColor('', false);
+    form.title.textContent = 'Add Item';
+    form.cancelBtn.style.display = 'none';
+  }
+  form.cancelBtn.addEventListener('click', resetItemForm);
+
+  el('save-item-btn').addEventListener('click', () => {
+    const name = form.name.value.trim();
+    const category = form.cat.value.trim();
+    const qty = parseInt(form.qty.value, 10);
+    const price = parseFloat(form.price.value);
+    if(!name) return showToast('Please enter an item name.');
+    if(!(qty >= 0)) return showToast('Please enter a valid quantity.');
+    if(!(price >= 0)) return showToast('Please enter a valid price.');
+
+    const editId = form.id.value;
+    const color = form.color.value || '';
+    if(editId){
+      const item = findItem(editId);
+      if(item){
+        Object.assign(item, { name, category, qty, price, color });
+        if(pendingImage) item.image = pendingImage;
+      }
+    } else {
+      state.items.push({ id: uid(), name, category, qty, price, color, image: pendingImage });
+    }
+    saveState();
+    resetItemForm();
+    renderItems();
+    renderStockOverview();
+  });
+
+  function startEditItem(id){
+    const item = findItem(id);
+    if(!item) return;
+    form.id.value = item.id;
+    form.name.value = item.name;
+    form.cat.value = item.category || '';
+    form.qty.value = item.qty;
+    form.price.value = item.price;
+    colorManuallySet = true; setColor(item.color || '', true);
+    pendingImage = item.image || '';
+    form.imgPreview.innerHTML = item.image ? `<img src="${item.image}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">` : '🖼️';
+    form.title.textContent = 'Edit Item';
+    form.cancelBtn.style.display = 'inline-block';
+    form.name.focus();
+  }
+
+  async function deleteItem(id){
+    const ok = await showConfirm('Delete this item? Existing chips referencing it will show as "Removed item".');
+    if(!ok) return;
+    state.items = state.items.filter(i => i.id !== id);
+    saveState();
+    renderItems();
+    renderStockOverview();
+  }
+
+  itemListEl.addEventListener('click', e => {
+    const btn = e.target.closest('[data-action]');
+    if(!btn) return;
+    const id = btn.closest('.item-card').dataset.id;
+    if(btn.dataset.action === 'edit') startEditItem(id);
+    if(btn.dataset.action === 'delete') deleteItem(id);
+  });
+
+  function refreshCategoryDatalist(){
+    const cats = [...new Set(state.items.map(i => (i.category || '').trim()).filter(Boolean))].sort();
+    el('category-list').innerHTML = cats.map(c => `<option value="${escapeHtml(c)}">`).join('');
+  }
+
+  function renderItems(){
+    refreshCategoryDatalist();
+    if(state.items.length === 0){
+      itemListEl.innerHTML = '';
+      manageEmptyEl.hidden = false;
+      return;
+    }
+    manageEmptyEl.hidden = true;
+    itemListEl.innerHTML = state.items.map(item => `
+      <div class="item-card" data-id="${item.id}">
+        ${avatarHtml(item.image, 34, '📦')}
+        <div class="ic-info">
+          <div class="ic-name-row">
+            <span class="ic-name">${colorDotHtml(item.color)}${escapeHtml(item.name)}</span>
+            <span class="ic-cat">${escapeHtml(categoryOf(item))}</span>
+          </div>
+          <div class="ic-meta ${item.qty <= 0 ? 'low' : ''}">${item.qty} in stock · ${money(item.price)} each</div>
+        </div>
+        <div class="ic-actions">
+          <button class="btn btn-secondary" data-action="edit" type="button">Edit</button>
+          <button class="btn btn-danger" data-action="delete" type="button">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ================= STOCK OVERVIEW =================
+  function renderStockOverview(){
+    if(state.items.length === 0){
+      stockGridEl.innerHTML = '<div class="empty-state" style="grid-column:1/-1;padding:16px;">No items yet.</div>';
+      return;
+    }
+    const groups = new Map();
+    state.items.forEach(item => {
+      const cat = categoryOf(item);
+      if(!groups.has(cat)) groups.set(cat, []);
+      groups.get(cat).push(item);
+    });
+    const catNames = [...groups.keys()].sort((a,b) => a.localeCompare(b));
+
+    stockGridEl.innerHTML = catNames.map(cat => {
+      const items = groups.get(cat).slice().sort((a,b) => a.name.localeCompare(b.name));
+      const rows = items.map(item => `
+        <div class="cat-item-row">
+          <span class="name ${item.qty <= 0 ? 'out' : ''}">${colorDotHtml(item.color)}${escapeHtml(item.name)}</span>
+          <span class="qty-badge ${item.qty <= 0 ? 'zero' : ''}" style="${item.qty > 0 ? `background:${colorBg(item.color)};color:${colorFg(item.color)}` : ''}">${item.qty}</span>
+        </div>
+      `).join('');
+      return `
+        <details class="cat-box">
+          <summary>
+            <span class="cat-name">${escapeHtml(cat)}</span>
+            <span class="chev">▸</span>
+          </summary>
+          <div class="cat-box-items">${rows}</div>
+        </details>
+      `;
+    }).join('');
+  }
+
+  // ================= ORDER BOARD =================
+  el('add-cust-btn').addEventListener('click', addCustomer);
+  el('new-cust-input').addEventListener('keydown', e => { if(e.key === 'Enter') addCustomer(); });
+
+  function addCustomer(){
+    const input = el('new-cust-input');
+    const name = input.value.trim();
+    if(!name) return;
+    state.customers.push({ id: uid(), name, chips: [] });
+    input.value = '';
+    saveState();
+    renderCustomers();
+  }
+
+  async function deleteCustomer(id){
+    const ok = await showConfirm('Remove this customer row? Item stock will not be restored.');
+    if(!ok) return;
+    state.customers = state.customers.filter(c => c.id !== id);
+    saveState();
+    renderCustomers();
+  }
+
+  function custTotal(cust){
+    return cust.chips.reduce((sum, chip) => {
+      const item = findItem(chip.itemId);
+      const price = item ? item.price : (chip.priceSnapshot || 0);
+      return sum + price * chip.qty;
+    }, 0);
+  }
+
+  function bumpChip(custId, chipId){
+    const cust = findCustomer(custId);
+    const chip = cust && cust.chips.find(c => c.id === chipId);
+    if(!chip) return;
+    const item = findItem(chip.itemId);
+    if(!item) return;
+    if(item.qty <= 0) return showToast(`No more stock left for "${item.name}".`);
+    item.qty -= 1;
+    chip.qty += 1;
+    saveState();
+    renderCustomers();
+    renderItems();
+    renderStockOverview();
+  }
+
+  function shrinkChip(custId, chipId){
+    const cust = findCustomer(custId);
+    const chip = cust && cust.chips.find(c => c.id === chipId);
+    if(!chip) return;
+    const item = findItem(chip.itemId);
+    if(item) item.qty += 1;
+    chip.qty -= 1;
+    if(chip.qty <= 0) cust.chips = cust.chips.filter(c => c.id !== chipId);
+    saveState();
+    renderCustomers();
+    renderItems();
+    renderStockOverview();
+  }
+
+  function addChipToCustomer(custId, itemId){
+    const cust = findCustomer(custId);
+    const item = findItem(itemId);
+    if(!cust || !item || item.qty <= 0) return;
+    item.qty -= 1;
+    cust.chips.push({ id: uid(), itemId, qty: 1, nameSnapshot: item.name, priceSnapshot: item.price });
+    saveState();
+    closePopover();
+    renderCustomers();
+    renderItems();
+    renderStockOverview();
+  }
+
+  custListEl.addEventListener('click', e => {
+    const custRow = e.target.closest('.cust-row');
+    if(!custRow) return;
+    const custId = custRow.dataset.id;
+
+    const delBtn = e.target.closest('[data-action="delete-customer"]');
+    if(delBtn) return deleteCustomer(custId);
+
+    const addBtn = e.target.closest('[data-action="open-picker"]');
+    if(addBtn) return openPicker(addBtn, custId);
+
+    const xBtn = e.target.closest('[data-action="shrink-chip"]');
+    if(xBtn) return shrinkChip(custId, xBtn.closest('.chip').dataset.id);
+
+    const chip = e.target.closest('.chip');
+    if(chip) return bumpChip(custId, chip.dataset.id);
+  });
+
+  function renderCustomers(){
+    if(state.customers.length === 0){
+      custListEl.innerHTML = '';
+      mainEmptyEl.hidden = false;
+      return;
+    }
+    mainEmptyEl.hidden = true;
+    custListEl.innerHTML = state.customers.map(cust => `
+      <div class="cust-row" data-id="${cust.id}">
+        <span class="cust-name">${escapeHtml(cust.name)}</span>
+        <span class="cust-total">${money(custTotal(cust))}</span>
+        <div class="cust-chips">
+          ${cust.chips.map(chip => {
+            const item = findItem(chip.itemId);
+            const name = item ? item.name : (chip.nameSnapshot || 'Removed item');
+            return `<span class="chip" data-id="${chip.id}">
+              ${item && item.image ? avatarHtml(item.image, 16, '') : (item ? colorDotHtml(item.color) : '')}
+              ${escapeHtml(name)}
+              <span class="chip-qty">×${chip.qty}</span>
+              <span class="round-btn ghost chip-x" data-action="shrink-chip">×</span>
+            </span>`;
+          }).join('')}
+          <button class="round-btn fill add-chip-btn" data-action="open-picker" title="Add item" type="button">+</button>
+        </div>
+        <button class="round-btn outline-danger cust-del" data-action="delete-customer" title="Remove customer" type="button">×</button>
+      </div>
+    `).join('');
+  }
+
+  // ---------- Item picker popover ----------
+  let activePopover = null;
+  function closePopover(){
+    if(!activePopover) return;
+    activePopover.backdrop.remove();
+    activePopover.pop.remove();
+    activePopover = null;
+  }
+
+  function openPicker(anchorBtn, custId){
+    closePopover();
+    const rect = anchorBtn.getBoundingClientRect();
+
+    const backdrop = document.createElement('div');
+    backdrop.className = 'popover-backdrop';
+    backdrop.addEventListener('click', closePopover);
+
+    const pop = document.createElement('div');
+    pop.className = 'popover';
+    let top = rect.bottom + 6;
+    let left = Math.max(8, Math.min(rect.left, window.innerWidth - 258));
+    if(top + 340 > window.innerHeight) top = Math.max(8, rect.top - 348);
+    pop.style.top = top + 'px';
+    pop.style.left = left + 'px';
+
+    pop.innerHTML = state.items.length === 0
+      ? '<div class="picker-empty">No items yet. Add some in "Manage Items".</div>'
+      : '<h3>Add item</h3>' + state.items.map(item => `
+          <div class="picker-item ${item.qty <= 0 ? 'disabled' : ''}" data-item-id="${item.id}">
+            ${avatarHtml(item.image, 28, '📦')}
+            <div>
+              <div class="pi-name">${colorDotHtml(item.color)}${escapeHtml(item.name)}</div>
+              <div class="pi-meta">${item.qty} left · ${money(item.price)}</div>
+            </div>
+          </div>
+        `).join('');
+
+    pop.addEventListener('click', e => {
+      const row = e.target.closest('.picker-item');
+      if(row) addChipToCustomer(custId, row.dataset.itemId);
+    });
+
+    document.body.append(backdrop, pop);
+    activePopover = { backdrop, pop };
+  }
+
+  // ================= GITHUB SYNC =================
+  // index.html fetches data.json from this repo/folder at runtime, and can
+  // publish the current local state straight back into the repo.
+  const GH_SETTINGS_KEY = 'gh_sync_settings_v1';
+  const GH_TOKEN_KEY = 'gh_sync_token_v1'; // persisted independently — never auto-cleared
+  const GH_DEFAULTS = { owner: 'sseoyi', repo: 'tracker', folder: 'storage', branch: 'main' };
+
+  function loadGhSettings(){
+    try{
+      const raw = localStorage.getItem(GH_SETTINGS_KEY);
+      if(raw) return { ...GH_DEFAULTS, ...JSON.parse(raw) };
+    }catch(e){}
+    return { ...GH_DEFAULTS };
+  }
+  function saveGhSettings(s){
+    try{ localStorage.setItem(GH_SETTINGS_KEY, JSON.stringify(s)); }catch(e){}
+  }
+  // Token is only ever written when a non-empty value is provided, and is
+  // never cleared automatically (e.g. on page refresh) — it stays saved
+  // across sessions until the user deletes it themselves.
+  function loadGhToken(){
+    try{ return localStorage.getItem(GH_TOKEN_KEY) || ''; }catch(e){ return ''; }
+  }
+  function saveGhToken(t){
+    try{ if(t) localStorage.setItem(GH_TOKEN_KEY, t); }catch(e){}
+  }
+
+  let ghSettings = loadGhSettings();
+
+  function ghPath(){
+    const folder = (ghSettings.folder || '').replace(/^\/+|\/+$/g, '');
+    return (folder ? folder + '/' : '') + 'data.json';
+  }
+  function ghApiUrl(){
+    return `https://api.github.com/repos/${encodeURIComponent(ghSettings.owner)}/${encodeURIComponent(ghSettings.repo)}/contents/${ghPath()}`;
+  }
+  function ghRawUrl(){
+    return `https://raw.githubusercontent.com/${ghSettings.owner}/${ghSettings.repo}/${ghSettings.branch}/${ghPath()}?_=${Date.now()}`;
+  }
+  function b64EncodeUnicode(str){
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+
+  function ghSetDot(status){ // 'ok' | 'err' | ''
+    const dot = document.getElementById('gh-dot');
+    if(!dot) return;
+    dot.classList.remove('ok', 'err');
+    if(status) dot.classList.add(status);
+  }
+  function ghSetStatus(msg, kind){ // kind: 'ok' | 'err' | undefined
+    const box = document.getElementById('gh-status');
+    if(!box) return;
+    box.textContent = msg || '';
+    box.classList.remove('ok', 'err');
+    if(kind) box.classList.add(kind);
+  }
+  function ghUpdatePathPreview(){
+    const preview = document.getElementById('gh-path-preview');
+    if(preview) preview.value = `${ghSettings.owner}/${ghSettings.repo}/${ghPath()} (branch: ${ghSettings.branch})`;
+  }
+
+  async function fetchDataJson(silent){
+    try{
+      if(!silent) ghSetStatus('Fetching latest data.json…');
+      const res = await fetch(ghRawUrl(), { cache: 'no-store' });
+      if(!res.ok) throw new Error(`not found yet (HTTP ${res.status})`);
+      const parsed = JSON.parse(await res.text());
+      if(!parsed || typeof parsed !== 'object') throw new Error('data.json was not valid JSON');
+      state.items = (parsed.items || []).map(i => ({ category:'', color:'', ...i }));
+      state.customers = parsed.customers || [];
+      saveState();
+      renderCustomers();
+      renderItems();
+      renderStockOverview();
+      if(!silent) ghSetStatus('Loaded latest data.json from GitHub ✓', 'ok');
+      ghSetDot('ok');
+      return true;
+    }catch(e){
+      if(!silent) ghSetStatus('Could not fetch data.json: ' + e.message, 'err');
+      ghSetDot(silent ? '' : 'err');
+      return false;
+    }
+  }
+
+  async function publishToGithub(){
+    const token = loadGhToken();
+    const publishBtn = el('gh-publish-btn');
+    if(!token) return ghSetStatus('Enter a GitHub token above first.', 'err');
+    if(!ghSettings.owner || !ghSettings.repo) return ghSetStatus('Enter an owner and repo first.', 'err');
+
+    publishBtn.disabled = true;
+    ghSetStatus('Publishing data.json to GitHub…');
+    try{
+      let sha;
+      const getRes = await fetch(ghApiUrl() + `?ref=${encodeURIComponent(ghSettings.branch)}`, {
+        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
+      });
+      if(getRes.status === 200){
+        sha = (await getRes.json()).sha;
+      } else if(getRes.status === 401 || getRes.status === 403){
+        throw new Error('token was rejected — check it has repo write access');
+      } else if(getRes.status !== 404){
+        throw new Error(`GET failed (HTTP ${getRes.status})`);
+      }
+
+      const content = JSON.stringify({ items: state.items, customers: state.customers }, null, 2);
+      const body = {
+        message: `Update data.json — ${new Date().toISOString()}`,
+        content: b64EncodeUnicode(content),
+        branch: ghSettings.branch
+      };
+      if(sha) body.sha = sha;
+
+      const putRes = await fetch(ghApiUrl(), {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/vnd.github+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+      if(!putRes.ok){
+        const errBody = await putRes.json().catch(() => ({}));
+        throw new Error(errBody.message || `PUT failed (HTTP ${putRes.status})`);
+      }
+      ghSetStatus('Published data.json to GitHub ✓', 'ok');
+      ghSetDot('ok');
+      showToast('data.json published to GitHub.');
+    }catch(e){
+      ghSetStatus('Publish failed: ' + e.message, 'err');
+      ghSetDot('err');
+      showToast('GitHub publish failed: ' + e.message);
+    }finally{
+      publishBtn.disabled = false;
+    }
+  }
+
+  // ---- modal wiring ----
+  function ghFillForm(){
+    el('gh-owner').value = ghSettings.owner || '';
+    el('gh-repo').value = ghSettings.repo || '';
+    el('gh-folder').value = ghSettings.folder || '';
+    el('gh-branch').value = ghSettings.branch || '';
+    el('gh-token').value = loadGhToken();
+    ghUpdatePathPreview();
+  }
+  el('gh-open-btn').addEventListener('click', () => {
+    ghFillForm();
+    ghSetStatus('');
+    el('gh-modal-backdrop').classList.add('open');
+  });
+  el('gh-close-btn').addEventListener('click', () => el('gh-modal-backdrop').classList.remove('open'));
+  el('gh-modal-backdrop').addEventListener('click', e => {
+    if(e.target.id === 'gh-modal-backdrop') el('gh-modal-backdrop').classList.remove('open');
+  });
+  ['gh-owner','gh-repo','gh-folder','gh-branch'].forEach(id => {
+    el(id).addEventListener('input', () => {
+      ghSettings = {
+        owner: el('gh-owner').value.trim() || GH_DEFAULTS.owner,
+        repo: el('gh-repo').value.trim() || GH_DEFAULTS.repo,
+        folder: el('gh-folder').value.trim(),
+        branch: el('gh-branch').value.trim() || GH_DEFAULTS.branch
+      };
+      ghUpdatePathPreview();
+    });
+  });
+  el('gh-save-settings-btn').addEventListener('click', () => {
+    saveGhSettings(ghSettings);
+    const tokenVal = el('gh-token').value.trim();
+    if(tokenVal) saveGhToken(tokenVal); // latest token is kept; refresh never clears it
+    ghSetStatus('Settings saved.', 'ok');
+    showToast('GitHub settings saved.');
+  });
+  el('gh-token').addEventListener('change', () => {
+    const t = el('gh-token').value.trim();
+    if(t) saveGhToken(t);
+  });
+  el('gh-fetch-btn').addEventListener('click', () => fetchDataJson(false));
+  el('gh-publish-btn').addEventListener('click', publishToGithub);
+
+  // ---------- Init ----------
+  renderCustomers();
+  renderItems();
+  renderStockOverview();
+  fetchDataJson(true); // auto-load latest data.json from the repo at runtime
+})();
+</script>
+<div class="toast" id="toast"></div>
+</body>
+</html>
