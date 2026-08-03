@@ -191,6 +191,21 @@
   .profit-summary-box .ps-label{ font-size:.68rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.03em; }
   .profit-summary-box .ps-value{ font-size:1rem; font-weight:700; color:var(--text); }
   .profit-summary-box .ps-value.profit{ color:var(--teal-dark); }
+  .expenses-block{ margin-top:10px; }
+  .expenses-add-row{ display:flex; gap:6px; }
+  .expenses-add-row .expense-name-input{ flex:1.4; min-width:0; }
+  .expenses-add-row .expense-amount-input{ flex:1; min-width:70px; }
+  .expenses-add-row .btn{ flex-shrink:0; }
+  .expenses-list{ display:flex; flex-direction:column; gap:5px; margin-top:8px; }
+  .expense-row{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    border:1px solid var(--teal-border); border-radius:var(--radius-sm); background:#fff; padding:6px 10px; font-size:.78rem;
+  }
+  .expense-row .expense-name{ color:var(--text); font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .expense-row .expense-amount{ color:var(--danger); font-weight:700; flex-shrink:0; margin-left:auto; }
+  .expense-row .expense-del{ flex-shrink:0; }
+  .expenses-total-row{ display:flex; justify-content:space-between; font-size:.76rem; font-weight:700; color:var(--text-muted); padding:2px 2px 0; margin-top:2px; }
+  .expenses-total-row span:last-child{ color:var(--danger); }
   .cust-chips{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; flex:1; min-width:0; }
 
   .chip{
@@ -331,6 +346,14 @@
         <div class="stock-section panel panel-profit" id="profit-summary-section">
           <div class="stock-section-title">Overall Profit</div>
           <div id="profit-summary"></div>
+          <div class="expenses-block">
+            <div class="expenses-add-row">
+              <input class="expense-name-input" id="expense-name-input" placeholder="Expense name..." type="text"/>
+              <input class="expense-amount-input" id="expense-amount-input" min="0" placeholder="Amount" step="any" type="number"/>
+              <button class="btn btn-primary" id="add-expense-btn" type="button">Add</button>
+            </div>
+            <div class="expenses-list" id="expenses-list"></div>
+          </div>
         </div>
       </div>
 
@@ -466,12 +489,13 @@
         parsed.items = (parsed.items || []).map(i => ({ category:'', color:'', collection:'', cost:0, ...i }));
         parsed.customers = parsed.customers || [];
         parsed.collections = parsed.collections || [];
+        parsed.expenses = parsed.expenses || [];
         const existingCats = [...new Set(parsed.items.map(i => (i.category || '').trim()).filter(Boolean))];
         parsed.categories = [...new Set([...(parsed.categories || []), ...existingCats])].sort((a,b) => a.localeCompare(b));
         return parsed;
       }
     }catch(e){}
-    return { items: [], customers: [], collections: [], categories: [] };
+    return { items: [], customers: [], collections: [], categories: [], expenses: [] };
   }
   function saveState(){
     try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
@@ -1243,7 +1267,41 @@
 
   function overallTotal(){ return state.customers.reduce((s, cust) => s + custTotal(cust), 0); }
   function overallCost(){ return state.customers.reduce((s, cust) => s + custCost(cust), 0); }
-  function overallProfit(){ return overallTotal() - overallCost(); }
+  function totalExpenses(){ return (state.expenses || []).reduce((s, ex) => s + (ex.amount || 0), 0); }
+  function overallProfit(){ return overallTotal() - overallCost() - totalExpenses(); }
+
+  const expenseNameInput = el('expense-name-input');
+  const expenseAmountInput = el('expense-amount-input');
+  const addExpenseBtn = el('add-expense-btn');
+  const expensesListEl = el('expenses-list');
+
+  function addExpense(){
+    const name = expenseNameInput.value.trim();
+    const amount = parseFloat(expenseAmountInput.value);
+    if(!name) return showToast('Please enter an expense name.');
+    if(!(amount >= 0)) return showToast('Please enter a valid amount.');
+    state.expenses = state.expenses || [];
+    state.expenses.push({ id: uid(), name, amount });
+    saveState();
+    expenseNameInput.value = '';
+    expenseAmountInput.value = '';
+    expenseNameInput.focus();
+    renderProfitSummary();
+  }
+  function deleteExpense(id){
+    state.expenses = (state.expenses || []).filter(ex => ex.id !== id);
+    saveState();
+    renderProfitSummary();
+  }
+  addExpenseBtn.addEventListener('click', addExpense);
+  [expenseNameInput, expenseAmountInput].forEach(input => {
+    input.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); addExpense(); } });
+  });
+  expensesListEl.addEventListener('click', e => {
+    const delBtn = e.target.closest('[data-action="delete-expense"]');
+    if(delBtn) deleteExpense(delBtn.closest('.expense-row').dataset.id);
+  });
+
   function renderProfitSummary(){
     const box = el('profit-summary');
     if(!box) return;
@@ -1254,6 +1312,16 @@
         <div class="ps-item"><span class="ps-label">Profit</span><span class="ps-value profit">${money(overallProfit())}</span></div>
       </div>
     `;
+    const expenses = state.expenses || [];
+    expensesListEl.innerHTML = expenses.map(ex => `
+      <div class="expense-row" data-id="${ex.id}">
+        <span class="expense-name">${escapeHtml(ex.name)}</span>
+        <span class="expense-amount">-${money(ex.amount)}</span>
+        <button class="round-btn ghost expense-del" data-action="delete-expense" title="Remove expense" type="button">×</button>
+      </div>
+    `).join('') + (expenses.length ? `
+      <div class="expenses-total-row"><span>Total expenses</span><span>-${money(totalExpenses())}</span></div>
+    ` : '');
   }
 
   function renderCustomers(){
@@ -1450,6 +1518,7 @@
       const existingCats = [...new Set(state.items.map(i => (i.category || '').trim()).filter(Boolean))];
       state.categories = [...new Set([...(parsed.categories || []), ...existingCats])].sort((a,b) => a.localeCompare(b));
       state.customers = parsed.customers || [];
+      state.expenses = parsed.expenses || [];
       saveState();
       renderCustomers();
       renderItems();
@@ -1487,7 +1556,7 @@
         throw new Error(`GET failed (HTTP ${getRes.status})`);
       }
 
-      const content = JSON.stringify({ items: state.items, customers: state.customers, collections: state.collections, categories: state.categories }, null, 2);
+      const content = JSON.stringify({ items: state.items, customers: state.customers, collections: state.collections, categories: state.categories, expenses: state.expenses }, null, 2);
       const body = {
         message: `Update data.json — ${new Date().toISOString()}`,
         content: b64EncodeUnicode(content),
