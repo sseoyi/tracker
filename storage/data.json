@@ -49,7 +49,84 @@
       "qty": 1,
       "price": 30,
       "image": ""
+    },
+    {
+      "id": "mscws8zzg5ihpg",
+      "name": "Hyuna",
+      "category": "Key strap",
+      "qty": 2,
+      "price": 30,
+      "color": "brown",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscwshyejmzwfe",
+      "name": "Sua",
+      "category": "Phonecharm",
+      "qty": 0,
+      "price": 15,
+      "color": "purple",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscwsofihst0wd",
+      "name": "Mizi",
+      "category": "Phonecharm",
+      "qty": 0,
+      "price": 15,
+      "color": "pink",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscwsvzqzm455q",
+      "name": "Ivan",
+      "category": "Phonecharm",
+      "qty": 1,
+      "price": 15,
+      "color": "red",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscwt8hieuydeq",
+      "name": "Till",
+      "category": "Phonecharm",
+      "qty": 0,
+      "price": 15,
+      "color": "mint",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscwthon4o84p2",
+      "name": "Luka",
+      "category": "Phonecharm",
+      "qty": 3,
+      "price": 15,
+      "color": "yellow",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscwtmxjyos3li",
+      "name": "Hyuna",
+      "category": "Phonecharm",
+      "qty": 0,
+      "price": 15,
+      "color": "brown",
+      "collection": "",
+      "image": ""
     }
   ],
-  "customers": []
+  "customers": [],
+  "collections": [
+    "Clique"
+  ],
+  "categories": [
+    "Key strap",
+    "Phonecharm"
+  ]
 }
