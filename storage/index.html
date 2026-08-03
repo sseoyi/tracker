@@ -135,9 +135,16 @@
   .model-rows{ display:flex; flex-direction:column; gap:8px; }
   .model-row{ border:1px solid var(--border); border-left:3px solid transparent; border-radius:var(--radius-sm); padding:8px; transition:border-left-color .12s ease; }
   .model-row-top{ display:flex; gap:6px; align-items:center; }
+  .model-row-top .model-color-btn{ width:24px; height:24px; border-radius:50%; border:2px solid var(--border-strong); background:#fff; cursor:pointer; padding:0; flex-shrink:0; }
+  .model-row-top .model-color-btn.has-color{ border-color:#fff; box-shadow:0 0 0 1px var(--border-strong); }
   .model-row-top .model-name-input{ flex:1.4; min-width:0; }
   .model-row-top .model-qty-input{ flex:1; min-width:56px; }
   .model-row-top .model-remove-btn{ width:26px; height:26px; font-size:.8rem; flex-shrink:0; }
+  .color-popover{ width:184px !important; padding:10px !important; }
+  .color-swatch-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; padding:2px 2px 8px; }
+  .color-swatch{ width:30px; height:30px; border-radius:50%; cursor:pointer; border:2px solid transparent; }
+  .color-swatch.selected{ border-color:var(--text); }
+  .color-popover .popover-back{ margin:2px 0 0; }
   .model-actions{ display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
   .model-actions .btn{ width:auto; }
 
@@ -562,15 +569,17 @@
   function setCollection(key){ collectionPicker.set(key); }
   function setCategory(key){ categoryPicker.set(key); }
 
-  // ---- Models: repeatable name+qty rows, color auto-assigned from name ----
+  // ---- Models: repeatable name+qty rows, color auto-assigned from name (overridable manually) ----
   const modelRowsEl = el('model-rows');
   const addModelRowBtn = el('add-model-row-btn');
+  const COLOR_KEYS = ['purple', 'pink', 'red', 'mint', 'yellow', 'brown', 'gray', 'green'];
   let modelRowSeq = 0;
 
-  function modelRowHtml(rowId, name, qty, itemId){
+  function modelRowHtml(rowId, name, qty, itemId, color){
     return `
-      <div class="model-row" data-row-id="${rowId}" data-item-id="${itemId || ''}">
+      <div class="model-row" data-row-id="${rowId}" data-item-id="${itemId || ''}" data-color="${escapeHtml(color || '')}">
         <div class="model-row-top">
+          <button class="model-color-btn" title="Choose color" type="button"></button>
           <input class="model-name-input" placeholder="Model name" type="text" value="${escapeHtml(name)}"/>
           <input class="model-qty-input" min="0" placeholder="Qty" type="number" value="${escapeHtml(qty)}"/>
           <button class="round-btn ghost model-remove-btn" title="Remove model" type="button">×</button>
@@ -578,12 +587,13 @@
       </div>
     `;
   }
-  function addModelRow(name, qty, itemId, focusIt){
+  function addModelRow(name, qty, itemId, focusIt, color, manual){
     const rowId = 'r' + (++modelRowSeq);
     const wrapper = document.createElement('div');
-    wrapper.innerHTML = modelRowHtml(rowId, name || '', qty === undefined || qty === '' ? '' : String(qty), itemId).trim();
+    wrapper.innerHTML = modelRowHtml(rowId, name || '', qty === undefined || qty === '' ? '' : String(qty), itemId, color).trim();
     const rowEl = wrapper.firstChild;
     modelRowsEl.appendChild(rowEl);
+    if(manual) rowEl.dataset.colorManual = 'true';
     updateModelRow(rowEl);
     if(focusIt !== false) rowEl.querySelector('.model-name-input').focus();
     return rowEl;
@@ -598,12 +608,60 @@
       return (a.name || '').localeCompare(b.name || '');
     });
   }
+  function updateModelRowSwatch(rowEl){
+    const btn = rowEl.querySelector('.model-color-btn');
+    if(!btn) return;
+    const color = rowEl.dataset.color || '';
+    btn.style.background = color ? colorFg(color) : '#fff';
+    btn.classList.toggle('has-color', !!color);
+  }
   function updateModelRow(rowEl){
-    const nameInput = rowEl.querySelector('.model-name-input');
-    const val = nameInput.value.trim().toLowerCase();
-    const color = NAME_COLOR_MAP[val] || '';
-    rowEl.dataset.color = color;
+    if(!rowEl.dataset.colorManual){
+      const nameInput = rowEl.querySelector('.model-name-input');
+      const val = nameInput.value.trim().toLowerCase();
+      rowEl.dataset.color = NAME_COLOR_MAP[val] || '';
+    }
+    const color = rowEl.dataset.color || '';
     rowEl.style.borderLeftColor = color ? colorFg(color) : 'transparent';
+    updateModelRowSwatch(rowEl);
+  }
+  function openColorPicker(anchorBtn, rowEl){
+    closePopover();
+    const rect = anchorBtn.getBoundingClientRect();
+    const backdrop = document.createElement('div');
+    backdrop.className = 'popover-backdrop';
+    backdrop.addEventListener('click', closePopover);
+    const pop = document.createElement('div');
+    pop.className = 'popover color-popover';
+    let top = rect.bottom + 6;
+    let left = Math.max(8, Math.min(rect.left, window.innerWidth - 192));
+    pop.style.top = top + 'px';
+    pop.style.left = left + 'px';
+    const current = rowEl.dataset.color || '';
+    pop.innerHTML = `
+      <div class="color-swatch-grid">
+        ${COLOR_KEYS.map(k => `<div class="color-swatch${current === k ? ' selected' : ''}" data-color-key="${k}" style="background:${colorFg(k)}" title="${k}"></div>`).join('')}
+      </div>
+      <div class="popover-back" data-clear="1">↺ Auto (from name)</div>
+    `;
+    pop.addEventListener('click', e => {
+      const swatch = e.target.closest('[data-color-key]');
+      if(swatch){
+        rowEl.dataset.color = swatch.dataset.colorKey;
+        rowEl.dataset.colorManual = 'true';
+        rowEl.style.borderLeftColor = colorFg(rowEl.dataset.color);
+        updateModelRowSwatch(rowEl);
+        closePopover();
+        return;
+      }
+      if(e.target.closest('[data-clear]')){
+        delete rowEl.dataset.colorManual;
+        updateModelRow(rowEl);
+        closePopover();
+      }
+    });
+    document.body.append(backdrop, pop);
+    activePopover = { backdrop, pop };
   }
   function resetModelRows(){
     modelRowsEl.innerHTML = '';
@@ -628,6 +686,8 @@
     });
   });
   modelRowsEl.addEventListener('click', e => {
+    const colorBtn = e.target.closest('.model-color-btn');
+    if(colorBtn){ openColorPicker(colorBtn, colorBtn.closest('.model-row')); return; }
     const removeBtn = e.target.closest('.model-remove-btn');
     if(removeBtn){
       const row = removeBtn.closest('.model-row');
@@ -636,6 +696,8 @@
       } else {
         row.querySelector('.model-name-input').value = '';
         row.querySelector('.model-qty-input').value = '';
+        delete row.dataset.colorManual;
+        row.dataset.color = '';
         updateModelRow(row);
       }
     }
@@ -741,7 +803,11 @@
     form.imgPreview.innerHTML = item.image ? `<img src="${item.image}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">` : '🖼️';
     modelRowsEl.innerHTML = '';
     modelRowSeq = 0;
-    groupItems.forEach(gi => addModelRow(gi.name, gi.qty, gi.id, false));
+    groupItems.forEach(gi => {
+      const autoColor = NAME_COLOR_MAP[(gi.name || '').trim().toLowerCase()] || '';
+      const manual = (gi.color || '') !== autoColor;
+      addModelRow(gi.name, gi.qty, gi.id, false, gi.color || '', manual);
+    });
     addModelRowBtn.style.display = '';
     form.title.textContent = 'Edit Item';
     form.cancelBtn.style.display = 'inline-block';
