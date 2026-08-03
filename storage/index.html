@@ -146,6 +146,8 @@
     border-radius:999px; padding:5px 12px; font-weight:600; font-size:.76rem; color:var(--text-muted); cursor:pointer;
   }
   .coll-chip-add:hover{ border-color:var(--accent); color:var(--accent-dark); background:var(--accent-light); }
+  .dropdown-add-row{ display:flex; gap:8px; align-items:center; }
+  .dropdown-add-row .dropdown-add-input{ flex:1; }
   .coll-chip-input{
     border:1px solid var(--border-strong); border-radius:999px; padding:5px 12px; font-size:.76rem; font-weight:600;
     font-family:var(--font); width:120px;
@@ -653,8 +655,57 @@
     return { get, set, render };
   }
 
+  function makeDropdownPicker({ rowEl, inputEl, listKey }){
+    function get(){ return inputEl.value; }
+    function set(key){
+      inputEl.value = key || '';
+      render();
+    }
+    function render(addingNew){
+      const selected = inputEl.value;
+      const options = state[listKey];
+      if(addingNew){
+        rowEl.innerHTML = `
+          <div class="dropdown-add-row">
+            <input class="dropdown-add-input" placeholder="New name..." type="text"/>
+            <button class="btn btn-secondary dropdown-add-cancel" type="button">Cancel</button>
+          </div>`;
+        const input = rowEl.querySelector('.dropdown-add-input');
+        input.focus();
+        const commit = () => {
+          const val = input.value.trim();
+          if(val && !options.includes(val)){
+            options.push(val);
+            saveState();
+          }
+          set(val || selected);
+        };
+        input.addEventListener('keydown', e => {
+          if(e.key === 'Enter'){ e.preventDefault(); commit(); }
+          if(e.key === 'Escape'){ render(false); }
+        });
+        input.addEventListener('blur', commit);
+        rowEl.querySelector('.dropdown-add-cancel').addEventListener('click', () => render(false));
+        return;
+      }
+      const optionsHtml = ['<option value="">Select…</option>']
+        .concat(options.map(c => `<option ${c === selected ? 'selected' : ''} value="${escapeHtml(c)}">${escapeHtml(c)}</option>`))
+        .concat(['<option value="__add_new__">+ Add new…</option>'])
+        .join('');
+      rowEl.innerHTML = `<select class="dropdown-picker-select">${optionsHtml}</select>`;
+    }
+    rowEl.addEventListener('change', e => {
+      const sel = e.target.closest('.dropdown-picker-select');
+      if(!sel) return;
+      if(sel.value === '__add_new__'){ render(true); return; }
+      set(sel.value);
+    });
+    render();
+    return { get, set, render };
+  }
+
   const collectionPicker = makeChipPicker({ rowEl: el('collection-chip-row'), inputEl: form.collection, listKey: 'collections' });
-  const categoryPicker = makeChipPicker({ rowEl: el('category-chip-row'), inputEl: form.cat, listKey: 'categories' });
+  const categoryPicker = makeDropdownPicker({ rowEl: el('category-chip-row'), inputEl: form.cat, listKey: 'categories' });
   function setCollection(key){ collectionPicker.set(key); }
   function setCategory(key){ categoryPicker.set(key); }
 
