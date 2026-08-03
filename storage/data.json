@@ -212,7 +212,7 @@
     {
       "category": "Strap sổ",
       "color": "purple",
-      "collection": "",
+      "collection": "Clique",
       "cost": 0,
       "id": "mscz76tjciny21",
       "name": "A - Sky",
@@ -223,7 +223,7 @@
     {
       "category": "Strap sổ",
       "color": "red",
-      "collection": "",
+      "collection": "Clique",
       "cost": 0,
       "id": "mscz76tjdl3k53",
       "name": "B - Chocomint",
@@ -234,7 +234,7 @@
     {
       "category": "Strap sổ",
       "color": "yellow",
-      "collection": "",
+      "collection": "Clique",
       "cost": 0,
       "id": "mscz76tjhzx64z",
       "name": "C - Pink",
@@ -245,7 +245,7 @@
     {
       "category": "Strap sổ",
       "color": "brown",
-      "collection": "",
+      "collection": "Clique",
       "cost": 0,
       "id": "mscz76tj2a5ibg",
       "name": "D - Cream",
