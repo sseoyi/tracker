@@ -70,7 +70,7 @@
       "category": "Sticker",
       "color": "",
       "collection": "Clique",
-      "cost": 0,
+      "cost": 10,
       "id": "mscyit0ucdiqmn",
       "name": "Sticker set táo",
       "qty": 2,
@@ -1198,5 +1198,31 @@
     "Sticker",
     "Strap sổ"
   ],
-  "expenses": []
+  "expenses": [
+    {
+      "id": "msd4qbtzdrbsyh",
+      "name": "Ship",
+      "amount": 80
+    },
+    {
+      "id": "msd4qrun79pnsi",
+      "name": "Packaging",
+      "amount": 60
+    },
+    {
+      "id": "msd4qvrnhioeu4",
+      "name": "Phí gói",
+      "amount": 100
+    },
+    {
+      "id": "msd4r2w0gn8avw",
+      "name": "Card gift",
+      "amount": 132
+    },
+    {
+      "id": "msd4rvy1euecwj",
+      "name": "Taobao",
+      "amount": 299
+    }
+  ]
 }
