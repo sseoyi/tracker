@@ -33,7 +33,7 @@
   }
   h1,h2,h3{ font-family:var(--font); margin:0; font-weight:600; }
 
-  .app{ max-width:760px; margin:0; padding:0 100px 32px; }
+  .app{ max-width:none; margin:0; padding:0 24px 32px; }
 
   /* ---- Tabs ---- */
   .topbar{ padding:12px 0 10px; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
@@ -85,6 +85,9 @@
 
   /* ================= STOCK OVERVIEW ================= */
   .stock-section{ margin-bottom:14px; }
+  .top-columns{ display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; margin-bottom:14px; }
+  .top-columns .stock-section{ margin-bottom:0; }
+  @media (max-width:640px){ .top-columns{ grid-template-columns:1fr; } }
   .stock-section-title{ font-size:.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
   .coll-section{ margin-bottom:14px; grid-column:1/-1; }
   .coll-section:last-child{ margin-bottom:0; }
@@ -302,14 +305,16 @@
 
   <main>
     <section class="view active" data-view="main">
-      <div class="stock-section">
-        <div class="stock-section-title">Remaining Stock</div>
-        <div class="stock-grid" id="stock-grid"></div>
-      </div>
+      <div class="top-columns">
+        <div class="stock-section">
+          <div class="stock-section-title">Remaining Stock</div>
+          <div class="stock-grid" id="stock-grid"></div>
+        </div>
 
-      <div class="stock-section" id="profit-summary-section">
-        <div class="stock-section-title">Overall Profit</div>
-        <div id="profit-summary"></div>
+        <div class="stock-section" id="profit-summary-section">
+          <div class="stock-section-title">Overall Profit</div>
+          <div id="profit-summary"></div>
+        </div>
       </div>
 
       <div class="cust-row new-cust-row" id="new-cust-row">
