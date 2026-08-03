@@ -166,6 +166,11 @@
   .cust-total{ font-weight:700; font-size:.78rem; color:var(--accent-dark); }
   .cust-cost{ font-weight:600; font-size:.68rem; color:var(--text-faint); }
   .cust-profit{ font-weight:700; font-size:.68rem; color:var(--accent-dark); }
+  .profit-summary-box{ display:flex; gap:16px; align-items:baseline; border:1px solid var(--border); border-radius:var(--radius-md); background:#fff; padding:10px 14px; }
+  .profit-summary-box .ps-item{ display:flex; flex-direction:column; gap:1px; }
+  .profit-summary-box .ps-label{ font-size:.68rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.03em; }
+  .profit-summary-box .ps-value{ font-size:1rem; font-weight:700; color:var(--text); }
+  .profit-summary-box .ps-value.profit{ color:var(--accent-dark); }
   .cust-chips{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; flex:1; min-width:0; }
 
   .chip{
@@ -298,6 +303,11 @@
       <div class="stock-section">
         <div class="stock-section-title">Remaining Stock</div>
         <div class="stock-grid" id="stock-grid"></div>
+      </div>
+
+      <div class="stock-section" id="profit-summary-section">
+        <div class="stock-section-title">Overall Profit</div>
+        <div id="profit-summary"></div>
       </div>
 
       <div class="cust-row new-cust-row" id="new-cust-row">
@@ -1163,7 +1173,23 @@
     if(chip) return editing ? bumpChip(custId, chip.dataset.id) : undefined;
   });
 
+  function overallTotal(){ return state.customers.reduce((s, cust) => s + custTotal(cust), 0); }
+  function overallCost(){ return state.customers.reduce((s, cust) => s + custCost(cust), 0); }
+  function overallProfit(){ return overallTotal() - overallCost(); }
+  function renderProfitSummary(){
+    const box = el('profit-summary');
+    if(!box) return;
+    box.innerHTML = `
+      <div class="profit-summary-box">
+        <div class="ps-item"><span class="ps-label">Revenue</span><span class="ps-value">${money(overallTotal())}</span></div>
+        <div class="ps-item"><span class="ps-label">Cost</span><span class="ps-value">${money(overallCost())}</span></div>
+        <div class="ps-item"><span class="ps-label">Profit</span><span class="ps-value profit">${money(overallProfit())}</span></div>
+      </div>
+    `;
+  }
+
   function renderCustomers(){
+    renderProfitSummary();
     if(state.customers.length === 0){
       custListEl.innerHTML = '';
       mainEmptyEl.hidden = false;
@@ -1172,14 +1198,12 @@
     mainEmptyEl.hidden = true;
     custListEl.innerHTML = state.customers.map(cust => {
       const editing = cust.id === editingCustomerId;
-      const profit = custProfit(cust);
       return `
       <div class="cust-row${editing ? ' editing' : ''}" data-id="${cust.id}">
         <span class="cust-name">${escapeHtml(cust.name)}</span>
         <span class="cust-totals">
           <span class="cust-total">${money(custTotal(cust))}</span>
           <span class="cust-cost">Cost ${money(custCost(cust))}</span>
-          <span class="cust-profit">+${money(profit)}</span>
         </span>
         <div class="cust-chips">
           ${cust.chips.map(chip => {
