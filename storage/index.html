@@ -158,9 +158,14 @@
   .cust-row{
     display:flex; align-items:center; gap:8px; flex-wrap:wrap;
     border:1px solid var(--border); border-radius:var(--radius-md); padding:9px 10px; background:#fff;
+    transition:border-color .12s ease,background .12s ease;
   }
+  .cust-row.editing{ border-color:var(--accent); background:var(--accent-light); }
   .cust-name{ font-weight:700; font-size:.85rem; flex-shrink:0; }
-  .cust-total{ font-weight:700; font-size:.78rem; color:var(--accent-dark); flex-shrink:0; }
+  .cust-totals{ display:flex; flex-direction:column; align-items:flex-end; gap:1px; flex-shrink:0; }
+  .cust-total{ font-weight:700; font-size:.78rem; color:var(--accent-dark); }
+  .cust-cost{ font-weight:600; font-size:.68rem; color:var(--text-faint); }
+  .cust-profit{ font-weight:700; font-size:.68rem; color:var(--accent-dark); }
   .cust-chips{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; flex:1; min-width:0; }
 
   .chip{
@@ -169,12 +174,16 @@
     cursor:pointer; user-select:none; transition:border-color .1s ease,background .1s ease;
   }
   .chip:hover{ border-color:var(--accent); background:var(--accent-light); }
+  .chip.readonly{ cursor:default; }
+  .chip.readonly:hover{ border-color:var(--border-strong); background:#fff; }
   .chip .avatar{ width:16px; height:16px; }
   .chip-qty{ background:var(--accent-light); color:var(--accent-dark); border-radius:999px; padding:1px 6px; font-size:.68rem; }
   .chip-x{ width:15px; height:15px; font-size:.65rem; }
   .add-chip-btn{ width:24px; height:24px; border:1px dashed var(--border-strong); background:#fff; color:var(--text-muted); font-size:.85rem; flex-shrink:0; }
   .add-chip-btn:hover{ border-color:var(--accent); color:var(--accent-dark); background:var(--accent-light); }
-  .cust-del{ width:22px; height:22px; font-size:.7rem; margin-left:auto; }
+  .cust-edit-btn{ width:26px; height:26px; font-size:.75rem; flex-shrink:0; margin-left:auto; }
+  .cust-edit-btn.ghost:hover{ color:var(--accent-dark); }
+  .cust-del{ width:22px; height:22px; font-size:.7rem; }
 
   /* ---- Item picker popover ---- */
   .popover-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.08); z-index:40; }
@@ -321,6 +330,10 @@
         </div>
         <div class="mg-row">
           <div class="field">
+            <label>Cost</label>
+            <input id="item-cost-input" min="0" placeholder="0.00" step="0.01" type="number"/>
+          </div>
+          <div class="field">
             <label>Price</label>
             <input id="item-price-input" min="0" placeholder="0.00" step="0.01" type="number"/>
           </div>
@@ -412,7 +425,7 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if(raw){
         const parsed = JSON.parse(raw);
-        parsed.items = (parsed.items || []).map(i => ({ category:'', color:'', collection:'', ...i }));
+        parsed.items = (parsed.items || []).map(i => ({ category:'', color:'', collection:'', cost:0, ...i }));
         parsed.customers = parsed.customers || [];
         parsed.collections = parsed.collections || [];
         const existingCats = [...new Set(parsed.items.map(i => (i.category || '').trim()).filter(Boolean))];
@@ -513,7 +526,7 @@
 
   // ================= MANAGE ITEMS =================
   const form = {
-    id: el('edit-item-id'), cat: el('item-cat-input'), price: el('item-price-input'),
+    id: el('edit-item-id'), cat: el('item-cat-input'), price: el('item-price-input'), cost: el('item-cost-input'),
     collection: el('item-collection-input'), imgInput: el('item-img-input'), imgPreview: el('item-img-preview'),
     title: el('item-form-title'), cancelBtn: el('cancel-edit-btn')
   };
@@ -732,7 +745,7 @@
   });
 
   function resetItemForm(){
-    form.id.value = ''; form.price.value = '';
+    form.id.value = ''; form.price.value = ''; form.cost.value = '';
     pendingImage = ''; form.imgInput.value = ''; form.imgPreview.innerHTML = '🖼️';
     setCategory('');
     setCollection('');
@@ -747,6 +760,9 @@
     const category = form.cat.value.trim();
     const price = parseFloat(form.price.value);
     if(!(price >= 0)) return showToast('Please enter a valid price.');
+    const costRaw = form.cost.value.trim();
+    const cost = costRaw === '' ? 0 : parseFloat(costRaw);
+    if(!(cost >= 0)) return showToast('Please enter a valid cost.');
 
     const models = [...modelRowsEl.querySelectorAll('.model-row')]
       .map(row => ({
@@ -771,16 +787,16 @@
         if(m.itemId){
           const item = findItem(m.itemId);
           if(item){
-            Object.assign(item, { name: m.name, category, qty: m.qty, price, color: m.color, collection });
+            Object.assign(item, { name: m.name, category, qty: m.qty, price, cost, color: m.color, collection });
             if(pendingImage) item.image = pendingImage;
           }
         } else {
-          state.items.push({ id: uid(), name: m.name, category, qty: m.qty, price, color: m.color, collection, image: pendingImage });
+          state.items.push({ id: uid(), name: m.name, category, qty: m.qty, price, cost, color: m.color, collection, image: pendingImage });
         }
       });
     } else {
       models.forEach(m => {
-        state.items.push({ id: uid(), name: m.name, category, qty: m.qty, price, color: m.color, collection, image: pendingImage });
+        state.items.push({ id: uid(), name: m.name, category, qty: m.qty, price, cost, color: m.color, collection, image: pendingImage });
       });
     }
     saveState();
@@ -797,6 +813,7 @@
     form.id.value = item.id;
     editingIds = groupItems.map(i => i.id);
     form.price.value = item.price;
+    form.cost.value = item.cost || 0;
     setCategory(item.category || '');
     setCollection(item.collection || '');
     pendingImage = item.image || '';
@@ -839,9 +856,10 @@
         <div class="ic-info">
           <div class="ic-name-row">
             <span class="ic-name">${colorDotHtml(item.color)}${escapeHtml(item.name)}</span>
+            <span class="qty-badge ${item.qty <= 0 ? 'zero' : ''}" style="${item.qty > 0 ? `background:${colorBg(item.color)};color:${colorFg(item.color)}` : ''}">${item.qty}</span>
             ${item.collection ? `<span class="ic-coll">${escapeHtml(item.collection)}</span>` : ''}
           </div>
-          <div class="ic-meta ${item.qty <= 0 ? 'low' : ''}">${item.qty} in stock · ${money(item.price)} each</div>
+          <div class="ic-meta ${item.qty <= 0 ? 'low' : ''}">Cost ${money(item.cost || 0)} · Price ${money(item.price)}</div>
         </div>
         <div class="ic-actions">
           <button class="btn btn-secondary" data-action="edit" type="button">Edit</button>
@@ -1022,7 +1040,7 @@
     if(!name) return showToast('Please enter a customer name.');
     const chips = pendingNewCust.chips.map(c => {
       const item = findItem(c.itemId);
-      return { id: uid(), itemId: c.itemId, qty: c.qty, nameSnapshot: item ? item.name : 'Removed item', priceSnapshot: item ? item.price : 0 };
+      return { id: uid(), itemId: c.itemId, qty: c.qty, nameSnapshot: item ? item.name : 'Removed item', priceSnapshot: item ? item.price : 0, costSnapshot: item ? (item.cost || 0) : 0 };
     });
     chips.forEach(c => { const item = findItem(c.itemId); if(item) item.qty -= c.qty; });
     state.customers.push({ id: uid(), name, chips });
@@ -1049,6 +1067,16 @@
       const price = item ? item.price : (chip.priceSnapshot || 0);
       return sum + price * chip.qty;
     }, 0);
+  }
+  function custCost(cust){
+    return cust.chips.reduce((sum, chip) => {
+      const item = findItem(chip.itemId);
+      const cost = item ? (item.cost || 0) : (chip.costSnapshot || 0);
+      return sum + cost * chip.qty;
+    }, 0);
+  }
+  function custProfit(cust){
+    return custTotal(cust) - custCost(cust);
   }
 
   function bumpChip(custId, chipId){
@@ -1085,7 +1113,7 @@
     const item = findItem(itemId);
     if(!cust || !item || item.qty <= 0) return;
     item.qty -= 1;
-    cust.chips.push({ id: uid(), itemId, qty: 1, nameSnapshot: item.name, priceSnapshot: item.price });
+    cust.chips.push({ id: uid(), itemId, qty: 1, nameSnapshot: item.name, priceSnapshot: item.price, costSnapshot: item.cost || 0 });
     saveState();
     closePopover();
     renderCustomers();
@@ -1093,22 +1121,33 @@
     renderStockOverview();
   }
 
+  let editingCustomerId = null;
+
   custListEl.addEventListener('click', e => {
     const custRow = e.target.closest('.cust-row');
     if(!custRow) return;
     const custId = custRow.dataset.id;
 
+    const editBtn = e.target.closest('[data-action="toggle-edit-customer"]');
+    if(editBtn){
+      editingCustomerId = editingCustomerId === custId ? null : custId;
+      renderCustomers();
+      return;
+    }
+
+    const editing = custId === editingCustomerId;
+
     const delBtn = e.target.closest('[data-action="delete-customer"]');
-    if(delBtn) return deleteCustomer(custId);
+    if(delBtn) return editing ? deleteCustomer(custId) : undefined;
 
     const addBtn = e.target.closest('[data-action="open-picker"]');
-    if(addBtn) return openPicker(addBtn, { onSelect: itemId => addChipToCustomer(custId, itemId) });
+    if(addBtn) return editing ? openPicker(addBtn, { onSelect: itemId => addChipToCustomer(custId, itemId) }) : undefined;
 
     const xBtn = e.target.closest('[data-action="shrink-chip"]');
-    if(xBtn) return shrinkChip(custId, xBtn.closest('.chip').dataset.id);
+    if(xBtn) return editing ? shrinkChip(custId, xBtn.closest('.chip').dataset.id) : undefined;
 
     const chip = e.target.closest('.chip');
-    if(chip) return bumpChip(custId, chip.dataset.id);
+    if(chip) return editing ? bumpChip(custId, chip.dataset.id) : undefined;
   });
 
   function renderCustomers(){
@@ -1118,26 +1157,35 @@
       return;
     }
     mainEmptyEl.hidden = true;
-    custListEl.innerHTML = state.customers.map(cust => `
-      <div class="cust-row" data-id="${cust.id}">
+    custListEl.innerHTML = state.customers.map(cust => {
+      const editing = cust.id === editingCustomerId;
+      const profit = custProfit(cust);
+      return `
+      <div class="cust-row${editing ? ' editing' : ''}" data-id="${cust.id}">
         <span class="cust-name">${escapeHtml(cust.name)}</span>
-        <span class="cust-total">${money(custTotal(cust))}</span>
+        <span class="cust-totals">
+          <span class="cust-total">${money(custTotal(cust))}</span>
+          <span class="cust-cost">Cost ${money(custCost(cust))}</span>
+          <span class="cust-profit">+${money(profit)}</span>
+        </span>
         <div class="cust-chips">
           ${cust.chips.map(chip => {
             const item = findItem(chip.itemId);
             const name = item ? item.name : (chip.nameSnapshot || 'Removed item');
-            return `<span class="chip" data-id="${chip.id}">
+            return `<span class="chip${editing ? '' : ' readonly'}" data-id="${chip.id}">
               ${item && item.image ? avatarHtml(item.image, 16, '') : (item ? colorDotHtml(item.color) : '')}
               ${escapeHtml(name)}
               <span class="chip-qty">×${chip.qty}</span>
-              <span class="round-btn ghost chip-x" data-action="shrink-chip">×</span>
+              ${editing ? `<span class="round-btn ghost chip-x" data-action="shrink-chip">×</span>` : ''}
             </span>`;
           }).join('')}
-          <button class="round-btn fill add-chip-btn" data-action="open-picker" title="Add item" type="button">+</button>
+          ${editing ? `<button class="round-btn fill add-chip-btn" data-action="open-picker" title="Add item" type="button">+</button>` : ''}
         </div>
-        <button class="round-btn outline-danger cust-del" data-action="delete-customer" title="Remove customer" type="button">×</button>
+        <button class="round-btn ${editing ? 'fill' : 'ghost'} cust-edit-btn" data-action="toggle-edit-customer" title="${editing ? 'Done' : 'Edit'}" type="button">${editing ? '✓' : '✎'}</button>
+        ${editing ? `<button class="round-btn outline-danger cust-del" data-action="delete-customer" title="Remove customer" type="button">×</button>` : ''}
       </div>
-    `).join('');
+    `;
+    }).join('');
   }
 
   // ---------- Item picker popover ----------
@@ -1285,7 +1333,7 @@
       if(!res.ok) throw new Error(`not found yet (HTTP ${res.status})`);
       const parsed = JSON.parse(await res.text());
       if(!parsed || typeof parsed !== 'object') throw new Error('data.json was not valid JSON');
-      state.items = (parsed.items || []).map(i => ({ category:'', color:'', collection:'', ...i }));
+      state.items = (parsed.items || []).map(i => ({ category:'', color:'', collection:'', cost:0, ...i }));
       state.collections = parsed.collections || [];
       const existingCats = [...new Set(state.items.map(i => (i.category || '').trim()).filter(Boolean))];
       state.categories = [...new Set([...(parsed.categories || []), ...existingCats])].sort((a,b) => a.localeCompare(b));
