@@ -324,7 +324,7 @@
       "name": "Till",
       "category": "Key",
       "qty": 4,
-      "price": 20,
+      "price": 10,
       "cost": 0,
       "color": "mint",
       "collection": "Bunny",
@@ -338,7 +338,7 @@
       "price": 10,
       "cost": 0,
       "color": "pink",
-      "collection": "",
+      "collection": "Bunny",
       "image": ""
     },
     {
@@ -349,7 +349,7 @@
       "price": 10,
       "cost": 0,
       "color": "red",
-      "collection": "",
+      "collection": "Bunny",
       "image": ""
     },
     {
@@ -360,7 +360,7 @@
       "price": 10,
       "cost": 0,
       "color": "mint",
-      "collection": "",
+      "collection": "Bunny",
       "image": ""
     },
     {
@@ -371,29 +371,7 @@
       "price": 10,
       "cost": 0,
       "color": "yellow",
-      "collection": "",
-      "image": ""
-    },
-    {
-      "id": "msddx24vvamwni",
-      "name": "Sua",
-      "category": "Key",
-      "qty": 1,
-      "price": 20,
-      "cost": 0,
-      "color": "purple",
-      "collection": "Crush",
-      "image": ""
-    },
-    {
-      "id": "msddx24vbzxsth",
-      "name": "Hyunwoo",
-      "category": "Key",
-      "qty": 2,
-      "price": 20,
-      "cost": 0,
-      "color": "gray",
-      "collection": "Crush",
+      "collection": "Bunny",
       "image": ""
     },
     {
