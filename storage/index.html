@@ -12,6 +12,7 @@
     --text:#1c1c1e; --text-muted:#8a8f98; --text-faint:#b7bcc4;
     --border:#ececee; --border-strong:#e2e4e8;
     --accent:#2fa572; --accent-dark:#238059; --accent-light:#eaf7f1;
+    --teal-fg:#0f7a8c; --teal-dark:#0b5f6d; --teal-light:#e8f5f7; --teal-border:#c7e6ec;
     --danger:#e0566b; --danger-light:#fdedf0;
     --radius-lg:16px; --radius-md:12px; --radius-sm:8px;
     --font:'Inter',system-ui,-apple-system,sans-serif;
@@ -85,9 +86,16 @@
 
   /* ================= STOCK OVERVIEW ================= */
   .stock-section{ margin-bottom:14px; }
-  .top-columns{ display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; margin-bottom:14px; }
+  .top-columns{ display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; margin-bottom:16px; }
   .top-columns .stock-section{ margin-bottom:0; }
   @media (max-width:640px){ .top-columns{ grid-template-columns:1fr; } }
+  .panel{ border:1px solid var(--border-strong); border-radius:var(--radius-lg); padding:14px 14px 16px; }
+  .panel-remaining{ background:var(--accent-light); border-color:#cdeee0; }
+  .panel-remaining .stock-section-title{ color:var(--accent-dark); }
+  .panel-profit{ background:var(--teal-light); border-color:var(--teal-border); }
+  .panel-profit .stock-section-title{ color:var(--teal-dark); }
+  .panel-customers{ background:#fff; border-color:var(--border-strong); padding:14px; }
+  .panel-customers .stock-section-title{ color:var(--text-muted); }
   .stock-section-title{ font-size:.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
   .coll-section{ margin-bottom:14px; grid-column:1/-1; }
   .coll-section:last-child{ margin-bottom:0; }
@@ -154,7 +162,7 @@
   /* ================= ORDER BOARD ================= */
   .toolbar{ display:flex; gap:8px; margin-bottom:10px; }
   .toolbar input{ flex:1; }
-  .new-cust-row{ border:1px dashed var(--border-strong); background:var(--accent-light); }
+  .new-cust-row{ border:1px dashed var(--border-strong); background:var(--accent-light); margin-bottom:8px; }
   .new-cust-row .new-cust-input{ flex:1 1 130px; min-width:100px; border:none; background:transparent; padding:4px 2px; font-weight:700; font-size:.85rem; }
   .new-cust-row .new-cust-input:focus{ border:none; }
   .cust-list{ display:flex; flex-direction:column; gap:6px; }
@@ -169,11 +177,11 @@
   .cust-total{ font-weight:700; font-size:.78rem; color:var(--accent-dark); }
   .cust-cost{ font-weight:600; font-size:.68rem; color:var(--text-faint); }
   .cust-profit{ font-weight:700; font-size:.68rem; color:var(--accent-dark); }
-  .profit-summary-box{ display:flex; gap:16px; align-items:baseline; border:1px solid var(--border); border-radius:var(--radius-md); background:#fff; padding:10px 14px; }
+  .profit-summary-box{ display:flex; gap:16px; align-items:baseline; border:1px solid var(--teal-border); border-radius:var(--radius-md); background:#fff; padding:10px 14px; }
   .profit-summary-box .ps-item{ display:flex; flex-direction:column; gap:1px; }
   .profit-summary-box .ps-label{ font-size:.68rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.03em; }
   .profit-summary-box .ps-value{ font-size:1rem; font-weight:700; color:var(--text); }
-  .profit-summary-box .ps-value.profit{ color:var(--accent-dark); }
+  .profit-summary-box .ps-value.profit{ color:var(--teal-dark); }
   .cust-chips{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; flex:1; min-width:0; }
 
   .chip{
@@ -306,26 +314,29 @@
   <main>
     <section class="view active" data-view="main">
       <div class="top-columns">
-        <div class="stock-section">
+        <div class="stock-section panel panel-remaining">
           <div class="stock-section-title">Remaining Stock</div>
           <div class="stock-grid" id="stock-grid"></div>
         </div>
 
-        <div class="stock-section" id="profit-summary-section">
+        <div class="stock-section panel panel-profit" id="profit-summary-section">
           <div class="stock-section-title">Overall Profit</div>
           <div id="profit-summary"></div>
         </div>
       </div>
 
-      <div class="cust-row new-cust-row" id="new-cust-row">
-        <input class="new-cust-input" id="new-cust-input" placeholder="Customer name..." type="text"/>
-        <div class="cust-chips" id="new-cust-chips">
-          <button class="round-btn fill add-chip-btn" data-action="open-picker-new" title="Add item" type="button">+</button>
+      <div class="panel panel-customers">
+        <div class="stock-section-title">Customers</div>
+        <div class="cust-row new-cust-row" id="new-cust-row">
+          <input class="new-cust-input" id="new-cust-input" placeholder="Customer name..." type="text"/>
+          <div class="cust-chips" id="new-cust-chips">
+            <button class="round-btn fill add-chip-btn" data-action="open-picker-new" title="Add item" type="button">+</button>
+          </div>
+          <button class="btn btn-primary" id="add-cust-btn" type="button">Add Customer</button>
         </div>
-        <button class="btn btn-primary" id="add-cust-btn" type="button">Add Customer</button>
+        <div class="cust-list" id="cust-list"></div>
+        <div class="empty-state" hidden id="main-empty">No customers yet — add one above to start tracking sales.</div>
       </div>
-      <div class="cust-list" id="cust-list"></div>
-      <div class="empty-state" hidden id="main-empty">No customers yet — add one above to start tracking sales.</div>
     </section>
 
     <section class="view" data-view="manage">
