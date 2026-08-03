@@ -59,6 +59,136 @@
       "color": "brown",
       "collection": "Clique",
       "image": ""
+    },
+    {
+      "id": "mscyit0ucdiqmn",
+      "name": "Sticker set táo",
+      "category": "Sticker",
+      "qty": 1,
+      "price": 30,
+      "color": "",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscyjcgmwuzkmq",
+      "name": "Sua",
+      "category": "Key strap",
+      "qty": 6,
+      "price": 30,
+      "color": "purple",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscyjcgmkf0auk",
+      "name": "Mizi",
+      "category": "Key strap",
+      "qty": 5,
+      "price": 30,
+      "color": "pink",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscyjcgmnzw0y6",
+      "name": "Ivan",
+      "category": "Key strap",
+      "qty": 7,
+      "price": 30,
+      "color": "red",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscyjcgm6mmso9",
+      "name": "Till",
+      "category": "Key strap",
+      "qty": 9,
+      "price": 30,
+      "color": "mint",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscyjcgm489ac6",
+      "name": "Luka",
+      "category": "Key strap",
+      "qty": 1,
+      "price": 30,
+      "color": "yellow",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscyjcgm5ffup8",
+      "name": "Hyuna",
+      "category": "Key strap",
+      "qty": 2,
+      "price": 30,
+      "color": "brown",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscyjt2eyj8g7i",
+      "name": "Sua",
+      "category": "Phonecharm",
+      "qty": 0,
+      "price": 15,
+      "color": "purple",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscyjt2eepqzka",
+      "name": "Mizi",
+      "category": "Phonecharm",
+      "qty": 0,
+      "price": 15,
+      "color": "pink",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscyjt2ergfjds",
+      "name": "Ivan",
+      "category": "Phonecharm",
+      "qty": 1,
+      "price": 15,
+      "color": "red",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscyjt2ean5x3h",
+      "name": "Till",
+      "category": "Phonecharm",
+      "qty": 0,
+      "price": 15,
+      "color": "mint",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscyjt2e5zh1je",
+      "name": "Luka",
+      "category": "Phonecharm",
+      "qty": 3,
+      "price": 15,
+      "color": "yellow",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscyjt2e03vwjn",
+      "name": "Hyuna",
+      "category": "Phonecharm",
+      "qty": 0,
+      "price": 15,
+      "color": "brown",
+      "collection": "Clique",
+      "image": ""
     }
   ],
   "customers": [],
@@ -68,6 +198,7 @@
   "categories": [
     "Badge 3.2",
     "Key strap",
-    "Phonecharm"
+    "Phonecharm",
+    "Sticker"
   ]
 }
