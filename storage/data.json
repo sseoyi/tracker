@@ -73,7 +73,7 @@
       "cost": 0,
       "id": "mscyit0ucdiqmn",
       "name": "Sticker set táo",
-      "qty": 10,
+      "qty": 9,
       "price": 30,
       "image": ""
     },
@@ -344,7 +344,17 @@
     {
       "id": "msd0sos6u5tsf9",
       "name": "Alis Charline",
-      "chips": []
+      "chips": [
+        {
+          "id": "msd2jyni23m01w",
+          "itemId": "mscyit0ucdiqmn",
+          "qty": 1,
+          "nameSnapshot": "Sticker set táo",
+          "categorySnapshot": "Sticker",
+          "priceSnapshot": 30,
+          "costSnapshot": 0
+        }
+      ]
     },
     {
       "id": "msd2305yc7tjcu",
