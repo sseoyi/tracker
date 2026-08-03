@@ -93,12 +93,13 @@
   .stock-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px; }
   .cat-box{ border:1px solid var(--border); border-radius:var(--radius-md); background:#fff; overflow:hidden; }
   .cat-box summary{
-    list-style:none; cursor:pointer; padding:9px 12px; display:flex; align-items:center; justify-content:space-between;
-    gap:8px; font-weight:600; font-size:.8rem;
+    list-style:none; cursor:pointer; padding:9px 12px; display:flex; flex-direction:column; gap:3px;
+    font-weight:600; font-size:.8rem;
   }
   .cat-box summary::-webkit-details-marker{ display:none; }
+  .cat-box summary .cat-top-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
   .cat-box summary .cat-name{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .cat-box summary .cat-qty-summary{ flex:1; display:flex; align-items:center; gap:4px; font-weight:700; font-size:.78rem; overflow:hidden; }
+  .cat-box summary .cat-qty-summary{ display:flex; align-items:center; gap:4px; flex-wrap:wrap; font-weight:700; font-size:.78rem; }
   .cat-box summary .cat-qty-sep{ color:var(--text-faint); font-weight:600; }
   .cat-box summary .cat-count{ color:var(--text-faint); font-weight:600; font-size:.72rem; flex-shrink:0; }
   .cat-box summary .chev{ color:var(--text-faint); font-size:.7rem; transition:transform .15s ease; flex-shrink:0; }
@@ -280,8 +281,8 @@
           </div>
           <div class="field">
             <label>Category</label>
-            <input id="item-cat-input" list="category-list" placeholder="e.g. Drinks" type="text"/>
-            <datalist id="category-list"></datalist>
+            <input id="item-cat-input" type="hidden"/>
+            <div class="chip-select-row" id="category-chip-row"></div>
           </div>
         </div>
         <div class="mg-row">
@@ -389,10 +390,12 @@
         parsed.items = (parsed.items || []).map(i => ({ category:'', color:'', collection:'', ...i }));
         parsed.customers = parsed.customers || [];
         parsed.collections = parsed.collections || [];
+        const existingCats = [...new Set(parsed.items.map(i => (i.category || '').trim()).filter(Boolean))];
+        parsed.categories = [...new Set([...(parsed.categories || []), ...existingCats])].sort((a,b) => a.localeCompare(b));
         return parsed;
       }
     }catch(e){}
-    return { items: [], customers: [], collections: [] };
+    return { items: [], customers: [], collections: [], categories: [] };
   }
   function saveState(){
     try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
@@ -502,45 +505,54 @@
     const key = sw.dataset.color;
     setColor(form.color.value === key ? '' : key, true);
   });
-  const collRow = el('collection-chip-row');
-  function setCollection(key){
-    form.collection.value = key || '';
-    renderCollectionChips();
-  }
-  function renderCollectionChips(addingNew){
-    const selected = form.collection.value;
-    const chips = state.collections.map(c =>
-      `<div class="coll-chip${c === selected ? ' selected' : ''}" data-coll="${escapeHtml(c)}">${escapeHtml(c)}</div>`
-    ).join('');
-    const addHtml = addingNew
-      ? `<input class="coll-chip-input" id="coll-new-input" placeholder="Name..." type="text"/>`
-      : `<div class="coll-chip-add" id="coll-add-btn">+ Add</div>`;
-    collRow.innerHTML = chips + addHtml;
-    if(addingNew){
-      const input = el('coll-new-input');
-      input.focus();
-      const commit = () => {
-        const val = input.value.trim();
-        if(val && !state.collections.includes(val)){
-          state.collections.push(val);
-          saveState();
-        }
-        setCollection(val || form.collection.value);
-      };
-      input.addEventListener('keydown', e => {
-        if(e.key === 'Enter'){ e.preventDefault(); commit(); }
-        if(e.key === 'Escape'){ renderCollectionChips(false); }
-      });
-      input.addEventListener('blur', commit);
+  function makeChipPicker({ rowEl, inputEl, listKey }){
+    function get(){ return inputEl.value; }
+    function set(key){
+      inputEl.value = key || '';
+      render();
     }
+    function render(addingNew){
+      const selected = inputEl.value;
+      const options = state[listKey];
+      const chips = options.map(c =>
+        `<div class="coll-chip${c === selected ? ' selected' : ''}" data-val="${escapeHtml(c)}">${escapeHtml(c)}</div>`
+      ).join('');
+      const addHtml = addingNew
+        ? `<input class="coll-chip-input" placeholder="Name..." type="text"/>`
+        : `<div class="coll-chip-add">+ Add</div>`;
+      rowEl.innerHTML = chips + addHtml;
+      if(addingNew){
+        const input = rowEl.querySelector('.coll-chip-input');
+        input.focus();
+        const commit = () => {
+          const val = input.value.trim();
+          if(val && !options.includes(val)){
+            options.push(val);
+            saveState();
+          }
+          set(val || inputEl.value);
+        };
+        input.addEventListener('keydown', e => {
+          if(e.key === 'Enter'){ e.preventDefault(); commit(); }
+          if(e.key === 'Escape'){ render(false); }
+        });
+        input.addEventListener('blur', commit);
+      }
+    }
+    rowEl.addEventListener('click', e => {
+      const addBtn = e.target.closest('.coll-chip-add');
+      if(addBtn){ render(true); return; }
+      const chip = e.target.closest('.coll-chip');
+      if(chip){ set(inputEl.value === chip.dataset.val ? '' : chip.dataset.val); }
+    });
+    render();
+    return { get, set, render };
   }
-  collRow.addEventListener('click', e => {
-    const addBtn = e.target.closest('#coll-add-btn');
-    if(addBtn){ renderCollectionChips(true); return; }
-    const chip = e.target.closest('.coll-chip');
-    if(chip){ setCollection(form.collection.value === chip.dataset.coll ? '' : chip.dataset.coll); }
-  });
-  renderCollectionChips();
+
+  const collectionPicker = makeChipPicker({ rowEl: el('collection-chip-row'), inputEl: form.collection, listKey: 'collections' });
+  const categoryPicker = makeChipPicker({ rowEl: el('category-chip-row'), inputEl: form.cat, listKey: 'categories' });
+  function setCollection(key){ collectionPicker.set(key); }
+  function setCategory(key){ categoryPicker.set(key); }
 
   form.name.addEventListener('input', () => {
     if(colorManuallySet) return;
@@ -565,9 +577,10 @@
   });
 
   function resetItemForm(){
-    form.id.value = ''; form.name.value = ''; form.cat.value = ''; form.qty.value = ''; form.price.value = '';
+    form.id.value = ''; form.name.value = ''; form.qty.value = ''; form.price.value = '';
     pendingImage = ''; form.imgInput.value = ''; form.imgPreview.innerHTML = '🖼️';
     colorManuallySet = false; setColor('', false);
+    setCategory('');
     setCollection('');
     form.title.textContent = 'Add Item';
     form.cancelBtn.style.display = 'none';
@@ -606,10 +619,10 @@
     if(!item) return;
     form.id.value = item.id;
     form.name.value = item.name;
-    form.cat.value = item.category || '';
     form.qty.value = item.qty;
     form.price.value = item.price;
     colorManuallySet = true; setColor(item.color || '', true);
+    setCategory(item.category || '');
     setCollection(item.collection || '');
     pendingImage = item.image || '';
     form.imgPreview.innerHTML = item.image ? `<img src="${item.image}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">` : '🖼️';
@@ -635,13 +648,7 @@
     if(btn.dataset.action === 'delete') deleteItem(id);
   });
 
-  function refreshCategoryDatalist(){
-    const cats = [...new Set(state.items.map(i => (i.category || '').trim()).filter(Boolean))].sort();
-    el('category-list').innerHTML = cats.map(c => `<option value="${escapeHtml(c)}">`).join('');
-  }
-
   function renderItems(){
-    refreshCategoryDatalist();
     if(state.items.length === 0){
       itemListEl.innerHTML = '';
       manageEmptyEl.hidden = false;
@@ -709,9 +716,11 @@
         return `
           <details class="cat-box">
             <summary>
-              <span class="cat-name">${escapeHtml(cat)}</span>
+              <div class="cat-top-row">
+                <span class="cat-name">${escapeHtml(cat)}</span>
+                <span class="chev">▸</span>
+              </div>
               <span class="cat-qty-summary">${qtySummary}</span>
-              <span class="chev">▸</span>
             </summary>
             <div class="cat-box-items">${rows}</div>
           </details>
@@ -962,11 +971,15 @@
       if(!parsed || typeof parsed !== 'object') throw new Error('data.json was not valid JSON');
       state.items = (parsed.items || []).map(i => ({ category:'', color:'', collection:'', ...i }));
       state.collections = parsed.collections || [];
+      const existingCats = [...new Set(state.items.map(i => (i.category || '').trim()).filter(Boolean))];
+      state.categories = [...new Set([...(parsed.categories || []), ...existingCats])].sort((a,b) => a.localeCompare(b));
       state.customers = parsed.customers || [];
       saveState();
       renderCustomers();
       renderItems();
       renderStockOverview();
+      collectionPicker.render();
+      categoryPicker.render();
       if(!silent) ghSetStatus('Loaded latest data.json from GitHub ✓', 'ok');
       ghSetDot('ok');
       return true;
@@ -998,7 +1011,7 @@
         throw new Error(`GET failed (HTTP ${getRes.status})`);
       }
 
-      const content = JSON.stringify({ items: state.items, customers: state.customers }, null, 2);
+      const content = JSON.stringify({ items: state.items, customers: state.customers, collections: state.collections, categories: state.categories }, null, 2);
       const body = {
         message: `Update data.json — ${new Date().toISOString()}`,
         content: b64EncodeUnicode(content),
