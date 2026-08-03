@@ -1,48 +1,53 @@
 {
   "items": [
     {
+      "category": "Key strap",
+      "color": "purple",
+      "collection": "Clique",
       "id": "mscva9sf19sh1z",
       "name": "Sua",
-      "category": "Key strap",
       "qty": 6,
       "price": 30,
-      "color": "purple",
       "image": ""
     },
     {
+      "category": "Key strap",
+      "color": "pink",
+      "collection": "Clique",
       "id": "mscvamke32w8sn",
       "name": "Mizi",
-      "category": "Key strap",
       "qty": 5,
       "price": 30,
-      "color": "pink",
       "image": ""
     },
     {
+      "category": "Key strap",
+      "color": "red",
+      "collection": "Clique",
       "id": "mscvat6u7b63p4",
       "name": "Ivan",
-      "category": "Key strap",
       "qty": 7,
       "price": 30,
-      "color": "red",
       "image": ""
     },
     {
+      "category": "Key strap",
+      "color": "mint",
+      "collection": "Clique",
       "id": "mscvb08unvbkou",
       "name": "Till",
-      "category": "Key strap",
       "qty": 9,
       "price": 30,
-      "color": "mint",
       "image": ""
     },
     {
+      "category": "Key strap",
+      "color": "yellow",
+      "collection": "Clique",
       "id": "mscvb9e6kif270",
       "name": "Luka",
-      "category": "Key strap",
       "qty": 1,
       "price": 30,
-      "color": "yellow",
       "image": ""
     }
   ],
