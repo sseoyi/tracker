@@ -349,6 +349,7 @@
       <div class="top-columns">
         <div class="stock-section panel panel-remaining">
           <div class="stock-section-title">Remaining Stock</div>
+          <div class="coll-tabs-row" id="stock-coll-tabs"></div>
           <div class="stock-grid" id="stock-grid"></div>
         </div>
 
@@ -428,6 +429,7 @@
       </div>
 
       <div class="section-label">All Items</div>
+      <div class="coll-tabs-row" id="manage-coll-tabs"></div>
       <div class="item-list" id="item-list"></div>
       <div class="empty-state" hidden id="manage-empty">No items yet — add your first item above.</div>
     </section>
@@ -582,6 +584,8 @@
   const custCollTabsEl = el('cust-coll-tabs');
   const itemListEl = el('item-list');
   const stockGridEl = el('stock-grid');
+  const stockCollTabsEl = el('stock-coll-tabs');
+  const manageCollTabsEl = el('manage-coll-tabs');
   const mainEmptyEl = el('main-empty');
   const manageEmptyEl = el('manage-empty');
 
@@ -958,13 +962,19 @@
   }
 
   function renderItems(){
+    renderManageCollTabs();
     if(state.items.length === 0){
       itemListEl.innerHTML = '';
       manageEmptyEl.hidden = false;
       return;
     }
     manageEmptyEl.hidden = true;
-    const groups = groupItemsByCategory(state.items);
+    const scopedItems = currentManageTab === 'all' ? state.items : state.items.filter(i => collectionOf(i) === currentManageTab);
+    if(scopedItems.length === 0){
+      itemListEl.innerHTML = '<div class="empty-state">No items in this collection.</div>';
+      return;
+    }
+    const groups = groupItemsByCategory(scopedItems);
     itemListEl.innerHTML = groups.map(g => {
       const qtySummary = g.items.map(item =>
         `<span class="cat-qty-chip" style="color:${colorFg(item.color)}">${item.qty}</span>`
@@ -984,12 +994,18 @@
 
   // ================= STOCK OVERVIEW =================
   function renderStockOverview(){
+    renderStockCollTabs();
     if(state.items.length === 0){
       stockGridEl.innerHTML = '<div class="empty-state" style="grid-column:1/-1;padding:16px;">No items yet.</div>';
       return;
     }
+    const scopedItems = currentStockTab === 'all' ? state.items : state.items.filter(i => collectionOf(i) === currentStockTab);
+    if(scopedItems.length === 0){
+      stockGridEl.innerHTML = '<div class="empty-state" style="grid-column:1/-1;padding:16px;">No items in this collection.</div>';
+      return;
+    }
     const collGroups = new Map();
-    state.items.forEach(item => {
+    scopedItems.forEach(item => {
       const coll = collectionOf(item);
       if(!collGroups.has(coll)) collGroups.set(coll, []);
       collGroups.get(coll).push(item);
@@ -1000,8 +1016,7 @@
       return a.localeCompare(b);
     });
 
-    stockGridEl.innerHTML = collNames.map(coll => {
-      const collItems = collGroups.get(coll);
+    function catBoxesFor(collItems){
       const groups = new Map();
       collItems.forEach(item => {
         const cat = categoryOf(item);
@@ -1010,7 +1025,7 @@
       });
       const catNames = [...groups.keys()].sort((a,b) => a.localeCompare(b));
 
-      const catBoxes = catNames.map(cat => {
+      return catNames.map(cat => {
         const items = groups.get(cat).slice().sort((a,b) => a.name.localeCompare(b.name));
         const rows = items.map(item => `
           <div class="cat-item-row">
@@ -1034,14 +1049,19 @@
           </details>
         `;
       }).join('');
+    }
 
-      return `
+    if(currentStockTab !== 'all'){
+      stockGridEl.innerHTML = catBoxesFor(scopedItems);
+      return;
+    }
+
+    stockGridEl.innerHTML = collNames.map(coll => `
         <div class="coll-section">
           <div class="coll-section-title">${escapeHtml(coll)}</div>
-          <div class="coll-section-boxes">${catBoxes}</div>
+          <div class="coll-section-boxes">${catBoxesFor(collGroups.get(coll))}</div>
         </div>
-      `;
-    }).join('');
+      `).join('');
   }
 
   // ---- Show the item (category) name alongside the model name, e.g. "Tote Bag – Purple" ----
@@ -1245,6 +1265,41 @@
     if(!btn) return;
     currentCustTab = btn.dataset.coll;
     renderCustomers();
+  });
+
+  let currentStockTab = 'all';
+  let currentManageTab = 'all';
+  function renderStockCollTabs(){
+    if(!stockCollTabsEl) return;
+    const names = getCollectionTabNames();
+    if(names.length === 0){ stockCollTabsEl.innerHTML = ''; return; }
+    if(currentStockTab !== 'all' && !names.includes(currentStockTab)) currentStockTab = 'all';
+    const tabs = ['all', ...names];
+    stockCollTabsEl.innerHTML = tabs.map(t => `
+      <button class="coll-tab${t === currentStockTab ? ' active' : ''}" data-coll="${escapeHtml(t)}" type="button">${t === 'all' ? 'All' : escapeHtml(t)}</button>
+    `).join('');
+  }
+  stockCollTabsEl.addEventListener('click', e => {
+    const btn = e.target.closest('.coll-tab');
+    if(!btn) return;
+    currentStockTab = btn.dataset.coll;
+    renderStockOverview();
+  });
+  function renderManageCollTabs(){
+    if(!manageCollTabsEl) return;
+    const names = getCollectionTabNames();
+    if(names.length === 0){ manageCollTabsEl.innerHTML = ''; return; }
+    if(currentManageTab !== 'all' && !names.includes(currentManageTab)) currentManageTab = 'all';
+    const tabs = ['all', ...names];
+    manageCollTabsEl.innerHTML = tabs.map(t => `
+      <button class="coll-tab${t === currentManageTab ? ' active' : ''}" data-coll="${escapeHtml(t)}" type="button">${t === 'all' ? 'All' : escapeHtml(t)}</button>
+    `).join('');
+  }
+  manageCollTabsEl.addEventListener('click', e => {
+    const btn = e.target.closest('.coll-tab');
+    if(!btn) return;
+    currentManageTab = btn.dataset.coll;
+    renderItems();
   });
 
   custListEl.addEventListener('click', e => {
