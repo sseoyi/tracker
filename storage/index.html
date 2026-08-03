@@ -86,6 +86,10 @@
   /* ================= STOCK OVERVIEW ================= */
   .stock-section{ margin-bottom:14px; }
   .stock-section-title{ font-size:.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
+  .coll-section{ margin-bottom:14px; grid-column:1/-1; }
+  .coll-section:last-child{ margin-bottom:0; }
+  .coll-section-title{ font-size:.7rem; font-weight:700; color:var(--accent-dark); text-transform:uppercase; letter-spacing:.03em; margin-bottom:6px; }
+  .coll-section-boxes{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px; }
   .stock-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px; }
   .cat-box{ border:1px solid var(--border); border-radius:var(--radius-md); background:#fff; overflow:hidden; }
   .cat-box summary{
@@ -455,6 +459,7 @@
       : `<div class="avatar-ph" style="width:${size}px;height:${size}px">${fallback}</div>`;
   }
   function categoryOf(item){ return (item.category || '').trim() || 'Uncategorized'; }
+  function collectionOf(item){ return (item.collection || '').trim() || 'No Collection'; }
 
   const el = id => document.getElementById(id);
   const custListEl = el('cust-list');
@@ -668,34 +673,56 @@
       stockGridEl.innerHTML = '<div class="empty-state" style="grid-column:1/-1;padding:16px;">No items yet.</div>';
       return;
     }
-    const groups = new Map();
+    const collGroups = new Map();
     state.items.forEach(item => {
-      const cat = categoryOf(item);
-      if(!groups.has(cat)) groups.set(cat, []);
-      groups.get(cat).push(item);
+      const coll = collectionOf(item);
+      if(!collGroups.has(coll)) collGroups.set(coll, []);
+      collGroups.get(coll).push(item);
     });
-    const catNames = [...groups.keys()].sort((a,b) => a.localeCompare(b));
+    const collNames = [...collGroups.keys()].sort((a,b) => {
+      if(a === 'No Collection') return 1;
+      if(b === 'No Collection') return -1;
+      return a.localeCompare(b);
+    });
 
-    stockGridEl.innerHTML = catNames.map(cat => {
-      const items = groups.get(cat).slice().sort((a,b) => a.name.localeCompare(b.name));
-      const rows = items.map(item => `
-        <div class="cat-item-row">
-          <span class="name ${item.qty <= 0 ? 'out' : ''}">${colorDotHtml(item.color)}${escapeHtml(item.name)}</span>
-          <span class="qty-badge ${item.qty <= 0 ? 'zero' : ''}" style="${item.qty > 0 ? `background:${colorBg(item.color)};color:${colorFg(item.color)}` : ''}">${item.qty}</span>
-        </div>
-      `).join('');
-      const qtySummary = items.map(item =>
-        `<span class="cat-qty-chip" style="color:${colorFg(item.color)}">${item.qty}</span>`
-      ).join('<span class="cat-qty-sep">-</span>');
+    stockGridEl.innerHTML = collNames.map(coll => {
+      const collItems = collGroups.get(coll);
+      const groups = new Map();
+      collItems.forEach(item => {
+        const cat = categoryOf(item);
+        if(!groups.has(cat)) groups.set(cat, []);
+        groups.get(cat).push(item);
+      });
+      const catNames = [...groups.keys()].sort((a,b) => a.localeCompare(b));
+
+      const catBoxes = catNames.map(cat => {
+        const items = groups.get(cat).slice().sort((a,b) => a.name.localeCompare(b.name));
+        const rows = items.map(item => `
+          <div class="cat-item-row">
+            <span class="name ${item.qty <= 0 ? 'out' : ''}">${colorDotHtml(item.color)}${escapeHtml(item.name)}</span>
+            <span class="qty-badge ${item.qty <= 0 ? 'zero' : ''}" style="${item.qty > 0 ? `background:${colorBg(item.color)};color:${colorFg(item.color)}` : ''}">${item.qty}</span>
+          </div>
+        `).join('');
+        const qtySummary = items.map(item =>
+          `<span class="cat-qty-chip" style="color:${colorFg(item.color)}">${item.qty}</span>`
+        ).join('<span class="cat-qty-sep">-</span>');
+        return `
+          <details class="cat-box">
+            <summary>
+              <span class="cat-name">${escapeHtml(cat)}</span>
+              <span class="cat-qty-summary">${qtySummary}</span>
+              <span class="chev">▸</span>
+            </summary>
+            <div class="cat-box-items">${rows}</div>
+          </details>
+        `;
+      }).join('');
+
       return `
-        <details class="cat-box">
-          <summary>
-            <span class="cat-name">${escapeHtml(cat)}</span>
-            <span class="cat-qty-summary">${qtySummary}</span>
-            <span class="chev">▸</span>
-          </summary>
-          <div class="cat-box-items">${rows}</div>
-        </details>
+        <div class="coll-section">
+          <div class="coll-section-title">${escapeHtml(coll)}</div>
+          <div class="coll-section-boxes">${catBoxes}</div>
+        </div>
       `;
     }).join('');
   }
