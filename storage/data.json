@@ -1,0 +1,50 @@
+{
+  "items": [
+    {
+      "id": "mscva9sf19sh1z",
+      "name": "Sua",
+      "category": "Key strap",
+      "qty": 6,
+      "price": 30,
+      "color": "purple",
+      "image": ""
+    },
+    {
+      "id": "mscvamke32w8sn",
+      "name": "Mizi",
+      "category": "Key strap",
+      "qty": 5,
+      "price": 30,
+      "color": "pink",
+      "image": ""
+    },
+    {
+      "id": "mscvat6u7b63p4",
+      "name": "Ivan",
+      "category": "Key strap",
+      "qty": 7,
+      "price": 30,
+      "color": "red",
+      "image": ""
+    },
+    {
+      "id": "mscvb08unvbkou",
+      "name": "Till",
+      "category": "Key strap",
+      "qty": 9,
+      "price": 30,
+      "color": "mint",
+      "image": ""
+    },
+    {
+      "id": "mscvb9e6kif270",
+      "name": "Luka",
+      "category": "Key strap",
+      "qty": 1,
+      "price": 30,
+      "color": "yellow",
+      "image": ""
+    }
+  ],
+  "customers": []
+}
