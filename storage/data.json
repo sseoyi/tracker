@@ -18,7 +18,7 @@
       "cost": 0,
       "id": "mscyi9i6etm632",
       "name": "Mizi",
-      "qty": 5,
+      "qty": 4,
       "price": 15,
       "image": ""
     },
@@ -117,7 +117,7 @@
       "cost": 0,
       "id": "mscyjcgm6mmso9",
       "name": "Till",
-      "qty": 9,
+      "qty": 8,
       "price": 30,
       "image": ""
     },
@@ -212,7 +212,7 @@
     {
       "category": "Strap sổ",
       "color": "purple",
-      "collection": "Clique",
+      "collection": "",
       "cost": 0,
       "id": "mscz76tjciny21",
       "name": "A - Sky",
@@ -223,7 +223,7 @@
     {
       "category": "Strap sổ",
       "color": "red",
-      "collection": "Clique",
+      "collection": "",
       "cost": 0,
       "id": "mscz76tjdl3k53",
       "name": "B - Chocomint",
@@ -234,7 +234,7 @@
     {
       "category": "Strap sổ",
       "color": "yellow",
-      "collection": "Clique",
+      "collection": "",
       "cost": 0,
       "id": "mscz76tjhzx64z",
       "name": "C - Pink",
@@ -245,7 +245,7 @@
     {
       "category": "Strap sổ",
       "color": "brown",
-      "collection": "Clique",
+      "collection": "",
       "cost": 0,
       "id": "mscz76tj2a5ibg",
       "name": "D - Cream",
@@ -271,7 +271,7 @@
       "cost": 0,
       "id": "msd0s1pyn91rc4",
       "name": "Mizi",
-      "qty": 2,
+      "qty": 1,
       "price": 30,
       "image": ""
     },
@@ -293,7 +293,7 @@
       "cost": 0,
       "id": "msd0s1pyibgqa1",
       "name": "Till",
-      "qty": 4,
+      "qty": 3,
       "price": 30,
       "image": ""
     },
@@ -345,6 +345,48 @@
       "id": "msd0sos6u5tsf9",
       "name": "Alis Charline",
       "chips": []
+    },
+    {
+      "id": "msd2305yc7tjcu",
+      "name": "Shining Starz",
+      "chips": [
+        {
+          "id": "msd2305ydi3dtl",
+          "itemId": "mscyi9i6etm632",
+          "qty": 1,
+          "nameSnapshot": "Mizi",
+          "categorySnapshot": "Badge 3.2",
+          "priceSnapshot": 15,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2305yioigho",
+          "itemId": "mscyjcgm6mmso9",
+          "qty": 1,
+          "nameSnapshot": "Till",
+          "categorySnapshot": "Key strap",
+          "priceSnapshot": 30,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2305y8elehp",
+          "itemId": "msd0s1pyn91rc4",
+          "qty": 1,
+          "nameSnapshot": "Mizi",
+          "categorySnapshot": "Standee",
+          "priceSnapshot": 30,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2305y7khueq",
+          "itemId": "msd0s1pyibgqa1",
+          "qty": 1,
+          "nameSnapshot": "Till",
+          "categorySnapshot": "Standee",
+          "priceSnapshot": 30,
+          "costSnapshot": 0
+        }
+      ]
     }
   ],
   "collections": [
