@@ -105,6 +105,25 @@
   .qty-badge{ font-weight:700; border-radius:999px; padding:2px 8px; font-size:.72rem; flex-shrink:0; }
   .qty-badge.zero{ background:var(--danger-light); color:var(--danger); }
 
+  /* collection chip-select */
+  .chip-select-row{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  .coll-chip{
+    display:inline-flex; align-items:center; gap:4px; border:1px solid var(--border-strong); background:#fff;
+    border-radius:999px; padding:5px 12px; font-weight:600; font-size:.76rem; color:var(--text-muted); cursor:pointer;
+    transition:border-color .1s ease,background .1s ease,color .1s ease;
+  }
+  .coll-chip:hover{ border-color:var(--accent); color:var(--accent-dark); }
+  .coll-chip.selected{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .coll-chip-add{
+    display:inline-flex; align-items:center; gap:4px; border:1px dashed var(--border-strong); background:#fff;
+    border-radius:999px; padding:5px 12px; font-weight:600; font-size:.76rem; color:var(--text-muted); cursor:pointer;
+  }
+  .coll-chip-add:hover{ border-color:var(--accent); color:var(--accent-dark); background:var(--accent-light); }
+  .coll-chip-input{
+    border:1px solid var(--border-strong); border-radius:999px; padding:5px 12px; font-size:.76rem; font-weight:600;
+    font-family:var(--font); width:120px;
+  }
+
   /* color swatch picker */
   .swatch-row{ display:flex; gap:8px; flex-wrap:wrap; }
   .swatch{
@@ -173,6 +192,7 @@
   .ic-name-row{ display:flex; align-items:center; gap:6px; }
   .ic-name{ font-weight:700; font-size:.83rem; display:inline-flex; align-items:center; gap:5px; }
   .ic-cat{ font-size:.66rem; color:var(--accent-dark); background:var(--accent-light); border-radius:999px; padding:1px 7px; font-weight:600; }
+  .ic-coll{ font-size:.66rem; color:var(--text-muted); background:var(--border); border-radius:999px; padding:1px 7px; font-weight:600; }
   .ic-meta{ font-size:.72rem; color:var(--text-muted); font-weight:500; margin-top:2px; }
   .ic-meta.low{ color:var(--danger); }
   .ic-actions{ display:flex; gap:6px; flex-shrink:0; }
@@ -274,6 +294,11 @@
           <div class="swatch-row" id="color-swatch-row"></div>
         </div>
         <div class="field" style="margin-bottom:8px;">
+          <label>Collection</label>
+          <input id="item-collection-input" type="hidden"/>
+          <div class="chip-select-row" id="collection-chip-row"></div>
+        </div>
+        <div class="field" style="margin-bottom:8px;">
           <label>Image (optional)</label>
           <div class="img-upload-row">
             <div class="avatar-ph img-preview" id="item-img-preview">🖼️</div>
@@ -355,12 +380,13 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if(raw){
         const parsed = JSON.parse(raw);
-        parsed.items = (parsed.items || []).map(i => ({ category:'', color:'', ...i }));
+        parsed.items = (parsed.items || []).map(i => ({ category:'', color:'', collection:'', ...i }));
         parsed.customers = parsed.customers || [];
+        parsed.collections = parsed.collections || [];
         return parsed;
       }
     }catch(e){}
-    return { items: [], customers: [] };
+    return { items: [], customers: [], collections: [] };
   }
   function saveState(){
     try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
@@ -449,7 +475,8 @@
   // ================= MANAGE ITEMS =================
   const form = {
     id: el('edit-item-id'), name: el('item-name-input'), cat: el('item-cat-input'), qty: el('item-qty-input'),
-    price: el('item-price-input'), color: el('item-color-input'), imgInput: el('item-img-input'), imgPreview: el('item-img-preview'),
+    price: el('item-price-input'), color: el('item-color-input'), collection: el('item-collection-input'),
+    imgInput: el('item-img-input'), imgPreview: el('item-img-preview'),
     title: el('item-form-title'), cancelBtn: el('cancel-edit-btn')
   };
   let pendingImage = '';
@@ -468,6 +495,46 @@
     const key = sw.dataset.color;
     setColor(form.color.value === key ? '' : key, true);
   });
+  const collRow = el('collection-chip-row');
+  function setCollection(key){
+    form.collection.value = key || '';
+    renderCollectionChips();
+  }
+  function renderCollectionChips(addingNew){
+    const selected = form.collection.value;
+    const chips = state.collections.map(c =>
+      `<div class="coll-chip${c === selected ? ' selected' : ''}" data-coll="${escapeHtml(c)}">${escapeHtml(c)}</div>`
+    ).join('');
+    const addHtml = addingNew
+      ? `<input class="coll-chip-input" id="coll-new-input" placeholder="Name..." type="text"/>`
+      : `<div class="coll-chip-add" id="coll-add-btn">+ Add</div>`;
+    collRow.innerHTML = chips + addHtml;
+    if(addingNew){
+      const input = el('coll-new-input');
+      input.focus();
+      const commit = () => {
+        const val = input.value.trim();
+        if(val && !state.collections.includes(val)){
+          state.collections.push(val);
+          saveState();
+        }
+        setCollection(val || form.collection.value);
+      };
+      input.addEventListener('keydown', e => {
+        if(e.key === 'Enter'){ e.preventDefault(); commit(); }
+        if(e.key === 'Escape'){ renderCollectionChips(false); }
+      });
+      input.addEventListener('blur', commit);
+    }
+  }
+  collRow.addEventListener('click', e => {
+    const addBtn = e.target.closest('#coll-add-btn');
+    if(addBtn){ renderCollectionChips(true); return; }
+    const chip = e.target.closest('.coll-chip');
+    if(chip){ setCollection(form.collection.value === chip.dataset.coll ? '' : chip.dataset.coll); }
+  });
+  renderCollectionChips();
+
   form.name.addEventListener('input', () => {
     if(colorManuallySet) return;
     const match = NAME_COLOR_MAP[form.name.value.trim().toLowerCase()];
@@ -494,6 +561,7 @@
     form.id.value = ''; form.name.value = ''; form.cat.value = ''; form.qty.value = ''; form.price.value = '';
     pendingImage = ''; form.imgInput.value = ''; form.imgPreview.innerHTML = '🖼️';
     colorManuallySet = false; setColor('', false);
+    setCollection('');
     form.title.textContent = 'Add Item';
     form.cancelBtn.style.display = 'none';
   }
@@ -510,14 +578,15 @@
 
     const editId = form.id.value;
     const color = form.color.value || '';
+    const collection = form.collection.value || '';
     if(editId){
       const item = findItem(editId);
       if(item){
-        Object.assign(item, { name, category, qty, price, color });
+        Object.assign(item, { name, category, qty, price, color, collection });
         if(pendingImage) item.image = pendingImage;
       }
     } else {
-      state.items.push({ id: uid(), name, category, qty, price, color, image: pendingImage });
+      state.items.push({ id: uid(), name, category, qty, price, color, collection, image: pendingImage });
     }
     saveState();
     resetItemForm();
@@ -534,6 +603,7 @@
     form.qty.value = item.qty;
     form.price.value = item.price;
     colorManuallySet = true; setColor(item.color || '', true);
+    setCollection(item.collection || '');
     pendingImage = item.image || '';
     form.imgPreview.innerHTML = item.image ? `<img src="${item.image}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">` : '🖼️';
     form.title.textContent = 'Edit Item';
@@ -578,6 +648,7 @@
           <div class="ic-name-row">
             <span class="ic-name">${colorDotHtml(item.color)}${escapeHtml(item.name)}</span>
             <span class="ic-cat">${escapeHtml(categoryOf(item))}</span>
+            ${item.collection ? `<span class="ic-coll">${escapeHtml(item.collection)}</span>` : ''}
           </div>
           <div class="ic-meta ${item.qty <= 0 ? 'low' : ''}">${item.qty} in stock · ${money(item.price)} each</div>
         </div>
@@ -856,7 +927,8 @@
       if(!res.ok) throw new Error(`not found yet (HTTP ${res.status})`);
       const parsed = JSON.parse(await res.text());
       if(!parsed || typeof parsed !== 'object') throw new Error('data.json was not valid JSON');
-      state.items = (parsed.items || []).map(i => ({ category:'', color:'', ...i }));
+      state.items = (parsed.items || []).map(i => ({ category:'', color:'', collection:'', ...i }));
+      state.collections = parsed.collections || [];
       state.customers = parsed.customers || [];
       saveState();
       renderCustomers();
