@@ -967,6 +967,19 @@
     }).join('');
   }
 
+  // ---- Show the item (category) name alongside the model name, e.g. "Tote Bag – Purple" ----
+  function itemFullName(item){
+    if(!item) return '';
+    const cat = (item.category || '').trim();
+    return cat ? `${cat} – ${item.name}` : item.name;
+  }
+  function chipFullName(chip, item){
+    if(item) return itemFullName(item);
+    const cat = (chip.categorySnapshot || '').trim();
+    const name = chip.nameSnapshot || 'Removed item';
+    return cat ? `${cat} – ${name}` : name;
+  }
+
   // ================= ORDER BOARD =================
   // ---- New-customer builder: items can be picked (with quantities) before
   // the customer row is actually created. Stock is only deducted once
@@ -988,7 +1001,7 @@
       if(!item) return '';
       return `<span class="chip" data-id="${chip.id}">
         ${item.image ? avatarHtml(item.image, 16, '') : colorDotHtml(item.color)}
-        ${escapeHtml(item.name)}
+        ${escapeHtml(itemFullName(item))}
         <span class="chip-qty">×${chip.qty}</span>
         <span class="round-btn ghost chip-x" data-action="shrink-pending-chip">×</span>
       </span>`;
@@ -1040,7 +1053,7 @@
     if(!name) return showToast('Please enter a customer name.');
     const chips = pendingNewCust.chips.map(c => {
       const item = findItem(c.itemId);
-      return { id: uid(), itemId: c.itemId, qty: c.qty, nameSnapshot: item ? item.name : 'Removed item', priceSnapshot: item ? item.price : 0, costSnapshot: item ? (item.cost || 0) : 0 };
+      return { id: uid(), itemId: c.itemId, qty: c.qty, nameSnapshot: item ? item.name : 'Removed item', categorySnapshot: item ? (item.category || '') : '', priceSnapshot: item ? item.price : 0, costSnapshot: item ? (item.cost || 0) : 0 };
     });
     chips.forEach(c => { const item = findItem(c.itemId); if(item) item.qty -= c.qty; });
     state.customers.push({ id: uid(), name, chips });
@@ -1113,7 +1126,7 @@
     const item = findItem(itemId);
     if(!cust || !item || item.qty <= 0) return;
     item.qty -= 1;
-    cust.chips.push({ id: uid(), itemId, qty: 1, nameSnapshot: item.name, priceSnapshot: item.price, costSnapshot: item.cost || 0 });
+    cust.chips.push({ id: uid(), itemId, qty: 1, nameSnapshot: item.name, categorySnapshot: item.category || '', priceSnapshot: item.price, costSnapshot: item.cost || 0 });
     saveState();
     closePopover();
     renderCustomers();
@@ -1171,7 +1184,7 @@
         <div class="cust-chips">
           ${cust.chips.map(chip => {
             const item = findItem(chip.itemId);
-            const name = item ? item.name : (chip.nameSnapshot || 'Removed item');
+            const name = chipFullName(chip, item);
             return `<span class="chip${editing ? '' : ' readonly'}" data-id="${chip.id}">
               ${item && item.image ? avatarHtml(item.image, 16, '') : (item ? colorDotHtml(item.color) : '')}
               ${escapeHtml(name)}
