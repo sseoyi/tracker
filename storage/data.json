@@ -18,7 +18,7 @@
       "cost": 0,
       "id": "mscyi9i6etm632",
       "name": "Mizi",
-      "qty": 4,
+      "qty": 3,
       "price": 15,
       "image": ""
     },
@@ -29,7 +29,7 @@
       "cost": 0,
       "id": "mscyi9i6o48u2n",
       "name": "Ivan",
-      "qty": 13,
+      "qty": 12,
       "price": 15,
       "image": ""
     },
@@ -40,7 +40,7 @@
       "cost": 0,
       "id": "mscyi9i6zkjnez",
       "name": "Till",
-      "qty": 12,
+      "qty": 11,
       "price": 15,
       "image": ""
     },
@@ -73,7 +73,7 @@
       "cost": 0,
       "id": "mscyit0ucdiqmn",
       "name": "Sticker set táo",
-      "qty": 9,
+      "qty": 8,
       "price": 30,
       "image": ""
     },
@@ -95,7 +95,7 @@
       "cost": 0,
       "id": "mscyjcgmkf0auk",
       "name": "Mizi",
-      "qty": 5,
+      "qty": 4,
       "price": 30,
       "image": ""
     },
@@ -106,7 +106,7 @@
       "cost": 0,
       "id": "mscyjcgmnzw0y6",
       "name": "Ivan",
-      "qty": 7,
+      "qty": 6,
       "price": 30,
       "image": ""
     },
@@ -117,7 +117,7 @@
       "cost": 0,
       "id": "mscyjcgm6mmso9",
       "name": "Till",
-      "qty": 8,
+      "qty": 7,
       "price": 30,
       "image": ""
     },
@@ -194,7 +194,7 @@
       "cost": 0,
       "id": "mscyjt2e5zh1je",
       "name": "Luka",
-      "qty": 3,
+      "qty": 1,
       "price": 15,
       "image": ""
     },
@@ -213,44 +213,44 @@
       "category": "Strap sổ",
       "color": "purple",
       "collection": "Clique",
-      "cost": 0,
+      "cost": 13,
       "id": "mscz76tjciny21",
       "name": "A - Sky",
       "qty": 2,
-      "price": 20,
+      "price": 15,
       "image": ""
     },
     {
       "category": "Strap sổ",
       "color": "red",
       "collection": "Clique",
-      "cost": 0,
+      "cost": 13,
       "id": "mscz76tjdl3k53",
       "name": "B - Chocomint",
       "qty": 5,
-      "price": 20,
+      "price": 15,
       "image": ""
     },
     {
       "category": "Strap sổ",
       "color": "yellow",
       "collection": "Clique",
-      "cost": 0,
+      "cost": 13,
       "id": "mscz76tjhzx64z",
       "name": "C - Pink",
       "qty": 2,
-      "price": 20,
+      "price": 15,
       "image": ""
     },
     {
       "category": "Strap sổ",
       "color": "brown",
       "collection": "Clique",
-      "cost": 0,
+      "cost": 13,
       "id": "mscz76tj2a5ibg",
       "name": "D - Cream",
       "qty": 2,
-      "price": 20,
+      "price": 15,
       "image": ""
     },
     {
@@ -451,6 +451,105 @@
           "nameSnapshot": "B - Chocomint",
           "categorySnapshot": "Strap sổ",
           "priceSnapshot": 20,
+          "costSnapshot": 0
+        }
+      ]
+    },
+    {
+      "id": "msd2nk3zgatli7",
+      "name": "Sam Guenz",
+      "chips": [
+        {
+          "id": "msd2nk3zdjncv5",
+          "itemId": "mscyi9i6etm632",
+          "qty": 1,
+          "nameSnapshot": "Mizi",
+          "categorySnapshot": "Badge 3.2",
+          "priceSnapshot": 15,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2nk3zlu62o0",
+          "itemId": "mscyjcgmkf0auk",
+          "qty": 1,
+          "nameSnapshot": "Mizi",
+          "categorySnapshot": "Key strap",
+          "priceSnapshot": 30,
+          "costSnapshot": 0
+        }
+      ]
+    },
+    {
+      "id": "msd2nvf3f1kucy",
+      "name": "Pánh Moè",
+      "chips": [
+        {
+          "id": "msd2nvf385mn1f",
+          "itemId": "mscyit0ucdiqmn",
+          "qty": 1,
+          "nameSnapshot": "Sticker set táo",
+          "categorySnapshot": "Sticker",
+          "priceSnapshot": 30,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2nvf3lau15z",
+          "itemId": "mscyjcgmnzw0y6",
+          "qty": 1,
+          "nameSnapshot": "Ivan",
+          "categorySnapshot": "Key strap",
+          "priceSnapshot": 30,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2nvf3p2krne",
+          "itemId": "mscyjt2e5zh1je",
+          "qty": 1,
+          "nameSnapshot": "Luka",
+          "categorySnapshot": "Phonecharm",
+          "priceSnapshot": 15,
+          "costSnapshot": 0
+        }
+      ]
+    },
+    {
+      "id": "msd2ock7twwdej",
+      "name": "Ăn Thịt Người Già",
+      "chips": [
+        {
+          "id": "msd2ock7ig5s2z",
+          "itemId": "mscyi9i6o48u2n",
+          "qty": 1,
+          "nameSnapshot": "Ivan",
+          "categorySnapshot": "Badge 3.2",
+          "priceSnapshot": 15,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2ock7l2nd9z",
+          "itemId": "mscyi9i6zkjnez",
+          "qty": 1,
+          "nameSnapshot": "Till",
+          "categorySnapshot": "Badge 3.2",
+          "priceSnapshot": 15,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2ock7hlunmw",
+          "itemId": "mscyjcgm6mmso9",
+          "qty": 1,
+          "nameSnapshot": "Till",
+          "categorySnapshot": "Key strap",
+          "priceSnapshot": 30,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2ock77wyl1q",
+          "itemId": "mscyjt2e5zh1je",
+          "qty": 1,
+          "nameSnapshot": "Luka",
+          "categorySnapshot": "Phonecharm",
+          "priceSnapshot": 15,
           "costSnapshot": 0
         }
       ]
