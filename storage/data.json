@@ -29,7 +29,7 @@
       "cost": 0,
       "id": "mscyi9i6o48u2n",
       "name": "Ivan",
-      "qty": 12,
+      "qty": 11,
       "price": 15,
       "image": ""
     },
@@ -40,7 +40,7 @@
       "cost": 0,
       "id": "mscyi9i6zkjnez",
       "name": "Till",
-      "qty": 11,
+      "qty": 10,
       "price": 15,
       "image": ""
     },
@@ -227,7 +227,7 @@
       "cost": 13,
       "id": "mscz76tjdl3k53",
       "name": "B - Chocomint",
-      "qty": 5,
+      "qty": 4,
       "price": 15,
       "image": ""
     },
@@ -282,7 +282,7 @@
       "cost": 8,
       "id": "msd0s1py59zvwk",
       "name": "Ivan",
-      "qty": 6,
+      "qty": 5,
       "price": 35,
       "image": ""
     },
@@ -551,6 +551,54 @@
           "categorySnapshot": "Phonecharm",
           "priceSnapshot": 15,
           "costSnapshot": 0
+        }
+      ]
+    },
+    {
+      "id": "msd2rpbq41oezt",
+      "name": "Phan Thảo Vy",
+      "chips": [
+        {
+          "id": "msd2rpbq6zlesk",
+          "itemId": "msd0s1py59zvwk",
+          "qty": 1,
+          "nameSnapshot": "Ivan",
+          "categorySnapshot": "Standee",
+          "priceSnapshot": 35,
+          "costSnapshot": 8
+        }
+      ]
+    },
+    {
+      "id": "msd2rxu6snkxwi",
+      "name": "Chảo Dính",
+      "chips": [
+        {
+          "id": "msd2rxu6ubhlrk",
+          "itemId": "mscyi9i6o48u2n",
+          "qty": 1,
+          "nameSnapshot": "Ivan",
+          "categorySnapshot": "Badge 3.2",
+          "priceSnapshot": 15,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2rxu6kcumt2",
+          "itemId": "mscyi9i6zkjnez",
+          "qty": 1,
+          "nameSnapshot": "Till",
+          "categorySnapshot": "Badge 3.2",
+          "priceSnapshot": 15,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2rxu692wk2y",
+          "itemId": "mscz76tjdl3k53",
+          "qty": 1,
+          "nameSnapshot": "B - Chocomint",
+          "categorySnapshot": "Strap sổ",
+          "priceSnapshot": 15,
+          "costSnapshot": 13
         }
       ]
     }
