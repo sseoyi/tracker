@@ -117,7 +117,37 @@
       "qty": 0,
       "price": 15,
       "color": "brown",
-      "collection": "",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscwula6squ1au",
+      "name": "Sua",
+      "category": "Badge 3.2",
+      "qty": 3,
+      "price": 15,
+      "color": "purple",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscwur7y69uo8u",
+      "name": "Mizi",
+      "category": "Badge 3.2",
+      "qty": 5,
+      "price": 15,
+      "color": "pink",
+      "collection": "Clique",
+      "image": ""
+    },
+    {
+      "id": "mscwuxza512u27",
+      "name": "Ivan",
+      "category": "Badge 3.2",
+      "qty": 14,
+      "price": 15,
+      "color": "red",
+      "collection": "Clique",
       "image": ""
     }
   ],
@@ -127,6 +157,7 @@
   ],
   "categories": [
     "Key strap",
-    "Phonecharm"
+    "Phonecharm",
+    "Badge 3.2"
   ]
 }
