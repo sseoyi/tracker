@@ -367,16 +367,16 @@
   }
 
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-  const money = n => 'VNĐ' + (Math.round((n + Number.EPSILON) * 100) / 100).toFixed(2);
+  const money = n => (Math.round((n + Number.EPSILON) * 100) / 100).toFixed(2) + 'k';
   const findItem = id => state.items.find(i => i.id === id);
   const findCustomer = id => state.customers.find(c => c.id === id);
 
   const COLORS = ['purple','pink','red','mint','yellow','brown','gray','green'];
   const NAME_COLOR_MAP = { sua:'purple', mizi:'pink', ivan:'red', till:'mint', luka:'yellow', hyuna:'brown' };
-  function colorFg(key){ return `var(--clr-VNĐ{key || 'gray'}-fg)`; }
-  function colorBg(key){ return `var(--clr-VNĐ{key || 'gray'}-bg)`; }
+  function colorFg(key){ return `var(--clr-${key || 'gray'}-fg)`; }
+  function colorBg(key){ return `var(--clr-${key || 'gray'}-bg)`; }
   function colorDotHtml(key){
-    return key ? `<span class="color-dot" style="background:VNĐ{colorFg(key)}"></span>` : '';
+    return key ? `<span class="color-dot" style="background:${colorFg(key)}"></span>` : '';
   }
 
   // ---- custom confirm/toast (native confirm()/alert() are silently blocked
@@ -395,7 +395,7 @@
       backdrop.className = 'confirm-backdrop';
       backdrop.innerHTML = `
         <div class="confirm-box">
-          <div class="confirm-msg">VNĐ{escapeHtml(message)}</div>
+          <div class="confirm-msg">${escapeHtml(message)}</div>
           <div class="confirm-actions">
             <button class="btn btn-secondary" data-act="cancel" type="button">Cancel</button>
             <button class="btn btn-danger" data-act="ok" style="border-color:var(--danger);color:#fff;background:var(--danger);" type="button">Delete</button>
@@ -423,8 +423,8 @@
   }
   function avatarHtml(image, size, fallback){
     return image
-      ? `<img class="avatar" src="VNĐ{image}" style="width:VNĐ{size}px;height:VNĐ{size}px">`
-      : `<div class="avatar-ph" style="width:VNĐ{size}px;height:VNĐ{size}px">VNĐ{fallback}</div>`;
+      ? `<img class="avatar" src="${image}" style="width:${size}px;height:${size}px">`
+      : `<div class="avatar-ph" style="width:${size}px;height:${size}px">${fallback}</div>`;
   }
   function categoryOf(item){ return (item.category || '').trim() || 'Uncategorized'; }
 
@@ -456,7 +456,7 @@
   let colorManuallySet = false;
 
   const swatchRow = el('color-swatch-row');
-  swatchRow.innerHTML = COLORS.map(c => `<div class="swatch" data-color="VNĐ{c}" style="background:VNĐ{colorFg(c)}" title="VNĐ{c}"></div>`).join('');
+  swatchRow.innerHTML = COLORS.map(c => `<div class="swatch" data-color="${c}" style="background:${colorFg(c)}" title="${c}"></div>`).join('');
   function setColor(key, manual){
     form.color.value = key || '';
     if(manual) colorManuallySet = true;
@@ -480,7 +480,7 @@
     const reader = new FileReader();
     reader.onload = e => {
       pendingImage = e.target.result;
-      form.imgPreview.innerHTML = `<img src="VNĐ{pendingImage}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+      form.imgPreview.innerHTML = `<img src="${pendingImage}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
     };
     reader.readAsDataURL(file);
   });
@@ -535,7 +535,7 @@
     form.price.value = item.price;
     colorManuallySet = true; setColor(item.color || '', true);
     pendingImage = item.image || '';
-    form.imgPreview.innerHTML = item.image ? `<img src="VNĐ{item.image}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">` : '🖼️';
+    form.imgPreview.innerHTML = item.image ? `<img src="${item.image}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">` : '🖼️';
     form.title.textContent = 'Edit Item';
     form.cancelBtn.style.display = 'inline-block';
     form.name.focus();
@@ -560,7 +560,7 @@
 
   function refreshCategoryDatalist(){
     const cats = [...new Set(state.items.map(i => (i.category || '').trim()).filter(Boolean))].sort();
-    el('category-list').innerHTML = cats.map(c => `<option value="VNĐ{escapeHtml(c)}">`).join('');
+    el('category-list').innerHTML = cats.map(c => `<option value="${escapeHtml(c)}">`).join('');
   }
 
   function renderItems(){
@@ -572,14 +572,14 @@
     }
     manageEmptyEl.hidden = true;
     itemListEl.innerHTML = state.items.map(item => `
-      <div class="item-card" data-id="VNĐ{item.id}">
-        VNĐ{avatarHtml(item.image, 34, '📦')}
+      <div class="item-card" data-id="${item.id}">
+        ${avatarHtml(item.image, 34, '📦')}
         <div class="ic-info">
           <div class="ic-name-row">
-            <span class="ic-name">VNĐ{colorDotHtml(item.color)}VNĐ{escapeHtml(item.name)}</span>
-            <span class="ic-cat">VNĐ{escapeHtml(categoryOf(item))}</span>
+            <span class="ic-name">${colorDotHtml(item.color)}${escapeHtml(item.name)}</span>
+            <span class="ic-cat">${escapeHtml(categoryOf(item))}</span>
           </div>
-          <div class="ic-meta VNĐ{item.qty <= 0 ? 'low' : ''}">VNĐ{item.qty} in stock · VNĐ{money(item.price)} each</div>
+          <div class="ic-meta ${item.qty <= 0 ? 'low' : ''}">${item.qty} in stock · ${money(item.price)} each</div>
         </div>
         <div class="ic-actions">
           <button class="btn btn-secondary" data-action="edit" type="button">Edit</button>
@@ -607,17 +607,17 @@
       const items = groups.get(cat).slice().sort((a,b) => a.name.localeCompare(b.name));
       const rows = items.map(item => `
         <div class="cat-item-row">
-          <span class="name VNĐ{item.qty <= 0 ? 'out' : ''}">VNĐ{colorDotHtml(item.color)}VNĐ{escapeHtml(item.name)}</span>
-          <span class="qty-badge VNĐ{item.qty <= 0 ? 'zero' : ''}" style="VNĐ{item.qty > 0 ? `background:VNĐ{colorBg(item.color)};color:VNĐ{colorFg(item.color)}` : ''}">VNĐ{item.qty}</span>
+          <span class="name ${item.qty <= 0 ? 'out' : ''}">${colorDotHtml(item.color)}${escapeHtml(item.name)}</span>
+          <span class="qty-badge ${item.qty <= 0 ? 'zero' : ''}" style="${item.qty > 0 ? `background:${colorBg(item.color)};color:${colorFg(item.color)}` : ''}">${item.qty}</span>
         </div>
       `).join('');
       return `
         <details class="cat-box">
           <summary>
-            <span class="cat-name">VNĐ{escapeHtml(cat)}</span>
+            <span class="cat-name">${escapeHtml(cat)}</span>
             <span class="chev">▸</span>
           </summary>
-          <div class="cat-box-items">VNĐ{rows}</div>
+          <div class="cat-box-items">${rows}</div>
         </details>
       `;
     }).join('');
@@ -659,7 +659,7 @@
     if(!chip) return;
     const item = findItem(chip.itemId);
     if(!item) return;
-    if(item.qty <= 0) return showToast(`No more stock left for "VNĐ{item.name}".`);
+    if(item.qty <= 0) return showToast(`No more stock left for "${item.name}".`);
     item.qty -= 1;
     chip.qty += 1;
     saveState();
@@ -721,17 +721,17 @@
     }
     mainEmptyEl.hidden = true;
     custListEl.innerHTML = state.customers.map(cust => `
-      <div class="cust-row" data-id="VNĐ{cust.id}">
-        <span class="cust-name">VNĐ{escapeHtml(cust.name)}</span>
-        <span class="cust-total">VNĐ{money(custTotal(cust))}</span>
+      <div class="cust-row" data-id="${cust.id}">
+        <span class="cust-name">${escapeHtml(cust.name)}</span>
+        <span class="cust-total">${money(custTotal(cust))}</span>
         <div class="cust-chips">
-          VNĐ{cust.chips.map(chip => {
+          ${cust.chips.map(chip => {
             const item = findItem(chip.itemId);
             const name = item ? item.name : (chip.nameSnapshot || 'Removed item');
-            return `<span class="chip" data-id="VNĐ{chip.id}">
-              VNĐ{item && item.image ? avatarHtml(item.image, 16, '') : (item ? colorDotHtml(item.color) : '')}
-              VNĐ{escapeHtml(name)}
-              <span class="chip-qty">×VNĐ{chip.qty}</span>
+            return `<span class="chip" data-id="${chip.id}">
+              ${item && item.image ? avatarHtml(item.image, 16, '') : (item ? colorDotHtml(item.color) : '')}
+              ${escapeHtml(name)}
+              <span class="chip-qty">×${chip.qty}</span>
               <span class="round-btn ghost chip-x" data-action="shrink-chip">×</span>
             </span>`;
           }).join('')}
@@ -770,11 +770,11 @@
     pop.innerHTML = state.items.length === 0
       ? '<div class="picker-empty">No items yet. Add some in "Manage Items".</div>'
       : '<h3>Add item</h3>' + state.items.map(item => `
-          <div class="picker-item VNĐ{item.qty <= 0 ? 'disabled' : ''}" data-item-id="VNĐ{item.id}">
-            VNĐ{avatarHtml(item.image, 28, '📦')}
+          <div class="picker-item ${item.qty <= 0 ? 'disabled' : ''}" data-item-id="${item.id}">
+            ${avatarHtml(item.image, 28, '📦')}
             <div>
-              <div class="pi-name">VNĐ{colorDotHtml(item.color)}VNĐ{escapeHtml(item.name)}</div>
-              <div class="pi-meta">VNĐ{item.qty} left · VNĐ{money(item.price)}</div>
+              <div class="pi-name">${colorDotHtml(item.color)}${escapeHtml(item.name)}</div>
+              <div class="pi-meta">${item.qty} left · ${money(item.price)}</div>
             </div>
           </div>
         `).join('');
@@ -818,14 +818,14 @@
   let ghSettings = loadGhSettings();
 
   function ghPath(){
-    const folder = (ghSettings.folder || '').replace(/^\/+|\/+VNĐ/g, '');
+    const folder = (ghSettings.folder || '').replace(/^\/+|\/+$/g, '');
     return (folder ? folder + '/' : '') + 'data.json';
   }
   function ghApiUrl(){
-    return `https://api.github.com/repos/VNĐ{encodeURIComponent(ghSettings.owner)}/VNĐ{encodeURIComponent(ghSettings.repo)}/contents/VNĐ{ghPath()}`;
+    return `https://api.github.com/repos/${encodeURIComponent(ghSettings.owner)}/${encodeURIComponent(ghSettings.repo)}/contents/${ghPath()}`;
   }
   function ghRawUrl(){
-    return `https://raw.githubusercontent.com/VNĐ{ghSettings.owner}/VNĐ{ghSettings.repo}/VNĐ{ghSettings.branch}/VNĐ{ghPath()}?_=VNĐ{Date.now()}`;
+    return `https://raw.githubusercontent.com/${ghSettings.owner}/${ghSettings.repo}/${ghSettings.branch}/${ghPath()}?_=${Date.now()}`;
   }
   function b64EncodeUnicode(str){
     return btoa(unescape(encodeURIComponent(str)));
@@ -846,14 +846,14 @@
   }
   function ghUpdatePathPreview(){
     const preview = document.getElementById('gh-path-preview');
-    if(preview) preview.value = `VNĐ{ghSettings.owner}/VNĐ{ghSettings.repo}/VNĐ{ghPath()} (branch: VNĐ{ghSettings.branch})`;
+    if(preview) preview.value = `${ghSettings.owner}/${ghSettings.repo}/${ghPath()} (branch: ${ghSettings.branch})`;
   }
 
   async function fetchDataJson(silent){
     try{
       if(!silent) ghSetStatus('Fetching latest data.json…');
       const res = await fetch(ghRawUrl(), { cache: 'no-store' });
-      if(!res.ok) throw new Error(`not found yet (HTTP VNĐ{res.status})`);
+      if(!res.ok) throw new Error(`not found yet (HTTP ${res.status})`);
       const parsed = JSON.parse(await res.text());
       if(!parsed || typeof parsed !== 'object') throw new Error('data.json was not valid JSON');
       state.items = (parsed.items || []).map(i => ({ category:'', color:'', ...i }));
@@ -882,20 +882,20 @@
     ghSetStatus('Publishing data.json to GitHub…');
     try{
       let sha;
-      const getRes = await fetch(ghApiUrl() + `?ref=VNĐ{encodeURIComponent(ghSettings.branch)}`, {
-        headers: { 'Authorization': `Bearer VNĐ{token}`, 'Accept': 'application/vnd.github+json' }
+      const getRes = await fetch(ghApiUrl() + `?ref=${encodeURIComponent(ghSettings.branch)}`, {
+        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
       });
       if(getRes.status === 200){
         sha = (await getRes.json()).sha;
       } else if(getRes.status === 401 || getRes.status === 403){
         throw new Error('token was rejected — check it has repo write access');
       } else if(getRes.status !== 404){
-        throw new Error(`GET failed (HTTP VNĐ{getRes.status})`);
+        throw new Error(`GET failed (HTTP ${getRes.status})`);
       }
 
       const content = JSON.stringify({ items: state.items, customers: state.customers }, null, 2);
       const body = {
-        message: `Update data.json — VNĐ{new Date().toISOString()}`,
+        message: `Update data.json — ${new Date().toISOString()}`,
         content: b64EncodeUnicode(content),
         branch: ghSettings.branch
       };
@@ -904,7 +904,7 @@
       const putRes = await fetch(ghApiUrl(), {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer VNĐ{token}`,
+          'Authorization': `Bearer ${token}`,
           'Accept': 'application/vnd.github+json',
           'Content-Type': 'application/json'
         },
@@ -912,7 +912,7 @@
       });
       if(!putRes.ok){
         const errBody = await putRes.json().catch(() => ({}));
-        throw new Error(errBody.message || `PUT failed (HTTP VNĐ{putRes.status})`);
+        throw new Error(errBody.message || `PUT failed (HTTP ${putRes.status})`);
       }
       ghSetStatus('Published data.json to GitHub ✓', 'ok');
       ghSetDot('ok');
