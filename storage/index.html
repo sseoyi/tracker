@@ -144,6 +144,9 @@
   /* ================= ORDER BOARD ================= */
   .toolbar{ display:flex; gap:8px; margin-bottom:10px; }
   .toolbar input{ flex:1; }
+  .new-cust-row{ border:1px dashed var(--border-strong); background:var(--accent-light); }
+  .new-cust-row .new-cust-input{ flex:1 1 130px; min-width:100px; border:none; background:transparent; padding:4px 2px; font-weight:700; font-size:.85rem; }
+  .new-cust-row .new-cust-input:focus{ border:none; }
   .cust-list{ display:flex; flex-direction:column; gap:6px; }
   .cust-row{
     display:flex; align-items:center; gap:8px; flex-wrap:wrap;
@@ -180,6 +183,9 @@
   .picker-item .pi-meta{ font-size:.7rem; color:var(--text-faint); font-weight:500; }
   .picker-item.disabled{ opacity:.4; cursor:not-allowed; pointer-events:none; }
   .picker-empty{ text-align:center; padding:16px; color:var(--text-faint); font-size:.8rem; }
+  .popover-back{ display:flex; align-items:center; gap:6px; padding:7px 8px; margin-bottom:2px; border-radius:var(--radius-sm); cursor:pointer; font-weight:700; font-size:.78rem; color:var(--text-muted); }
+  .popover-back:hover{ background:var(--accent-light); color:var(--accent-dark); }
+  .picker-item .pi-meta.zero{ color:var(--danger); }
 
   /* ================= MANAGE ITEMS ================= */
   .mg-form{ border:1px solid var(--border); border-radius:var(--radius-md); padding:12px; margin-bottom:12px; }
@@ -278,9 +284,12 @@
         <div class="stock-grid" id="stock-grid"></div>
       </div>
 
-      <div class="toolbar">
-        <input id="new-cust-input" placeholder="New customer name..." type="text"/>
-        <button class="btn btn-primary" id="add-cust-btn" type="button">+ Add Customer</button>
+      <div class="cust-row new-cust-row" id="new-cust-row">
+        <input class="new-cust-input" id="new-cust-input" placeholder="Customer name..." type="text"/>
+        <div class="cust-chips" id="new-cust-chips">
+          <button class="round-btn fill add-chip-btn" data-action="open-picker-new" title="Add item" type="button">+</button>
+        </div>
+        <button class="btn btn-primary" id="add-cust-btn" type="button">Add Customer</button>
       </div>
       <div class="cust-list" id="cust-list"></div>
       <div class="empty-state" hidden id="main-empty">No customers yet — add one above to start tracking sales.</div>
@@ -875,17 +884,89 @@
   }
 
   // ================= ORDER BOARD =================
-  el('add-cust-btn').addEventListener('click', addCustomer);
-  el('new-cust-input').addEventListener('keydown', e => { if(e.key === 'Enter') addCustomer(); });
+  // ---- New-customer builder: items can be picked (with quantities) before
+  // the customer row is actually created. Stock is only deducted once
+  // "Add Customer" is pressed; until then, availability shown in the picker
+  // accounts for what's already been provisionally added here. ----
+  const pendingNewCust = { chips: [] }; // { id, itemId, qty }
+  const newCustChipsEl = el('new-cust-chips');
 
-  function addCustomer(){
+  function reservedQtyForNewCust(itemId){
+    return pendingNewCust.chips.filter(c => c.itemId === itemId).reduce((s, c) => s + c.qty, 0);
+  }
+  function newCustAvailable(item){
+    return item.qty - reservedQtyForNewCust(item.id);
+  }
+
+  function renderNewCustChips(){
+    const chipsHtml = pendingNewCust.chips.map(chip => {
+      const item = findItem(chip.itemId);
+      if(!item) return '';
+      return `<span class="chip" data-id="${chip.id}">
+        ${item.image ? avatarHtml(item.image, 16, '') : colorDotHtml(item.color)}
+        ${escapeHtml(item.name)}
+        <span class="chip-qty">×${chip.qty}</span>
+        <span class="round-btn ghost chip-x" data-action="shrink-pending-chip">×</span>
+      </span>`;
+    }).join('');
+    newCustChipsEl.innerHTML = chipsHtml + `<button class="round-btn fill add-chip-btn" data-action="open-picker-new" title="Add item" type="button">+</button>`;
+  }
+
+  function addPendingChip(itemId){
+    const item = findItem(itemId);
+    if(!item) return;
+    if(newCustAvailable(item) <= 0) return showToast(`No more stock left for "${item.name}".`);
+    const existing = pendingNewCust.chips.find(c => c.itemId === itemId);
+    if(existing) existing.qty += 1;
+    else pendingNewCust.chips.push({ id: uid(), itemId, qty: 1 });
+    closePopover();
+    renderNewCustChips();
+  }
+  function bumpPendingChip(chipId){
+    const chip = pendingNewCust.chips.find(c => c.id === chipId);
+    const item = chip && findItem(chip.itemId);
+    if(!chip || !item) return;
+    if(newCustAvailable(item) <= 0) return showToast(`No more stock left for "${item.name}".`);
+    chip.qty += 1;
+    renderNewCustChips();
+  }
+  function shrinkPendingChip(chipId){
+    const chip = pendingNewCust.chips.find(c => c.id === chipId);
+    if(!chip) return;
+    chip.qty -= 1;
+    if(chip.qty <= 0) pendingNewCust.chips = pendingNewCust.chips.filter(c => c.id !== chipId);
+    renderNewCustChips();
+  }
+
+  newCustChipsEl.addEventListener('click', e => {
+    const addBtn = e.target.closest('[data-action="open-picker-new"]');
+    if(addBtn) return openPicker(addBtn, { onSelect: addPendingChip, availableQtyFn: newCustAvailable });
+    const xBtn = e.target.closest('[data-action="shrink-pending-chip"]');
+    if(xBtn) return shrinkPendingChip(xBtn.closest('.chip').dataset.id);
+    const chip = e.target.closest('.chip');
+    if(chip) return bumpPendingChip(chip.dataset.id);
+  });
+
+  el('add-cust-btn').addEventListener('click', finalizeNewCustomer);
+  el('new-cust-input').addEventListener('keydown', e => { if(e.key === 'Enter') finalizeNewCustomer(); });
+
+  function finalizeNewCustomer(){
     const input = el('new-cust-input');
     const name = input.value.trim();
-    if(!name) return;
-    state.customers.push({ id: uid(), name, chips: [] });
+    if(!name) return showToast('Please enter a customer name.');
+    const chips = pendingNewCust.chips.map(c => {
+      const item = findItem(c.itemId);
+      return { id: uid(), itemId: c.itemId, qty: c.qty, nameSnapshot: item ? item.name : 'Removed item', priceSnapshot: item ? item.price : 0 };
+    });
+    chips.forEach(c => { const item = findItem(c.itemId); if(item) item.qty -= c.qty; });
+    state.customers.push({ id: uid(), name, chips });
     input.value = '';
+    pendingNewCust.chips = [];
+    renderNewCustChips();
     saveState();
     renderCustomers();
+    renderItems();
+    renderStockOverview();
   }
 
   async function deleteCustomer(id){
@@ -955,7 +1036,7 @@
     if(delBtn) return deleteCustomer(custId);
 
     const addBtn = e.target.closest('[data-action="open-picker"]');
-    if(addBtn) return openPicker(addBtn, custId);
+    if(addBtn) return openPicker(addBtn, { onSelect: itemId => addChipToCustomer(custId, itemId) });
 
     const xBtn = e.target.closest('[data-action="shrink-chip"]');
     if(xBtn) return shrinkChip(custId, xBtn.closest('.chip').dataset.id);
@@ -1002,9 +1083,10 @@
     activePopover = null;
   }
 
-  function openPicker(anchorBtn, custId){
+  function openPicker(anchorBtn, { onSelect, availableQtyFn } = {}){
     closePopover();
     const rect = anchorBtn.getBoundingClientRect();
+    const availableQty = item => availableQtyFn ? availableQtyFn(item) : item.qty;
 
     const backdrop = document.createElement('div');
     backdrop.className = 'popover-backdrop';
@@ -1018,23 +1100,53 @@
     pop.style.top = top + 'px';
     pop.style.left = left + 'px';
 
-    pop.innerHTML = state.items.length === 0
-      ? '<div class="picker-empty">No items yet. Add some in "Manage Items".</div>'
-      : '<h3>Add item</h3>' + state.items.map(item => `
-          <div class="picker-item ${item.qty <= 0 ? 'disabled' : ''}" data-item-id="${item.id}">
+    const groups = groupItemsByCategory(state.items); // [{ name, items }]
+    const groupMap = new Map(groups.map(g => [g.name, g.items]));
+
+    function renderCategoryLevel(){
+      pop.innerHTML = groups.length === 0
+        ? '<div class="picker-empty">No items yet. Add some in "Manage Items".</div>'
+        : '<h3>Select item</h3>' + groups.map(g => {
+            const total = g.items.reduce((s, i) => s + availableQty(i), 0);
+            const rep = g.items.find(i => i.image) || g.items[0];
+            return `
+              <div class="picker-item ${total <= 0 ? 'disabled' : ''}" data-cat="${escapeHtml(g.name)}">
+                ${avatarHtml(rep.image, 28, '📦')}
+                <div>
+                  <div class="pi-name">${escapeHtml(g.name)}</div>
+                  <div class="pi-meta ${total <= 0 ? 'zero' : ''}">${g.items.length} model${g.items.length === 1 ? '' : 's'} · ${total} left</div>
+                </div>
+              </div>
+            `;
+          }).join('');
+    }
+
+    function renderModelLevel(catName){
+      const items = groupMap.get(catName) || [];
+      pop.innerHTML = `<div class="popover-back" data-action="back">← ${escapeHtml(catName)}</div>` + items.map(item => {
+        const q = availableQty(item);
+        return `
+          <div class="picker-item ${q <= 0 ? 'disabled' : ''}" data-item-id="${item.id}">
             ${avatarHtml(item.image, 28, '📦')}
             <div>
               <div class="pi-name">${colorDotHtml(item.color)}${escapeHtml(item.name)}</div>
-              <div class="pi-meta">${item.qty} left · ${money(item.price)}</div>
+              <div class="pi-meta ${q <= 0 ? 'zero' : ''}">${q} left · ${money(item.price)}</div>
             </div>
           </div>
-        `).join('');
+        `;
+      }).join('');
+    }
 
     pop.addEventListener('click', e => {
-      const row = e.target.closest('.picker-item');
-      if(row) addChipToCustomer(custId, row.dataset.itemId);
+      const back = e.target.closest('[data-action="back"]');
+      if(back) return renderCategoryLevel();
+      const catRow = e.target.closest('[data-cat]');
+      if(catRow) return renderModelLevel(catRow.dataset.cat);
+      const itemRow = e.target.closest('[data-item-id]');
+      if(itemRow && onSelect) return onSelect(itemRow.dataset.itemId);
     });
 
+    renderCategoryLevel();
     document.body.append(backdrop, pop);
     activePopover = { backdrop, pop };
   }
@@ -1226,6 +1338,7 @@
   el('gh-publish-btn').addEventListener('click', publishToGithub);
 
   // ---------- Init ----------
+  renderNewCustChips();
   renderCustomers();
   renderItems();
   renderStockOverview();
