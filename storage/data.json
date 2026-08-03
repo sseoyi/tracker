@@ -29,7 +29,7 @@
       "cost": 0,
       "id": "mscyi9i6o48u2n",
       "name": "Ivan",
-      "qty": 14,
+      "qty": 13,
       "price": 15,
       "image": ""
     },
@@ -40,7 +40,7 @@
       "cost": 0,
       "id": "mscyi9i6zkjnez",
       "name": "Till",
-      "qty": 13,
+      "qty": 12,
       "price": 15,
       "image": ""
     },
@@ -84,7 +84,7 @@
       "cost": 0,
       "id": "mscyjcgmwuzkmq",
       "name": "Sua",
-      "qty": 6,
+      "qty": 5,
       "price": 30,
       "image": ""
     },
@@ -227,7 +227,7 @@
       "cost": 0,
       "id": "mscz76tjdl3k53",
       "name": "B - Chocomint",
-      "qty": 6,
+      "qty": 5,
       "price": 20,
       "image": ""
     },
@@ -260,7 +260,7 @@
       "cost": 8,
       "id": "msd0s1py9dp0yu",
       "name": "Sua",
-      "qty": 2,
+      "qty": 1,
       "price": 35,
       "image": ""
     },
@@ -394,6 +394,63 @@
           "nameSnapshot": "Till",
           "categorySnapshot": "Standee",
           "priceSnapshot": 30,
+          "costSnapshot": 0
+        }
+      ]
+    },
+    {
+      "id": "msd2m7s7xbbx0z",
+      "name": "ThiênKim Giới Hào Môn",
+      "chips": [
+        {
+          "id": "msd2m7s7z0gtiw",
+          "itemId": "mscyjcgmwuzkmq",
+          "qty": 1,
+          "nameSnapshot": "Sua",
+          "categorySnapshot": "Key strap",
+          "priceSnapshot": 30,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2m7s72ofn4a",
+          "itemId": "msd0s1py9dp0yu",
+          "qty": 1,
+          "nameSnapshot": "Sua",
+          "categorySnapshot": "Standee",
+          "priceSnapshot": 35,
+          "costSnapshot": 8
+        }
+      ]
+    },
+    {
+      "id": "msd2ml07piyf68",
+      "name": "Đỗ HuyềnAnh",
+      "chips": [
+        {
+          "id": "msd2ml076ih33s",
+          "itemId": "mscyi9i6o48u2n",
+          "qty": 1,
+          "nameSnapshot": "Ivan",
+          "categorySnapshot": "Badge 3.2",
+          "priceSnapshot": 15,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2ml07kjv8xn",
+          "itemId": "mscyi9i6zkjnez",
+          "qty": 1,
+          "nameSnapshot": "Till",
+          "categorySnapshot": "Badge 3.2",
+          "priceSnapshot": 15,
+          "costSnapshot": 0
+        },
+        {
+          "id": "msd2ml07jd18c0",
+          "itemId": "mscz76tjdl3k53",
+          "qty": 1,
+          "nameSnapshot": "B - Chocomint",
+          "categorySnapshot": "Strap sổ",
+          "priceSnapshot": 20,
           "costSnapshot": 0
         }
       ]
