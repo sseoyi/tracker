@@ -38,6 +38,7 @@
 
   /* ---- Tabs ---- */
   .topbar{ padding:12px 0 10px; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .topbar-actions{ display:flex; align-items:center; gap:8px; }
   .gh-btn{ display:inline-flex; align-items:center; gap:6px; }
   .gh-btn .gh-dot{ width:7px; height:7px; border-radius:50%; background:var(--text-faint); flex-shrink:0; }
   .gh-btn .gh-dot.ok{ background:var(--accent); }
@@ -131,9 +132,28 @@
   .color-dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
   .qty-badge{ font-weight:700; border-radius:999px; padding:2px 8px; font-size:.72rem; flex-shrink:0; }
   .qty-badge.zero{ background:var(--danger-light); color:var(--danger); }
+  .qty-badge.low{ background:#fff3d6; color:#93650c; }
+  .cat-item-row.low-stock{ background:#fffaf0; border-radius:6px; padding-left:6px; padding-right:6px; margin:0 -6px; }
+  .stock-title-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; margin-bottom:6px; }
+  .stock-title-row .stock-section-title{ margin-bottom:0; }
+  .low-stock-setting{ display:flex; align-items:center; gap:5px; font-size:.68rem; font-weight:600; color:var(--text-muted); }
+  .low-stock-setting input{ width:42px; padding:3px 5px; font-size:.72rem; border:1px solid var(--border-strong); border-radius:6px; font-family:var(--font); }
+  .search-row{ margin:8px 0; }
+  .search-input{ width:100%; }
 
   /* collection chip-select */
   .chip-select-row{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  .dropdown-select-row{ display:flex; gap:6px; align-items:center; }
+  .dropdown-select{
+    flex:1; min-width:0; border:1px solid var(--border-strong); border-radius:var(--radius-sm); background:#fff;
+    padding:8px 10px; font-family:var(--font); font-size:.85rem; font-weight:600; color:var(--text);
+  }
+  .dropdown-select:focus{ outline:none; border-color:var(--accent); }
+  .dropdown-add-btn{ flex-shrink:0; padding:8px 14px; font-size:.8rem; }
+  .dropdown-add-input{
+    flex:1; min-width:0; border:1px solid var(--accent); border-radius:var(--radius-sm); padding:8px 10px;
+    font-family:var(--font); font-size:.85rem; font-weight:600;
+  }
   .coll-chip{
     display:inline-flex; align-items:center; gap:4px; border:1px solid var(--border-strong); background:#fff;
     border-radius:999px; padding:5px 12px; font-weight:600; font-size:.76rem; color:var(--text-muted); cursor:pointer;
@@ -146,8 +166,6 @@
     border-radius:999px; padding:5px 12px; font-weight:600; font-size:.76rem; color:var(--text-muted); cursor:pointer;
   }
   .coll-chip-add:hover{ border-color:var(--accent); color:var(--accent-dark); background:var(--accent-light); }
-  .dropdown-add-row{ display:flex; gap:8px; align-items:center; }
-  .dropdown-add-row .dropdown-add-input{ flex:1; }
   .coll-chip-input{
     border:1px solid var(--border-strong); border-radius:999px; padding:5px 12px; font-size:.76rem; font-weight:600;
     font-family:var(--font); width:120px;
@@ -194,6 +212,10 @@
   .profit-summary-box .ps-value{ font-size:1rem; font-weight:700; color:var(--text); }
   .profit-summary-box .ps-value.profit{ color:var(--teal-dark); }
   .expenses-block{ margin-top:10px; }
+  .profit-filter-row{ display:flex; align-items:center; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
+  .profit-filter-row .profit-date-input{ flex:1 1 120px; min-width:0; font-size:.76rem; padding:6px 8px; }
+  .profit-filter-row .profit-filter-sep{ color:var(--text-faint); font-size:.72rem; font-weight:600; flex-shrink:0; }
+  .profit-filter-row .btn{ flex-shrink:0; font-size:.72rem; padding:6px 10px; }
   .expenses-add-row{ display:flex; gap:6px; }
   .expenses-add-row .expense-name-input{ flex:1.4; min-width:0; }
   .expenses-add-row .expense-amount-input{ flex:1; min-width:70px; }
@@ -341,22 +363,37 @@
       <button aria-selected="true" class="tab" data-tab="main" type="button">Order Board</button>
       <button aria-selected="false" class="tab" data-tab="manage" type="button">Manage Items</button>
     </div>
-    <button class="btn btn-secondary gh-btn" id="gh-open-btn" title="GitHub Sync" type="button">
-      <span class="gh-dot" id="gh-dot"></span> GitHub
-    </button>
+    <div class="topbar-actions">
+      <button class="btn btn-primary gh-btn" id="quick-publish-btn" title="Publish data.json to GitHub" type="button">⇪ Publish</button>
+      <button class="btn btn-secondary gh-btn" id="gh-open-btn" title="GitHub Sync" type="button">
+        <span class="gh-dot" id="gh-dot"></span> GitHub
+      </button>
+    </div>
   </div>
 
   <main>
     <section class="view active" data-view="main">
       <div class="top-columns">
         <div class="stock-section panel panel-remaining">
-          <div class="stock-section-title">Remaining Stock</div>
+          <div class="stock-title-row">
+            <div class="stock-section-title">Remaining Stock</div>
+            <div class="low-stock-setting">
+              <label for="low-stock-input">Low stock ≤</label>
+              <input id="low-stock-input" min="0" type="number" value="3"/>
+            </div>
+          </div>
           <div class="coll-tabs-row" id="stock-coll-tabs"></div>
           <div class="stock-grid" id="stock-grid"></div>
         </div>
 
         <div class="stock-section panel panel-profit" id="profit-summary-section">
           <div class="stock-section-title">Overall Profit</div>
+          <div class="profit-filter-row">
+            <input class="profit-date-input" id="profit-from" type="date"/>
+            <span class="profit-filter-sep">to</span>
+            <input class="profit-date-input" id="profit-to" type="date"/>
+            <button class="btn btn-secondary" id="profit-filter-clear" type="button">All time</button>
+          </div>
           <div id="profit-summary"></div>
           <div class="expenses-block">
             <div class="expenses-add-row">
@@ -378,6 +415,9 @@
           </div>
           <button class="btn btn-primary" id="add-cust-btn" type="button">Add Customer</button>
         </div>
+        <div class="search-row">
+          <input class="search-input" id="cust-search-input" placeholder="Search customers..." type="text"/>
+        </div>
         <div class="coll-tabs-row" id="cust-coll-tabs"></div>
         <div class="cust-list" id="cust-list"></div>
         <div class="empty-state" hidden id="main-empty">No customers yet — add one above to start tracking sales.</div>
@@ -391,7 +431,7 @@
         <div class="field" style="margin-bottom:10px;">
           <label>Item</label>
           <input id="item-cat-input" type="hidden"/>
-          <div class="chip-select-row" id="category-chip-row"></div>
+          <div class="dropdown-select-row" id="category-dropdown-row"></div>
         </div>
         <div class="field" style="margin-bottom:10px;">
           <label>Models</label>
@@ -431,6 +471,9 @@
       </div>
 
       <div class="section-label">All Items</div>
+      <div class="search-row">
+        <input class="search-input" id="manage-search-input" placeholder="Search items..." type="text"/>
+      </div>
       <div class="coll-tabs-row" id="manage-coll-tabs"></div>
       <div class="item-list" id="item-list"></div>
       <div class="empty-state" hidden id="manage-empty">No items yet — add your first item above.</div>
@@ -503,12 +546,13 @@
         parsed.customers = parsed.customers || [];
         parsed.collections = parsed.collections || [];
         parsed.expenses = parsed.expenses || [];
+        parsed.lowStockThreshold = Number.isFinite(parsed.lowStockThreshold) ? parsed.lowStockThreshold : 3;
         const existingCats = [...new Set(parsed.items.map(i => (i.category || '').trim()).filter(Boolean))];
         parsed.categories = [...new Set([...(parsed.categories || []), ...existingCats])].sort((a,b) => a.localeCompare(b));
         return parsed;
       }
     }catch(e){}
-    return { items: [], customers: [], collections: [], categories: [], expenses: [] };
+    return { items: [], customers: [], collections: [], categories: [], expenses: [], lowStockThreshold: 3 };
   }
   function saveState(){
     try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
@@ -527,6 +571,12 @@
   const NAME_QUICK = ['Sua', 'Mizi', 'Ivan', 'Till', 'Luka', 'Hyuna'];
   function colorFg(key){ return `var(--clr-${key || 'gray'}-fg)`; }
   function colorBg(key){ return `var(--clr-${key || 'gray'}-bg)`; }
+  function lowStockThreshold(){ return Number.isFinite(state.lowStockThreshold) ? state.lowStockThreshold : 3; }
+  function qtyBadgeInfo(item){
+    if(item.qty <= 0) return { cls: 'zero', style: '' };
+    if(item.qty <= lowStockThreshold()) return { cls: 'low', style: '' };
+    return { cls: '', style: `background:${colorBg(item.color)};color:${colorFg(item.color)}` };
+  }
   function colorDotHtml(key){
     return key ? `<span class="color-dot" style="background:${colorFg(key)}"></span>` : '';
   }
@@ -587,6 +637,16 @@
   const itemListEl = el('item-list');
   const stockGridEl = el('stock-grid');
   const stockCollTabsEl = el('stock-coll-tabs');
+  const lowStockInput = el('low-stock-input');
+  lowStockInput.value = lowStockThreshold();
+  lowStockInput.addEventListener('change', () => {
+    const v = parseInt(lowStockInput.value, 10);
+    state.lowStockThreshold = Number.isFinite(v) && v >= 0 ? v : 3;
+    lowStockInput.value = state.lowStockThreshold;
+    saveState();
+    renderStockOverview();
+    renderItems();
+  });
   const manageCollTabsEl = el('manage-coll-tabs');
   const mainEmptyEl = el('main-empty');
   const manageEmptyEl = el('manage-empty');
@@ -655,57 +715,55 @@
     return { get, set, render };
   }
 
-  function makeDropdownPicker({ rowEl, inputEl, listKey }){
+  function makeDropdownPicker({ rowEl, inputEl, listKey, placeholder }){
     function get(){ return inputEl.value; }
-    function set(key){
-      inputEl.value = key || '';
-      render();
-    }
+    function set(key){ inputEl.value = key || ''; render(); }
     function render(addingNew){
-      const selected = inputEl.value;
       const options = state[listKey];
       if(addingNew){
         rowEl.innerHTML = `
-          <div class="dropdown-add-row">
-            <input class="dropdown-add-input" placeholder="New name..." type="text"/>
-            <button class="btn btn-secondary dropdown-add-cancel" type="button">Cancel</button>
-          </div>`;
+          <input class="dropdown-add-input" placeholder="${escapeHtml(placeholder || 'New name...')}" type="text"/>
+          <button class="btn btn-secondary dropdown-add-btn" data-action="cancel-add" type="button">Cancel</button>
+        `;
         const input = rowEl.querySelector('.dropdown-add-input');
         input.focus();
         const commit = () => {
           const val = input.value.trim();
-          if(val && !options.includes(val)){
-            options.push(val);
-            saveState();
+          if(val){
+            if(!options.includes(val)){ options.push(val); saveState(); }
+            inputEl.value = val;
           }
-          set(val || selected);
+          render(false);
         };
         input.addEventListener('keydown', e => {
           if(e.key === 'Enter'){ e.preventDefault(); commit(); }
           if(e.key === 'Escape'){ render(false); }
         });
         input.addEventListener('blur', commit);
-        rowEl.querySelector('.dropdown-add-cancel').addEventListener('click', () => render(false));
         return;
       }
-      const optionsHtml = ['<option value="">Select…</option>']
-        .concat(options.map(c => `<option ${c === selected ? 'selected' : ''} value="${escapeHtml(c)}">${escapeHtml(c)}</option>`))
-        .concat(['<option value="__add_new__">+ Add new…</option>'])
-        .join('');
-      rowEl.innerHTML = `<select class="dropdown-picker-select">${optionsHtml}</select>`;
+      const selected = inputEl.value;
+      rowEl.innerHTML = `
+        <select class="dropdown-select">
+          <option value="">${escapeHtml(placeholder || 'Select...')}</option>
+          ${options.map(c => `<option value="${escapeHtml(c)}"${c === selected ? ' selected' : ''}>${escapeHtml(c)}</option>`).join('')}
+        </select>
+        <button class="btn btn-secondary dropdown-add-btn" data-action="add-new" type="button">+ Add</button>
+      `;
     }
     rowEl.addEventListener('change', e => {
-      const sel = e.target.closest('.dropdown-picker-select');
-      if(!sel) return;
-      if(sel.value === '__add_new__'){ render(true); return; }
-      set(sel.value);
+      if(e.target.matches('select')) inputEl.value = e.target.value;
+    });
+    rowEl.addEventListener('click', e => {
+      if(e.target.closest('[data-action="add-new"]')){ render(true); return; }
+      if(e.target.closest('[data-action="cancel-add"]')){ render(false); }
     });
     render();
     return { get, set, render };
   }
 
   const collectionPicker = makeChipPicker({ rowEl: el('collection-chip-row'), inputEl: form.collection, listKey: 'collections' });
-  const categoryPicker = makeDropdownPicker({ rowEl: el('category-chip-row'), inputEl: form.cat, listKey: 'categories' });
+  const categoryPicker = makeDropdownPicker({ rowEl: el('category-dropdown-row'), inputEl: form.cat, listKey: 'categories', placeholder: 'Select item...' });
   function setCollection(key){ collectionPicker.set(key); }
   function setCategory(key){ categoryPicker.set(key); }
 
@@ -983,7 +1041,7 @@
         <div class="ic-info">
           <div class="ic-name-row">
             <span class="ic-name">${colorDotHtml(item.color)}${escapeHtml(item.name)}</span>
-            <span class="qty-badge ${item.qty <= 0 ? 'zero' : ''}" style="${item.qty > 0 ? `background:${colorBg(item.color)};color:${colorFg(item.color)}` : ''}">${item.qty}</span>
+            <span class="qty-badge ${qtyBadgeInfo(item).cls}" style="${qtyBadgeInfo(item).style}">${item.qty}</span>
             ${item.collection ? `<span class="ic-coll">${escapeHtml(item.collection)}</span>` : ''}
           </div>
           <div class="ic-meta ${item.qty <= 0 ? 'low' : ''}">Cost ${money(item.cost || 0)} · Price ${money(item.price)}</div>
@@ -1020,9 +1078,14 @@
       return;
     }
     manageEmptyEl.hidden = true;
-    const scopedItems = currentManageTab === 'all' ? state.items : state.items.filter(i => collectionOf(i) === currentManageTab);
+    let scopedItems = currentManageTab === 'all' ? state.items : state.items.filter(i => collectionOf(i) === currentManageTab);
+    if(manageSearchQuery){
+      scopedItems = scopedItems.filter(i =>
+        i.name.toLowerCase().includes(manageSearchQuery) || categoryOf(i).toLowerCase().includes(manageSearchQuery)
+      );
+    }
     if(scopedItems.length === 0){
-      itemListEl.innerHTML = '<div class="empty-state">No items in this collection.</div>';
+      itemListEl.innerHTML = `<div class="empty-state">${manageSearchQuery ? 'No items match your search.' : 'No items in this collection.'}</div>`;
       return;
     }
     const groups = groupItemsByCategory(scopedItems);
@@ -1078,12 +1141,15 @@
 
       return catNames.map(cat => {
         const items = groups.get(cat).slice().sort((a,b) => a.name.localeCompare(b.name));
-        const rows = items.map(item => `
-          <div class="cat-item-row">
+        const rows = items.map(item => {
+          const badge = qtyBadgeInfo(item);
+          return `
+          <div class="cat-item-row${badge.cls === 'low' ? ' low-stock' : ''}">
             <span class="name ${item.qty <= 0 ? 'out' : ''}">${colorDotHtml(item.color)}${escapeHtml(item.name)}</span>
-            <span class="qty-badge ${item.qty <= 0 ? 'zero' : ''}" style="${item.qty > 0 ? `background:${colorBg(item.color)};color:${colorFg(item.color)}` : ''}">${item.qty}</span>
+            <span class="qty-badge ${badge.cls}" style="${badge.style}">${item.qty}</span>
           </div>
-        `).join('');
+        `;
+        }).join('');
         const qtySummary = items.map(item =>
           `<span class="cat-qty-chip" style="color:${colorFg(item.color)}">${item.qty}</span>`
         ).join('<span class="cat-qty-sep">-</span>');
@@ -1201,7 +1267,7 @@
     if(!name) return showToast('Please enter a customer name.');
     const chips = pendingNewCust.chips.map(c => {
       const item = findItem(c.itemId);
-      return { id: uid(), itemId: c.itemId, qty: c.qty, nameSnapshot: item ? item.name : 'Removed item', categorySnapshot: item ? (item.category || '') : '', collectionSnapshot: item ? (item.collection || '') : '', priceSnapshot: item ? item.price : 0, costSnapshot: item ? (item.cost || 0) : 0 };
+      return { id: uid(), itemId: c.itemId, qty: c.qty, nameSnapshot: item ? item.name : 'Removed item', categorySnapshot: item ? (item.category || '') : '', collectionSnapshot: item ? (item.collection || '') : '', priceSnapshot: item ? item.price : 0, costSnapshot: item ? (item.cost || 0) : 0, dateAdded: new Date().toISOString() };
     });
     chips.forEach(c => { const item = findItem(c.itemId); if(item) item.qty -= c.qty; });
     state.customers.push({ id: uid(), name, chips });
@@ -1274,7 +1340,7 @@
     const item = findItem(itemId);
     if(!cust || !item || item.qty <= 0) return;
     item.qty -= 1;
-    cust.chips.push({ id: uid(), itemId, qty: 1, nameSnapshot: item.name, categorySnapshot: item.category || '', collectionSnapshot: item.collection || '', priceSnapshot: item.price, costSnapshot: item.cost || 0 });
+    cust.chips.push({ id: uid(), itemId, qty: 1, nameSnapshot: item.name, categorySnapshot: item.category || '', collectionSnapshot: item.collection || '', priceSnapshot: item.price, costSnapshot: item.cost || 0, dateAdded: new Date().toISOString() });
     saveState();
     closePopover();
     renderCustomers();
@@ -1284,6 +1350,12 @@
 
   let editingCustomerId = null;
   let currentCustTab = 'all';
+  let custSearchQuery = '';
+  const custSearchInput = el('cust-search-input');
+  custSearchInput.addEventListener('input', () => {
+    custSearchQuery = custSearchInput.value.trim().toLowerCase();
+    renderCustomers();
+  });
 
   function chipCollectionName(chip, item){
     if(item) return collectionOf(item);
@@ -1320,6 +1392,12 @@
 
   let currentStockTab = 'all';
   let currentManageTab = 'all';
+  let manageSearchQuery = '';
+  const manageSearchInput = el('manage-search-input');
+  manageSearchInput.addEventListener('input', () => {
+    manageSearchQuery = manageSearchInput.value.trim().toLowerCase();
+    renderItems();
+  });
   function renderStockCollTabs(){
     if(!stockCollTabsEl) return;
     const names = getCollectionTabNames();
@@ -1380,10 +1458,50 @@
     if(chip) return editing ? bumpChip(custId, chip.dataset.id) : undefined;
   });
 
-  function overallTotal(){ return state.customers.reduce((s, cust) => s + custTotal(cust), 0); }
-  function overallCost(){ return state.customers.reduce((s, cust) => s + custCost(cust), 0); }
-  function totalExpenses(){ return (state.expenses || []).reduce((s, ex) => s + (ex.amount || 0), 0); }
-  function overallProfit(){ return overallTotal() - overallCost() - totalExpenses(); }
+  function isWithinRange(iso, from, to){
+    if(!iso) return true;
+    const d = iso.slice(0, 10);
+    if(from && d < from) return false;
+    if(to && d > to) return false;
+    return true;
+  }
+  function overallTotal(from, to){
+    let sum = 0;
+    state.customers.forEach(cust => cust.chips.forEach(chip => {
+      if(!isWithinRange(chip.dateAdded, from, to)) return;
+      const item = findItem(chip.itemId);
+      const price = item ? item.price : (chip.priceSnapshot || 0);
+      sum += price * chip.qty;
+    }));
+    return sum;
+  }
+  function overallCost(from, to){
+    let sum = 0;
+    state.customers.forEach(cust => cust.chips.forEach(chip => {
+      if(!isWithinRange(chip.dateAdded, from, to)) return;
+      const item = findItem(chip.itemId);
+      const cost = item ? (item.cost || 0) : (chip.costSnapshot || 0);
+      sum += cost * chip.qty;
+    }));
+    return sum;
+  }
+  function totalExpenses(from, to){
+    return (state.expenses || []).filter(ex => isWithinRange(ex.date, from, to)).reduce((s, ex) => s + (ex.amount || 0), 0);
+  }
+  function overallProfit(from, to){ return overallTotal(from, to) - overallCost(from, to) - totalExpenses(from, to); }
+
+  let profitFrom = '';
+  let profitTo = '';
+  const profitFromInput = el('profit-from');
+  const profitToInput = el('profit-to');
+  const profitFilterClearBtn = el('profit-filter-clear');
+  profitFromInput.addEventListener('change', () => { profitFrom = profitFromInput.value; renderProfitSummary(); });
+  profitToInput.addEventListener('change', () => { profitTo = profitToInput.value; renderProfitSummary(); });
+  profitFilterClearBtn.addEventListener('click', () => {
+    profitFrom = ''; profitTo = '';
+    profitFromInput.value = ''; profitToInput.value = '';
+    renderProfitSummary();
+  });
 
   const expenseNameInput = el('expense-name-input');
   const expenseAmountInput = el('expense-amount-input');
@@ -1396,7 +1514,7 @@
     if(!name) return showToast('Please enter an expense name.');
     if(!(amount >= 0)) return showToast('Please enter a valid amount.');
     state.expenses = state.expenses || [];
-    state.expenses.push({ id: uid(), name, amount });
+    state.expenses.push({ id: uid(), name, amount, date: new Date().toISOString() });
     saveState();
     expenseNameInput.value = '';
     expenseAmountInput.value = '';
@@ -1422,12 +1540,12 @@
     if(!box) return;
     box.innerHTML = `
       <div class="profit-summary-box">
-        <div class="ps-item"><span class="ps-label">Revenue</span><span class="ps-value">${money(overallTotal())}</span></div>
-        <div class="ps-item"><span class="ps-label">Cost</span><span class="ps-value">${money(overallCost())}</span></div>
-        <div class="ps-item"><span class="ps-label">Profit</span><span class="ps-value profit">${money(overallProfit())}</span></div>
+        <div class="ps-item"><span class="ps-label">Revenue</span><span class="ps-value">${money(overallTotal(profitFrom, profitTo))}</span></div>
+        <div class="ps-item"><span class="ps-label">Cost</span><span class="ps-value">${money(overallCost(profitFrom, profitTo))}</span></div>
+        <div class="ps-item"><span class="ps-label">Profit</span><span class="ps-value profit">${money(overallProfit(profitFrom, profitTo))}</span></div>
       </div>
     `;
-    const expenses = state.expenses || [];
+    const expenses = (state.expenses || []).filter(ex => isWithinRange(ex.date, profitFrom, profitTo));
     expensesListEl.innerHTML = expenses.map(ex => `
       <div class="expense-row" data-id="${ex.id}">
         <span class="expense-name">${escapeHtml(ex.name)}</span>
@@ -1435,7 +1553,7 @@
         <button class="round-btn ghost expense-del" data-action="delete-expense" title="Remove expense" type="button">×</button>
       </div>
     `).join('') + (expenses.length ? `
-      <div class="expenses-total-row"><span>Total expenses</span><span>-${money(totalExpenses())}</span></div>
+      <div class="expenses-total-row"><span>Total expenses</span><span>-${money(totalExpenses(profitFrom, profitTo))}</span></div>
     ` : '');
   }
 
@@ -1448,11 +1566,14 @@
       return;
     }
     mainEmptyEl.hidden = true;
-    const visibleCustomers = currentCustTab === 'all'
+    let visibleCustomers = currentCustTab === 'all'
       ? state.customers
       : state.customers.filter(cust => custCollections(cust).has(currentCustTab));
+    if(custSearchQuery){
+      visibleCustomers = visibleCustomers.filter(cust => cust.name.toLowerCase().includes(custSearchQuery));
+    }
     if(visibleCustomers.length === 0){
-      custListEl.innerHTML = '<div class="empty-state">No customers in this collection yet.</div>';
+      custListEl.innerHTML = `<div class="empty-state">${custSearchQuery ? 'No customers match your search.' : 'No customers in this collection yet.'}</div>`;
       return;
     }
     custListEl.innerHTML = visibleCustomers.map(cust => {
@@ -1634,6 +1755,8 @@
       state.categories = [...new Set([...(parsed.categories || []), ...existingCats])].sort((a,b) => a.localeCompare(b));
       state.customers = parsed.customers || [];
       state.expenses = parsed.expenses || [];
+      state.lowStockThreshold = Number.isFinite(parsed.lowStockThreshold) ? parsed.lowStockThreshold : 3;
+      lowStockInput.value = state.lowStockThreshold;
       saveState();
       renderCustomers();
       renderItems();
@@ -1671,7 +1794,7 @@
         throw new Error(`GET failed (HTTP ${getRes.status})`);
       }
 
-      const content = JSON.stringify({ items: state.items, customers: state.customers, collections: state.collections, categories: state.categories, expenses: state.expenses }, null, 2);
+      const content = JSON.stringify({ items: state.items, customers: state.customers, collections: state.collections, categories: state.categories, expenses: state.expenses, lowStockThreshold: state.lowStockThreshold }, null, 2);
       const body = {
         message: `Update data.json — ${new Date().toISOString()}`,
         content: b64EncodeUnicode(content),
@@ -1746,6 +1869,7 @@
   });
   el('gh-fetch-btn').addEventListener('click', () => fetchDataJson(false));
   el('gh-publish-btn').addEventListener('click', publishToGithub);
+  el('quick-publish-btn').addEventListener('click', publishToGithub);
 
   // ---------- Init ----------
   renderNewCustChips();
