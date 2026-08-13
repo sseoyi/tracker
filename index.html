@@ -1251,6 +1251,36 @@ border-top:none!important;
 box-shadow:none!important;
 margin-top:0!important;
 }
+
+/* ---- Delete column button ---- */
+.manage-record-actions{ display:flex; flex-wrap:wrap; gap:10px; }
+.btn-danger-outline{
+  background:var(--danger-light); border:2px solid var(--danger); color:var(--danger);
+  font-family:'Quicksand',sans-serif; font-weight:700; font-size:0.88rem;
+  padding:10px 16px; border-radius:999px; cursor:pointer;
+  transition:transform .12s ease, background .12s ease;
+}
+.btn-danger-outline:hover{ background:var(--danger); color:#fff; transform:translateY(-1px); }
+
+/* ---- Floating quick-publish button ---- */
+.quick-publish-btn{
+  position:fixed; right:22px; bottom:22px; z-index:60;
+  display:inline-flex; align-items:center; gap:8px;
+  background:linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color:#fff; border:none; border-radius:999px; padding:14px 22px;
+  font-family:'Quicksand',sans-serif; font-weight:700; font-size:0.95rem;
+  box-shadow:0 14px 28px -10px rgba(31,159,112,0.55);
+  cursor:pointer; transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.quick-publish-btn:hover{ transform:translateY(-2px); }
+.quick-publish-btn:disabled{ opacity:.75; cursor:not-allowed; transform:none; }
+.quick-publish-btn.has-unsynced{
+  background:linear-gradient(135deg, var(--danger), #e0435b);
+  box-shadow:0 14px 28px -10px rgba(255,107,129,0.55);
+}
+@media (max-width:820px){
+  .quick-publish-btn{ right:14px; bottom:14px; padding:12px 18px; font-size:0.86rem; }
+}
 </style>
 
 </head>
@@ -1492,7 +1522,7 @@ Keyring sao Luka Hyuna</td><td>455</td><td>✔</td><td>455</td><td>0</td><td>Thi
 <div class="view-header">
 <h1 id="manage-db-name">Database</h1>
 <p class="subtitle" id="manage-db-sub">0 records · 0 columns</p>
-</div><div aria-label="Database management sections" class="admin-tab-nav manage-tab-nav" id="manage-record-tabs" role="tablist"><button aria-controls="manage-tab-panel-records" aria-selected="true" class="admin-tab-button manage-tab-button active" data-manage-tab-target="records" role="tab" tabindex="0" type="button">📋 Records</button><button aria-controls="manage-tab-panel-display" aria-selected="false" class="admin-tab-button manage-tab-button" data-manage-tab-target="display" role="tab" tabindex="-1" type="button">👁️ Display</button><button aria-controls="manage-tab-panel-links" aria-selected="false" class="admin-tab-button manage-tab-button" data-manage-tab-target="links" role="tab" tabindex="-1" type="button">🔗 Links</button><button aria-controls="manage-tab-panel-icon" aria-selected="false" class="admin-tab-button manage-tab-button" data-manage-tab-target="icon" role="tab" tabindex="-1" type="button">🖼️ Icon</button></div><div class="manage-tab-panel active" data-manage-tab="records" id="manage-tab-panel-records" role="tabpanel"><div class="manage-record-actions"><button class="btn-secondary" id="manage-add-column-btn" type="button">+ Add new column</button></div><div class="admin-section" style="margin-top:18px;">
+</div><div aria-label="Database management sections" class="admin-tab-nav manage-tab-nav" id="manage-record-tabs" role="tablist"><button aria-controls="manage-tab-panel-records" aria-selected="true" class="admin-tab-button manage-tab-button active" data-manage-tab-target="records" role="tab" tabindex="0" type="button">📋 Records</button><button aria-controls="manage-tab-panel-display" aria-selected="false" class="admin-tab-button manage-tab-button" data-manage-tab-target="display" role="tab" tabindex="-1" type="button">👁️ Display</button><button aria-controls="manage-tab-panel-links" aria-selected="false" class="admin-tab-button manage-tab-button" data-manage-tab-target="links" role="tab" tabindex="-1" type="button">🔗 Links</button><button aria-controls="manage-tab-panel-icon" aria-selected="false" class="admin-tab-button manage-tab-button" data-manage-tab-target="icon" role="tab" tabindex="-1" type="button">🖼️ Icon</button></div><div class="manage-tab-panel active" data-manage-tab="records" id="manage-tab-panel-records" role="tabpanel"><div class="manage-record-actions"><button class="btn-secondary" id="manage-add-column-btn" type="button">+ Add new column</button><button class="btn-danger-outline" id="manage-delete-column-btn" type="button">🗑 Delete column</button></div><div class="admin-section" style="margin-top:18px;">
 <h2><span class="section-icon">➕</span>Add New Record</h2>
 <p class="hint-text">The input fields stay hidden until you open the form.</p>
 <button class="btn-primary" id="open-add-row-modal-btn" style="width:100%;" type="button">+ Add New Record</button>
@@ -1568,6 +1598,7 @@ Keyring sao Luka Hyuna</td><td>455</td><td>✔</td><td>455</td><td>0</td><td>Thi
 </main>
 </div>
 </div>
+<button class="quick-publish-btn" hidden="" id="quick-publish-btn" title="Push the latest data to GitHub" type="button">🚀 <span id="quick-publish-btn-label">Publish</span></button>
 </div>
 <script id="embedded-data" type="application/json">[]</script>
 <script id="embedded-site-settings" type="application/json">{"coverImage":"assets/cover.png","mascotImage":"assets/icon.png"}</script>
@@ -2723,6 +2754,31 @@ Keyring sao Luka Hyuna</td><td>455</td><td>✔</td><td>455</td><td>0</td><td>Thi
     renderManageRows();
   });
 
+  document.getElementById('manage-delete-column-btn').addEventListener('click', function(){
+    const db = databases[manageDbIndex];
+    if(!db.columns.length){ alert('This database has no columns.'); return; }
+    if(db.columns.length <= 1){ alert('A database needs at least 1 column — cannot delete the last one.'); return; }
+    const list = db.columns.map((c, i) => (i + 1) + '. ' + c).join('\n');
+    const input = prompt('Type the EXACT name of the column to delete completely from this database (data in every record will be permanently erased, this cannot be undone):\n\n' + list);
+    if(input === null) return;
+    const trimmed = input.trim();
+    const col = db.columns.find(c => c.toLowerCase() === trimmed.toLowerCase());
+    if(!col){ alert('No column found with that exact name.'); return; }
+    if(!confirm('Delete column "' + col + '" and erase its data from all ' + db.rows.length + ' record(s)? This cannot be undone.')) return;
+    db.columns = db.columns.filter(c => c !== col);
+    db.rows.forEach(r => { delete r[col]; });
+    if(db.keyColumn === col) db.keyColumn = db.columns[0] || '';
+    if(db.statusColumn === col) db.statusColumn = '';
+    if(db.passwordColumn === col) db.passwordColumn = '';
+    db.publicColumns = (db.publicColumns || []).filter(c => c !== col);
+    db.lockedColumns = (db.lockedColumns || []).filter(c => c !== col);
+    saveDatabases();
+    renderManageRows();
+    renderAdminDbList();
+    renderSelectList();
+    alert('Column "' + col + '" was deleted.');
+  });
+
 
   function fileToDataUrl(file){
     return new Promise((resolve, reject) => {
@@ -2996,8 +3052,8 @@ Keyring sao Luka Hyuna</td><td>455</td><td>✔</td><td>455</td><td>0</td><td>Thi
   }
   function updateUnsyncedBanner(){
     const el = document.getElementById('unsynced-banner');
-    if(!el) return;
-    el.hidden = !hasUnpushedChanges;
+    if(el) el.hidden = !hasUnpushedChanges;
+    updateQuickPublishBtn();
   }
   document.getElementById('gh-save-settings-btn').addEventListener('click', function(){
     const settings = {
@@ -3009,19 +3065,31 @@ Keyring sao Luka Hyuna</td><td>455</td><td>✔</td><td>455</td><td>0</td><td>Thi
     localStorage.setItem(GITHUB_SETTINGS_KEY, JSON.stringify(settings));
     document.getElementById('gh-status').textContent = 'Settings saved in this browser.';
   });
-  document.getElementById('gh-push-btn').addEventListener('click', async function(){
-    const pushBtn = this;
+  // Shared push routine used by both the "Push data.json to GitHub" button in
+  // the Data Manage tab and the floating quick-publish button (visible anywhere
+  // once logged in as admin). Reads settings via getEffectiveGithubSettings()
+  // so it works even if the Data Manage tab has never been opened this session.
+  async function pushDataToGithub(triggerBtn){
+    const isQuickBtn = triggerBtn && triggerBtn.id === 'quick-publish-btn';
+    const quickLabel = document.getElementById('quick-publish-btn-label');
     const statusEl = document.getElementById('gh-status');
-    const token = document.getElementById('gh-token').value.trim();
-    const repo = document.getElementById('gh-repo').value.trim();
-    const branch = document.getElementById('gh-branch').value.trim() || 'main';
-    const path = document.getElementById('gh-path').value.trim() || 'data.json';
-    if(!token || !repo){ statusEl.textContent = 'Please fill in the token and repo fields first.'; return; }
-    if(pushBtn.disabled) return;
-    pushBtn.disabled = true;
-    const originalLabel = pushBtn.textContent;
-    pushBtn.textContent = '⏳ Pushing...';
-    statusEl.textContent = 'Pushing to GitHub...';
+    const settings = getEffectiveGithubSettings();
+    const token = (settings.token || '').trim();
+    const repo = (settings.repo || '').trim();
+    const branch = (settings.branch || '').trim() || 'main';
+    const path = (settings.path || '').trim() || 'data.json';
+    if(!token || !repo){
+      const msg = 'Please fill in the GitHub token and repo first (Admin → Data Manage → Publish data.json to GitHub).';
+      if(statusEl) statusEl.textContent = msg;
+      alert(msg);
+      return;
+    }
+    if(triggerBtn.disabled) return;
+    triggerBtn.disabled = true;
+    const originalLabel = triggerBtn.textContent;
+    if(isQuickBtn && quickLabel) quickLabel.textContent = 'Publishing...';
+    else triggerBtn.textContent = '⏳ Pushing...';
+    if(statusEl) statusEl.textContent = 'Pushing to GitHub...';
     const apiUrl = `https://api.github.com/repos/${repo}/contents/${encodeURIComponent(path)}`;
     try{
       // 1) Check whether the file already exists, to get its sha (required for updates).
@@ -3049,19 +3117,38 @@ Keyring sao Luka Hyuna</td><td>455</td><td>✔</td><td>455</td><td>0</td><td>Thi
         })
       });
       if(putRes.status === 200 || putRes.status === 201){
-        statusEl.textContent = '✅ Pushed successfully to ' + repo + '/' + path + ' (' + branch + ').';
+        if(statusEl) statusEl.textContent = '✅ Pushed successfully to ' + repo + '/' + path + ' (' + branch + ').';
         clearUnsynced();
+        if(isQuickBtn && quickLabel){
+          quickLabel.textContent = 'Published!';
+          setTimeout(() => { quickLabel.textContent = 'Publish'; }, 2000);
+        }
       } else {
         const errData = await putRes.json().catch(() => ({}));
         throw new Error('PUT failed (' + putRes.status + '): ' + (errData.message || 'unknown error'));
       }
     }catch(err){
-      statusEl.textContent = '❌ ' + err.message;
+      if(statusEl) statusEl.textContent = '❌ ' + err.message;
+      if(isQuickBtn){
+        if(quickLabel) quickLabel.textContent = 'Publish';
+        alert('❌ Publish failed: ' + err.message);
+      }
     }finally{
-      pushBtn.disabled = false;
-      pushBtn.textContent = originalLabel;
+      triggerBtn.disabled = false;
+      if(!isQuickBtn) triggerBtn.textContent = originalLabel;
     }
-  });
+  }
+
+  document.getElementById('gh-push-btn').addEventListener('click', function(){ pushDataToGithub(this); });
+
+  // ---- Floating quick-publish button: visible anywhere once logged in as admin ----
+  function updateQuickPublishBtn(){
+    const btn = document.getElementById('quick-publish-btn');
+    if(!btn) return;
+    btn.hidden = !isAdminAuthed;
+    btn.classList.toggle('has-unsynced', hasUnpushedChanges);
+  }
+  document.getElementById('quick-publish-btn').addEventListener('click', function(){ pushDataToGithub(this); });
 
   document.getElementById('brand-text-save-btn').addEventListener('click', function(){
     const val = document.getElementById('brand-text-input').value.trim() || 'Order at Seoyi';
@@ -3083,6 +3170,7 @@ Keyring sao Luka Hyuna</td><td>455</td><td>✔</td><td>455</td><td>0</td><td>Thi
       fillGithubSettingsInputs();
       fillBrandTextInput();
       updateUnsyncedBanner();
+      updateQuickPublishBtn();
       activateAdminTab('databases', false);
     } else {
       document.getElementById('admin-login-error').hidden = false;
