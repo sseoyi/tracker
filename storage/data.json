@@ -29,7 +29,7 @@
       "cost": 5,
       "id": "mscyi9i6o48u2n",
       "name": "Ivan",
-      "qty": 4,
+      "qty": 3,
       "price": 15,
       "image": ""
     },
@@ -40,7 +40,7 @@
       "cost": 5,
       "id": "mscyi9i6zkjnez",
       "name": "Till",
-      "qty": 3,
+      "qty": 2,
       "price": 15,
       "image": ""
     },
@@ -84,7 +84,7 @@
       "cost": 10,
       "id": "mscyjcgmwuzkmq",
       "name": "Sua",
-      "qty": 2,
+      "qty": 1,
       "price": 30,
       "image": ""
     },
@@ -95,7 +95,7 @@
       "cost": 10,
       "id": "mscyjcgmkf0auk",
       "name": "Mizi",
-      "qty": 2,
+      "qty": 1,
       "price": 30,
       "image": ""
     },
@@ -441,36 +441,36 @@
       "image": ""
     },
     {
-      "id": "msde5oc36mh84y",
-      "name": "Till",
       "category": "Key",
-      "qty": 4,
-      "price": 20,
-      "cost": 0,
       "color": "mint",
       "collection": "Bunny",
+      "cost": 0,
+      "id": "msde5oc36mh84y",
+      "name": "Till",
+      "qty": 4,
+      "price": 20,
       "image": ""
     },
     {
-      "id": "msde69g3zb3h5t",
-      "name": "Hyunwoo",
       "category": "Key",
-      "qty": 2,
-      "price": 20,
-      "cost": 0,
       "color": "gray",
       "collection": "Crush",
+      "cost": 0,
+      "id": "msde69g3zb3h5t",
+      "name": "Hyunwoo",
+      "qty": 2,
+      "price": 20,
       "image": ""
     },
     {
-      "id": "msde69g327lmxi",
-      "name": "Sua",
       "category": "Key",
-      "qty": 1,
-      "price": 20,
-      "cost": 0,
       "color": "purple",
       "collection": "Crush",
+      "cost": 0,
+      "id": "msde69g327lmxi",
+      "name": "Sua",
+      "qty": 1,
+      "price": 20,
       "image": ""
     }
   ],
@@ -1339,6 +1339,62 @@
           "costSnapshot": 0
         }
       ]
+    },
+    {
+      "id": "msznu626mkt62r",
+      "name": "Ngoc Myw",
+      "chips": [
+        {
+          "id": "msznu626m7i0ud",
+          "itemId": "mscyi9i6o48u2n",
+          "qty": 1,
+          "nameSnapshot": "Ivan",
+          "categorySnapshot": "Badge 3.2",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 15,
+          "costSnapshot": 5,
+          "dateAdded": "2026-08-19T05:37:50.382Z"
+        },
+        {
+          "id": "msznu6266vlzjy",
+          "itemId": "mscyi9i6zkjnez",
+          "qty": 1,
+          "nameSnapshot": "Till",
+          "categorySnapshot": "Badge 3.2",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 15,
+          "costSnapshot": 5,
+          "dateAdded": "2026-08-19T05:37:50.382Z"
+        }
+      ]
+    },
+    {
+      "id": "msznv04mfraam6",
+      "name": "Emerald Suspect",
+      "chips": [
+        {
+          "id": "msznv04md4gm34",
+          "itemId": "mscyjcgmwuzkmq",
+          "qty": 1,
+          "nameSnapshot": "Sua",
+          "categorySnapshot": "Key strap",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 30,
+          "costSnapshot": 10,
+          "dateAdded": "2026-08-19T05:38:29.350Z"
+        },
+        {
+          "id": "msznv04mfmvxab",
+          "itemId": "mscyjcgmkf0auk",
+          "qty": 1,
+          "nameSnapshot": "Mizi",
+          "categorySnapshot": "Key strap",
+          "collectionSnapshot": "Clique",
+          "priceSnapshot": 30,
+          "costSnapshot": 10,
+          "dateAdded": "2026-08-19T05:38:29.350Z"
+        }
+      ]
     }
   ],
   "collections": [
@@ -1378,5 +1434,6 @@
       "name": "Card gift",
       "amount": 132
     }
-  ]
+  ],
+  "lowStockThreshold": 3
 }
